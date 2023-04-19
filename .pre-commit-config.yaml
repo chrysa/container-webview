@@ -1,0 +1,216 @@
+---
+default_language_version  :
+    python: python3.11
+fail_fast                 : false
+minimum_pre_commit_version: 3.2.2
+repos                     :
+  # - repo: meta
+  #   hooks:
+  #       - id: identity
+  #         stages:
+  #             - manual
+  #       - id: check-hooks-apply
+  #         stages:
+  #             - manual
+  #       - id: check-useless-excludes
+  #         stages:
+  #             - manual
+-   repo: local
+    hooks:
+    -   id: python-help-program
+        description: add python help to ReadMe
+        entry: scripts/pre_commit_hooks/python-get_program_help.py
+        language: python
+        name: python program help
+        stages:
+        -   manual
+        additional_dependencies:
+        -   PyYAML
+        -   graphviz
+        -   ipdb
+        -   ipython
+        -   prompt-toolkit
+        -   python-dotenv
+        -   termcolor
+    -   id: python-default-config
+        description: add python default config to ReadMe
+        entry: scripts/pre_commit_hooks/python-get_default_config.py
+        language: python
+        name: python default config
+        stages:
+        -   manual
+        additional_dependencies:
+        -   PyYAML
+        -   graphviz
+        -   ipdb
+        -   ipython
+        -   prompt-toolkit
+        -   python-dotenv
+        -   termcolor
+-   repo: https://github.com/hadolint/hadolint.git
+    rev: 024fd640378acd5d8218f77ec2c744826cdda5ce
+    hooks:
+    -   id: hadolint-docker
+        args: [--config=./config-tools/.hadolint.yaml]
+-   repo: https://github.com/asottile/setup-cfg-fmt
+    rev: 10cb23246c1579b5503217ad268b9983aa94d075
+    hooks:
+    -   id: setup-cfg-fmt
+-   repo: https://github.com/pre-commit/pygrep-hooks
+    rev: 646426822c4fa6e6d6c255430c35df08853b5140
+    hooks:
+    -   id: python-no-eval
+    -   id: python-no-log-warn
+    -   id: python-use-type-annotations
+    -   id: rst-backticks
+-   repo: https://github.com/MarcoGorelli/auto-walrus
+    rev: 803192698951433f710357b47982a23c63a07f4a
+    hooks:
+    -   id: auto-walrus
+-   repo: https://github.com/dannysepler/rm_unneeded_f_str
+    rev: df396a8bfdeced1a011c7d9d6787aa7f49ac8634
+    hooks:
+    -   id: rm-unneeded-f-str
+-   repo: https://github.com/asottile/pyupgrade
+    rev: f8932f0b87fa3688b219f7389bcf91537ae8a4d6
+    hooks:
+    -   id: pyupgrade
+        args: [--py3-only, --py39-plus]
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: 360f032546951b18410edad13ec51c7d6b8698e9
+    hooks:
+    -   id: reorder-python-imports
+        args: [--py37-plus, --application-directories=src]
+-   repo: https://github.com/psf/black
+    rev: 4b76a548153ed5e58e61c90d0f2e4d817fc19537
+    hooks:
+    -   id: black
+        args: [--config=./config-tools/black.toml]
+-   repo: https://github.com/asottile/blacken-docs
+    rev: f19d12cd8b1264c3264d2f8a5ce741ffbd939c33
+    hooks:
+    -   id: blacken-docs
+        additional_dependencies: [black]
+-   repo: https://github.com/asottile/dead
+    rev: c47fee556c6d98b12a95d130b2e4624de259ef12
+    hooks:
+    -   id: dead
+-   repo: https://github.com/pre-commit/mirrors-pylint
+    rev: a1b176a5ee919967cf01e87c0222bd64b94fe0de
+    hooks:
+    -   id: pylint
+        args: [--rcfile=./src/setup.cfg, --reports=no, --persistent=no, --score=no, --disable=E0401]
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.2.0
+    hooks:
+    -   id: mypy
+        args: [--config-file=./src/setup.cfg]
+-   repo: https://github.com/pycqa/flake8
+    rev: 4b011224b290db13178c8059034159fc333d6a6e
+    hooks:
+    -   id: flake8
+        args: [--config=./src/setup.cfg]
+-   repo: https://github.com/PyCQA/bandit
+    rev: 45619e0c8325fad08f0cbd74034e5161a16b1b4f
+    hooks:
+    -   id: bandit
+-   repo: https://github.com/econchick/interrogate
+    rev: 1e74611fc5296b0572b6bb11b480d43242c4ec49
+    hooks:
+    -   id: interrogate
+        args: [-vv, --ignore-init-method, --ignore-module, --fail-under=95, --color, --generate-badge=interogate.svg]
+#- repo: https://github.com/pre-commit/mirrors-eslint
+#  rev: v8.38.0
+#  hooks:
+#  - id: eslint
+#    args: [--config, code/.eslintrc.cjs]
+#    additional_dependencies:
+#    - eslint
+#    - svelte
+#    - typescript
+#    - eslint-plugin-svelte3
+#    - '@typescript-eslint/eslint-plugin'
+#    - '@typescript-eslint/parser'
+#    - eslint-config-prettier
+#- repo: https://github.com/pre-commit/mirrors-csslint
+#  rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
+#  hooks:
+#  - id: csslint
+#- repo: https://github.com/pre-commit/mirrors-csslint
+#  rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
+#  hooks:
+#  - id: csslint
+-   repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.31.0
+    hooks:
+    -   id: yamllint
+        args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
+-   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+    rev: 0.2.2
+    hooks:
+    -   id: yamlfmt
+        args: [--mapping, '4', --sequence, '4', --offset, '0', --colons, --width, '200']
+-   repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+    -   id: cmake-format
+        args: [-c, config-tools/.cmake-format.yaml]
+        files: Makefile
+    -   id: cmake-lint
+        args: [-c, config-tools/.cmake-format.yaml]
+        files: Makefile
+-   repo: https://github.com/frnmst/md-toc
+    rev: 8.1.9
+    hooks:
+    -   id: md-toc
+        stages:
+        -   manual
+-   repo: https://github.com/smian/pre-commit-makefile.git
+    rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
+    hooks:
+    -   id: makefile-doc
+        stages:
+        -   manual
+-   repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: 26bbe10a92b28874462d241817b2c1ff07220169
+    hooks:
+    -   id: markdownlint
+        args: [-c, config-tools/.markdownlint.yml, --fix]
+-   repo: https://github.com/executablebooks/mdformat
+    rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
+    hooks:
+    -   id: mdformat
+        # Optionally add plugins
+        additional_dependencies:
+        -   mdformat-gfm
+        -   mdformat-black
+-   repo: https://github.com/lovesegfault/beautysh.git
+    rev: 9845efc3ea3e86cc0d41465d720a47f521b2799c
+    hooks:
+    -   id: beautysh
+        args: [--indent-size, '4']
+-   repo: https://github.com/openstack/bashate.git
+    rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+    hooks:
+    -   id: bashate
+        args:
+        -   --ignore=E006,E020
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 84e478bc42d27f9c214de50dd331ca7602beb2f1
+    hooks:
+    -   id: check-json
+    -   id: check-yaml
+        args:
+        -   --allow-multiple-documents
+        files: .(yaml|yml)$
+    -   id: check-case-conflict
+    -   id: end-of-file-fixer
+    -   id: mixed-line-ending
+        args:
+        -   --fix=lf
+    -   id: pretty-format-json
+        args:
+        -   --indent=4
+        -   --autofix
+    -   id: trailing-whitespace
+    -   id: check-merge-conflict
