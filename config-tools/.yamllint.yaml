@@ -1,0 +1,16 @@
+---
+extends: default
+
+rules  :
+    colons:
+        max-spaces-before: 0
+        max-spaces-after: 1
+    commas:
+        max-spaces-before: 0
+        min-spaces-after: 1
+        max-spaces-after: 1
+    indentation:
+        level: warning
+        indent-sequences: consistent
+    line-length:
+        max: 200
