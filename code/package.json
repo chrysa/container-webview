@@ -1,0 +1,47 @@
+{
+    "browserslist": {
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ],
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ]
+    },
+    "dependencies": {
+        "build": "^0.1.4",
+        "npm": "^9.6.6",
+        "run": "^1.4.0",
+        "start": "^5.1.0"
+    },
+    "devDependencies": {
+        "@testing-library/jest-dom": "^5.16.5",
+        "@testing-library/react": "^13.4.0",
+        "@testing-library/user-event": "^13.5.0",
+        "cra-template": "1.2.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-scripts": "5.0.1",
+        "web-vitals": "^2.1.4"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "name": "docker-overview",
+    "private": true,
+    "scripts": {
+        "build": "react-scripts build",
+        "eject": "react-scripts eject",
+        "install-deps": "npm install --no-audit",
+        "outdated": "npm outdated",
+        "start": "react-scripts start",
+        "test": "react-scripts test"
+    },
+    "version": "0.1.0"
+}

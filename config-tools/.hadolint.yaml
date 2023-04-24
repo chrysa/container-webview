@@ -1,0 +1,17 @@
+---
+ignored          :
+-   DL3008
+-   DL3013
+-   DL3018
+-   DL3031
+-   DL3033
+-   DL4006
+-   SC2086
+-   SC2102
+
+trustedRegistries:
+-   docker.elastic.co
+-   docker.io
+-   ghcr.io
+-   registry.gitlab.com
+-   lscr.io
