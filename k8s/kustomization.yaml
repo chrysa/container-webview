@@ -18,11 +18,11 @@ resources:
   - ingress/ingressroute.yaml
 
 # Substitution d'images — mis à jour automatiquement par le CI/CD
-# (kustomize edit set image docker-overview-api=ghcr.io/OWNER/docker-overview-api:SHA)
+# (cd.yml injecte le SHA court via sed avant kubectl apply)
 images:
   - name: docker-overview-api
-    newName: ghcr.io/OWNER/docker-overview-api
+    newName: ghcr.io/chrysa/container-webview/api
     newTag: latest
   - name: docker-overview-frontend
-    newName: ghcr.io/OWNER/docker-overview-frontend
+    newName: ghcr.io/chrysa/container-webview/frontend
     newTag: latest

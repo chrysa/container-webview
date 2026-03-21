@@ -113,7 +113,8 @@ jobs:
     needs: [build-push-api, build-push-frontend]
     environment:
       name: production
-      url: https://docker-overview.example.com   # adapter selon votre hostname Traefik
+      # URL à adapter selon votre hostname Traefik (variable d'env DEPLOY_URL ou valeur fixe)
+      url: ${{ vars.DEPLOY_URL || 'https://docker-overview.example.com' }}
     permissions:
       contents: read
     steps:
