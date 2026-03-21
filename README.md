@@ -332,7 +332,7 @@ Je suis enthousiaste à l'idée de développer ce projet, et j'attends avec impa
 
 ```
 $ make help
-make[1]: Entering directory '/mnt/g/Mon Drive/dev/repos/-perso-/docker-overview-webui'
+make[1]: Entering directory '/home/anthony/Documents/perso/projects/docker-overview-webui'
 Hello to the `docker-overview-webui` Makefile
  	make [target] [args]
 
@@ -340,18 +340,19 @@ Hello to the `docker-overview-webui` Makefile
 | Rule                                               | Help                                                         | Usage                                              | dependencies                                                 | Service              |
 +====                                                +====                                                          +====                                                +====                                                          +====                  +
 | help                                               | display help                                                 |                                                    |                                                              |                      |
-| node-upgradable-package                            | check outdated packages                                      |                                                    |                                                              |                      |
-| docker-build                                       | build image                                                  |                                                    |                                                              |                      |
-| docker-connect-dev                                 | connect-to-dev-server                                        |                                                    |                                                              |                      |
-| docker-stop                                        | stop services                                                |                                                    |                                                              |                      |
 | app-build                                          | build application                                            |                                                    |                                                              |                      |
 | app-clean                                          |                                                              |                                                    |                                                              |                      |
 | app-dev                                            | launch as dev                                                |                                                    |                                                              |                      |
 | app-prod                                           | launch as prod                                               |                                                    |                                                              |                      |
 | app-test                                           |                                                              |                                                    |                                                              |                      |
+| docker-build                                       | build image                                                  |                                                    |                                                              |                      |
+| docker-connect-dev                                 | connect-to-dev-server                                        |                                                    |                                                              |                      |
+| docker-stop                                        | stop services                                                |                                                    |                                                              |                      |
+| docker-up-detach                                   |                                                              |                                                    |                                                              |                      |
+| node-upgradable-package                            | check outdated packages                                      |                                                    |                                                              |                      |
 | ci-run-local                                       | run ci pipeline locally                                      |                                                    |                                                              |                      |
 | pre-commit                                         | run localy precommit                                         |                                                    |                                                              |                      |
-make[1]: Leaving directory '/mnt/g/Mon Drive/dev/repos/-perso-/docker-overview-webui'
+make[1]: Leaving directory '/home/anthony/Documents/perso/projects/docker-overview-webui'
 ```
 
 <!-- END makefile-doc -->

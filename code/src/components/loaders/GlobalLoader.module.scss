@@ -1,0 +1,16 @@
+@use "../../styles/mixins" as m;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  @include m.flex-center;
+  background: var(--bg);
+  z-index: var(--z-overlay);
+}
+
+.spinner {
+  @include m.spinner(48px, var(--primary));
+}

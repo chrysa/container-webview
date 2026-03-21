@@ -1,0 +1,60 @@
+@use "../../styles/mixins" as m;
+
+.node {
+  @include m.flex-column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 160px;
+  font-size: 12px;
+}
+
+.header {
+  @include m.flex-center-y;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.image {
+  color: var(--text-muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ports {
+  @include m.flex-center-y;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.port {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  font-size: 10px;
+  color: var(--primary);
+}
+
+.status {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

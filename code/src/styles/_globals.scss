@@ -1,0 +1,25 @@
+@use "./mixins" as *;
+@import "./reset";
+@import "./theme";
+@import "./variables";
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

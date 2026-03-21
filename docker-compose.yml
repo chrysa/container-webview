@@ -1,68 +1,132 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# Development stack
-#   api      : FastAPI + uvicorn --reload  (port 8000)
-#   frontend : React / CRA dev server      (port 3000)
-# ─────────────────────────────────────────────────────────────────────────────
+---
+# ═══════════════════════════════════════════════════════════
+#  Docker Overview WebUI — docker-compose.yml
+# ═══════════════════════════════════════════════════════════
+
+x-common: &common
+  restart: unless-stopped
+  volumes:
+    - source: /etc/localtime
+      target: /etc/localtime
+      type: bind
+      read_only: true
+
 services:
 
-  # ── FastAPI backend ──────────────────────────────────────────────────────
+  # ─── Backend FastAPI ─────────────────────────────────────
   api:
+    <<: *common
     build:
       context: ./api
       dockerfile: Dockerfile
-      target: dev
-    container_name: container-webview-api
-    env_file: .env
+    container_name: docker-overview-api
+    hostname: api
+    image: docker-overview-api:latest
     environment:
       PROJECTS_PATH: /projects
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+      LDAP_SERVER: ${LDAP_SERVER:-}
+      LDAP_BASE_DN: ${LDAP_BASE_DN:-}
+    volumes:
+      - source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+        read_only: true
+      - source: /etc/localtime
+        target: /etc/localtime
+        type: bind
+        read_only: true
+      - source: ${PROJECTS_PATH:-/opt/projects}
+        target: /projects
+        type: bind
+        read_only: true
+    expose:
+      - "8000"
     ports:
       - "8000:8000"
-    volumes:
-      # Hot-reload: mount source code
-      - ./api:/app
-      # Docker socket so the API can inspect running containers
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      # Mount a local directory that holds your docker-compose projects
-      - ${PROJECTS_PATH:-./data/projects}:/projects:ro
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
-  # ── FastAPI tests ────────────────────────────────────────────────────────
-  api-test:
+  # ─── Frontend (serve + React build) ──────────────────────
+  frontend:
+    <<: *common
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        # URL absolue de l'API vue depuis le navigateur
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    container_name: docker-overview-frontend
+    hostname: frontend
+    image: docker-overview-frontend:latest
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ─── Dev : API (hot-reload) ───────────────────────────────
+  api-dev:
     build:
       context: ./api
       dockerfile: Dockerfile
-      target: test
-    container_name: container-webview-api-test
+    container_name: docker-overview-api-dev
+    hostname: api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      PROJECTS_PATH: /projects
+      SECRET_KEY: dev-secret-key
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
     volumes:
-      - ./api:/app
-    environment:
-      SECRET_KEY: test-secret-key-for-ci
-      ADMIN_USERNAME: testuser
-      ADMIN_PASSWORD: testpass
-      PROJECTS_PATH: /tmp/projects
-    profiles: [test]
-
-  # ── React frontend (CRA dev server) ─────────────────────────────────────
-  frontend:
-    image: node:20-slim
-    container_name: container-webview-frontend
-    working_dir: /app
-    env_file: .env
-    environment:
-      WATCHPACK_POLLING: "true"
-      NODE_ENV: development
-      PORT: "3000"
-      REACT_APP_API_URL: "http://localhost:8000"
+      - source: ./api
+        target: /app
+        type: bind
+      - source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        type: bind
+        read_only: true
+      - source: /etc/localtime
+        target: /etc/localtime
+        type: bind
+        read_only: true
+      - source: ${PROJECTS_PATH:-/opt/projects}
+        target: /projects
+        type: bind
+        read_only: true
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+      - "8000:8000"
+    profiles:
+      - dev
+
+  # ─── Dev : Frontend (Vite HMR) ───────────────────────────
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    container_name: docker-overview-frontend-dev
+    hostname: frontend-dev
+    command: npm run dev
+    environment:
+      NODE_ENV: development
     volumes:
-      - ./code:/app
-      - frontend_node_modules:/app/node_modules
-    command: sh -c "npm install --legacy-peer-deps && npm start"
-    depends_on:
-      - api
-    restart: unless-stopped
+      - source: ./code
+        target: /app
+        type: bind
+      - source: docker-overview-node-modules
+        target: /app/node_modules
+        type: volume
+    ports:
+      - "5173:5173"
+    profiles:
+      - dev
 
 volumes:
-  frontend_node_modules:
+  docker-overview-node-modules:
