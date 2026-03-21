@@ -1,0 +1,114 @@
+@use "../../styles/mixins" as m;
+
+.wrapper {
+  @include m.flex-column;
+  gap: 20px;
+}
+
+.summary {
+  display: flex;
+  gap: 16px;
+}
+
+.counter {
+  @include m.flex-center-y;
+  @include m.card;
+  gap: 10px;
+  padding: 16px 20px;
+  font-size: 15px;
+  flex: 1;
+
+  strong { font-size: 24px; }
+
+  &.critical { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+  &.warning  { color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); }
+  &.info     { color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
+}
+
+.list {
+  @include m.flex-column;
+  gap: 8px;
+}
+
+.alertRow {
+  @include m.flex-center-y;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+
+  &.critical {
+    border-left: 3px solid #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+  }
+  &.warning {
+    border-left: 3px solid #f59e0b;
+    background: rgba(245, 158, 11, 0.05);
+  }
+  &.info {
+    border-left: 3px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  .critical & { color: #ef4444; }
+  .warning  & { color: #f59e0b; }
+  .info     & { color: #3b82f6; }
+}
+
+.body {
+  @include m.flex-column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.topLine {
+  @include m.flex-center-y;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.level {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.project {
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.service {
+  color: var(--primary);
+  font-family: monospace;
+}
+
+.message {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.time {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.empty {
+  padding: 60px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.state {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}

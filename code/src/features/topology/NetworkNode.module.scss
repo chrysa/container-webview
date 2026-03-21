@@ -1,0 +1,20 @@
+@use "../../styles/mixins" as m;
+
+.node {
+  @include m.flex-center-y;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.icon {
+  font-size: 14px;
+}
+
+.label {
+  color: var(--text);
+  font-weight: 500;
+}

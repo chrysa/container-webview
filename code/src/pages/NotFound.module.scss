@@ -1,0 +1,31 @@
+@use "../styles/mixins" as m;
+
+.page {
+  @include m.flex-column;
+  @include m.flex-center;
+  gap: 12px;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.code {
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--border-strong);
+  line-height: 1;
+}
+
+.title {
+  font-size: var(--font-lg);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.back {
+  margin-top: 8px;
+  color: var(--primary);
+  font-size: var(--font-md);
+  @include m.smooth;
+
+  &:hover { text-decoration: underline; }
+}

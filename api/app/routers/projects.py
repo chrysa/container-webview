@@ -1,27 +1,20 @@
-from typing import Annotated
+from fastapi import APIRouter, HTTPException, Depends
+from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
-
-from app.constants import ERR_PROJECT_NOT_FOUND
-from app.security import security
-from app.services.project_manager import ProjectModel, project_manager
+from app.security import get_current_user
+from app.services.project_manager import list_projects, load_project, ProjectModel
 
 router = APIRouter()
 
-_CurrentUser = Annotated[dict, Depends(security.get_current_user)]
-_NOT_FOUND = {404: {"description": ERR_PROJECT_NOT_FOUND}}
+
+@router.get("", response_model=List[ProjectModel])
+def get_projects(_: dict = Depends(get_current_user)):
+    return list_projects()
 
 
-@router.get("", responses=_NOT_FOUND)
-def get_projects(_: _CurrentUser) -> list[ProjectModel]:
-    """List all discovered Compose projects."""
-    return project_manager.list_all()
-
-
-@router.get("/{project_id}", responses=_NOT_FOUND)
-def get_project(project_id: str, _: _CurrentUser) -> ProjectModel:
-    """Return a single Compose project by ID."""
-    project = project_manager.load(project_id)
+@router.get("/{project_id}", response_model=ProjectModel)
+def get_project(project_id: str, _: dict = Depends(get_current_user)):
+    project = load_project(project_id)
     if not project:
-        raise HTTPException(status_code=404, detail=ERR_PROJECT_NOT_FOUND)
+        raise HTTPException(status_code=404, detail="Projet introuvable")
     return project

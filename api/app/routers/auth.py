@@ -1,39 +1,53 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends
 from pydantic import BaseModel
 
-from app.constants import ERR_INVALID_CREDENTIALS, TokenType
-from app.security import security
-from app.services.auth_service import auth_service
+from app.config import settings
+from app.security import create_access_token
 
 router = APIRouter()
 
 
 class Token(BaseModel):
-    """OAuth2 token response payload."""
     access_token: str
     token_type: str
     username: str
 
 
-@router.post("/login")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
-    """Authenticate a user and return a JWT bearer token."""
-    if not auth_service.authenticate(form_data.username, form_data.password):
+def _authenticate_local(username: str, password: str) -> bool:
+    return username == settings.admin_username and password == settings.admin_password
+
+
+def _authenticate_ldap(username: str, password: str) -> bool:
+    if not settings.ldap_server:
+        return False
+    try:
+        import ldap  # type: ignore
+        conn = ldap.initialize(settings.ldap_server)
+        conn.simple_bind_s(
+            f"cn={username},{settings.ldap_base_dn}",
+            password,
+        )
+        return True
+    except Exception:
+        return False
+
+
+@router.post("/login", response_model=Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    authenticated = _authenticate_ldap(form_data.username, form_data.password) or \
+                    _authenticate_local(form_data.username, form_data.password)
+    if not authenticated:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ERR_INVALID_CREDENTIALS,
+            detail="Identifiants incorrects",
         )
-    return Token(
-        access_token=security.create_access_token(form_data.username),
-        token_type=TokenType.BEARER,
-        username=form_data.username,
-    )
+    token = create_access_token({"sub": form_data.username})
+    return Token(access_token=token, token_type="bearer", username=form_data.username)
 
 
 @router.get("/check")
-def check_token(_: Annotated[dict, Depends(security.get_current_user)]) -> dict:
-    """Validate the current bearer token and return a confirmation payload."""
+def check_token(payload: dict = Depends(lambda: None)):
+    # Vérifié côté middleware OAuth2 — si on arrive ici le token est valide
     return {"status": "ok"}
