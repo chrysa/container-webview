@@ -1,0 +1,52 @@
+@use "../../styles/mixins" as m;
+
+.header {
+  width: 100%;
+  height: 60px;
+  @include m.flex-between;
+  padding: 0 24px;
+  background: var(--header-bg);
+  color: var(--text-inverse);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  box-sizing: border-box;
+}
+
+.left {
+  @include m.flex-center-y;
+  gap: 8px;
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.right {
+  @include m.flex-center-y;
+  gap: 12px;
+}
+
+.username {
+  font-size: var(--font-sm);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  @include m.flex-center;
+  @include m.smooth;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+}

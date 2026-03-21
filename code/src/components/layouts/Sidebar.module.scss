@@ -1,0 +1,103 @@
+@use "../../styles/mixins" as m;
+
+.sidebar {
+  @include m.flex-column;
+  width: 200px;
+  min-height: 0;
+  flex-shrink: 0;
+  padding: 16px 12px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+  transition: width var(--transition-normal);
+  overflow: hidden;
+}
+
+.collapsed {
+  width: 60px;
+}
+
+.top {
+  @include m.flex-between;
+  margin-bottom: 20px;
+  min-height: 32px;
+}
+
+.logo {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.toggleBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  @include m.flex-center;
+  @include m.smooth;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+  }
+}
+
+.nav {
+  @include m.flex-column;
+  gap: 4px;
+  flex: 1;
+}
+
+.link {
+  @include m.flex-center-y;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+  white-space: nowrap;
+  @include m.smooth;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: white;
+  }
+}
+
+.separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 8px 0;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0 10px;
+  margin-bottom: 4px;
+}
+
+.footer {
+  @include m.flex-center-y;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  white-space: nowrap;
+}

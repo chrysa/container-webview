@@ -1,0 +1,42 @@
+# Traefik Middleware — StripPrefix pour retirer le préfixe /api
+# avant de transmettre la requête au backend FastAPI.
+# FastAPI monte ses routes sous /api donc ce middleware n'est PAS appliqué
+# par défaut ; décommenter si les routes FastAPI sont définies à la racine.
+#
+# apiVersion: traefik.io/v1alpha1
+# kind: Middleware
+# metadata:
+#   name: strip-api-prefix
+#   namespace: docker-overview
+# spec:
+#   stripPrefix:
+#     prefixes:
+#       - /api
+
+---
+# Middleware — Sécurité headers pour le frontend SPA
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: secure-headers
+  namespace: docker-overview
+spec:
+  headers:
+    frameDeny: true
+    browserXssFilter: true
+    contentTypeNosniff: true
+    referrerPolicy: "strict-origin-when-cross-origin"
+    customResponseHeaders:
+      X-Powered-By: ""
+
+---
+# Middleware — Redirection HTTP → HTTPS (à activer si TLS configuré)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: https-redirect
+  namespace: docker-overview
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

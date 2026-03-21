@@ -1,14 +1,21 @@
-docker-build: ## build image
-	@docker compose build --pull --no-cache --compress --force-rm
+docker-build: ## Construire toutes les images (production)
+	@docker compose build --pull --no-cache
 
-docker-connect-dev: ## connect-to-dev-server
-	@docker compose run --rm -it --entrypoint sh docker-overview-webui-dev
+docker-build-dev: ## Construire les images de développement
+	@docker compose --profile dev build --pull
 
-docker-stop: ## stop services
-	@docker compose stop
+docker-stop: ## Arrêter tous les services
+	@docker compose --profile dev stop
 
-docker-up: ## up service
-	@docker compose up docker-overview-webui
+docker-down: ## Arrêter et supprimer les containers
+	@docker compose --profile dev down
 
-docker-up-detach: ## up service and detach
-	@docker compose up --detach docker-overview-webui
+docker-ps: ## Lister les containers
+	@docker compose --profile dev ps
+
+docker-logs: ## Voir les logs (usage: make docker-logs SERVICE=api)
+	@docker compose logs --follow --tail=100 $(SERVICE)
+
+docker-clean: ## Supprimer images + volumes orphelins
+	@docker compose down --volumes --remove-orphans
+	@docker image prune -f
