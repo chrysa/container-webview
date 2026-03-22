@@ -339,6 +339,95 @@ export const ROUTES = {
 
 ---
 
+## API Constants — No Hardcoded URLs in Services (MANDATORY)
+
+**NEVER hardcode API path strings inside service methods or components.** All API endpoint paths must be declared in `src/constants/config.ts` and referenced by name.
+
+```typescript
+// ✅ CORRECT — paths declared as constants
+export const API_ROUTES = {
+  AUTH_LOGIN: '/api/auth/login',
+  PROJECTS: '/api/projects',
+  PROJECT_DETAIL: (id: string) => `/api/projects/${id}`,
+  PROJECT_METRICS: (id: string) => `/api/projects/${id}/metrics`,
+  PROJECT_TOPOLOGY: (id: string) => `/api/projects/${id}/topology`,
+  SERVICE_ACTION: (projectId: string, service: string, action: string) =>
+    `/api/projects/${projectId}/services/${service}/${action}`,
+  ALERTS: '/api/alerts',
+} as const
+
+// ✅ Service uses constant
+class ProjectService {
+  async getById(id: string): Promise<ProjectModel> {
+    return apiClient.get<ProjectModel>(API_ROUTES.PROJECT_DETAIL(id))
+  }
+}
+
+// ❌ FORBIDDEN — hardcoded string in service
+class ProjectService {
+  async getById(id: string): Promise<ProjectModel> {
+    return apiClient.get<ProjectModel>(`/api/projects/${id}`)  // ← FORBIDDEN
+  }
+}
+```
+
+---
+
+## HATEOAS — Discoverable Links from API (MANDATORY)
+
+When the backend returns HATEOAS `_links`, **always use the URLs provided by the API** rather than constructing them client-side. This decouples the frontend from API route changes.
+
+### Backend response pattern
+
+```json
+{
+  "id": "my-project",
+  "name": "My Project",
+  "_links": {
+    "self":     { "href": "/api/projects/my-project" },
+    "metrics":  { "href": "/api/projects/my-project/metrics" },
+    "topology": { "href": "/api/projects/my-project/topology" },
+    "alerts":   { "href": "/api/projects/my-project/alerts" }
+  }
+}
+```
+
+### Frontend usage pattern
+
+```typescript
+// src/types/api.ts — link envelope
+export interface HateoasLink {
+  href: string
+}
+
+export interface WithLinks {
+  _links?: Record<string, HateoasLink>
+}
+
+export interface ProjectModel extends WithLinks {
+  id: string
+  name: string
+  // ...
+}
+
+// ✅ CORRECT — use href from _links when available, fall back to constant
+class MetricsService {
+  async getMetrics(project: ProjectModel): Promise<ServiceMetrics[]> {
+    const url = project._links?.metrics?.href ?? API_ROUTES.PROJECT_METRICS(project.id)
+    return apiClient.get<ServiceMetrics[]>(url)
+  }
+}
+
+// ❌ FORBIDDEN — ignore _links and construct URL manually
+class MetricsService {
+  async getMetrics(project: ProjectModel): Promise<ServiceMetrics[]> {
+    return apiClient.get<ServiceMetrics[]>(`/api/projects/${project.id}/metrics`)
+  }
+}
+```
+
+---
+
 ## TypeScript: Types and Interfaces
 
 - All types/interfaces go in `src/types/` (no inline type declarations in components)

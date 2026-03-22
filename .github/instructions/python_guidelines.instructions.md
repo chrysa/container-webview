@@ -62,17 +62,78 @@ Docker Overview WebUI backend is built with FastAPI + Python 3.12+, Docker SDK, 
 
 ### Function and Method Design
 
-- **Single return point**: Use a variable to store the result; avoid multiple returns (RET)
+- **Single return point**: Use a variable to store the result; return **once at the end** (RET)
+- **`return None` and bare `return` are PROHIBITED**: Never write `return None` or `return` without a value. Always return via a result variable.
 - **Function length**: Keep functions focused and concise (typically < 20 lines)
 - **Parameter naming**: Use descriptive names that clearly indicate purpose
 - **Argument limits**: Maximum 10 arguments per function (PLR0913)
 - **Boolean parameters**: Avoid boolean positional arguments (FBT001/FBT002)
 - **Type annotations**: All public functions must have complete type hints (ANN)
 
+#### Single Return Point — Canonical Patterns
+
+**Pattern A — Nullable result (`-> T | None`)**:
+```python
+# ❌ PROHIBITED — multiple returns, return None
+def load(self, project_id: str) -> ProjectModel | None:
+    if invalid:
+        return None          # ← FORBIDDEN
+    if not found:
+        return None          # ← FORBIDDEN
+    return ProjectModel(...)
+
+# ✅ CORRECT — result variable, single return
+def load(self, project_id: str) -> ProjectModel | None:
+    project_model: ProjectModel | None = None
+    if not invalid and found:
+        project_model = ProjectModel(...)
+    return project_model
+```
+
+**Pattern B — `-> None` functions (no early exit)**:
+```python
+# ❌ PROHIBITED — bare return
+async def stream_logs(self, websocket: WebSocket) -> None:
+    if not authorized:
+        await websocket.close(code=4001)
+        return                           # ← FORBIDDEN
+    await websocket.accept()
+
+# ✅ CORRECT — try/except/else + if/else nesting, no return
+async def stream_logs(self, websocket: WebSocket) -> None:
+    try:
+        self._check_auth()
+    except HTTPException:
+        await websocket.close(code=4001)
+    else:
+        if not self._project_exists():
+            await websocket.close(code=4004)
+        else:
+            await websocket.accept()
+            await self._pipe_logs(websocket)
+```
+
+**Pattern C — List accumulator**:
+```python
+# ❌ PROHIBITED — early return []
+def list_all(self) -> list[ProjectModel]:
+    if not base.exists():
+        return []             # ← FORBIDDEN
+    ...
+
+# ✅ CORRECT — empty list initialised, guard as if-branch
+def list_all(self) -> list[ProjectModel]:
+    projects: list[ProjectModel] = []
+    if base.exists():
+        for entry in sorted(base.iterdir()):
+            ...
+    return projects
+```
+
 ### Control Flow
 
 - **Mapping over cascading**: Prefer dictionaries to cascades of if/elif for dispatch
-- **Early returns**: Use guard clauses to reduce nesting (RET)
+- **No early returns for None/empty**: See single return point patterns above
 - **Exception handling**: Handle specific exceptions, avoid bare `except:` (BLE001)
 - **Raise from**: Use `raise ... from ...` for exception chaining (B904)
 - **Security**: No hardcoded passwords or secrets (S105, S106)
@@ -196,6 +257,24 @@ ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
 - **List comprehensions**: Use when appropriate for readability and performance
 - **Generator expressions**: Use for memory-efficient iteration
 - **Built-in functions**: Leverage Python built-ins
+
+---
+
+## Build System (`pyproject.toml`)
+
+Always use `setuptools.build_meta` as the build backend. **Never** use `setuptools.backends.legacy:build` — that path was experimental and was removed in later setuptools releases, causing `BackendUnavailable` errors inside Docker.
+
+```toml
+# ✅ CORRECT
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ❌ BROKEN — BackendUnavailable: Cannot import 'setuptools.backends.legacy'
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+```
 
 ---
 
