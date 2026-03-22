@@ -14,7 +14,7 @@ from app.services.project_manager import project_manager
 if typing.TYPE_CHECKING:
     from docker.models.containers import Container
 
-_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
