@@ -207,6 +207,26 @@ api/app/tests/
 
 ---
 
+## Qualité du code
+
+Le backend respecte une conformité **zéro tolérance** aux violations Ruff :
+
+- **Zéro `# noqa`** et zéro `# type: ignore` — chaque violation est corrigée à la source
+- **Imports `force-single-line`** — un symbole par ligne d'import
+- **Point de retour unique** — chaque fonction stocke son résultat dans une variable et retourne en fin de corps
+- **100 % d'annotations de type** sur les fonctions et méthodes publiques
+- **`TYPE_CHECKING`** pour les imports destinés uniquement aux annotations (pas de surcoût runtime)
+- **Aucun `return None` ni `return` nu** — les fonctions `-> None` se terminent par fall-off
+
+```bash
+make api-lint        # Ruff linter (zéro tolérance)
+make api-format      # Ruff formatter
+make api-typecheck   # mypy
+make pre-commit      # Tous les hooks (ruff, mypy, hadolint, prettier…)
+```
+
+---
+
 ## Roadmap
 
 - [ ] Gestion dynamique des projets depuis le graphe

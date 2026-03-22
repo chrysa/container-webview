@@ -1,10 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 
 from app.constants import ERR_PROJECT_NOT_FOUND
 from app.security import security
-from app.services.metrics_service import ServiceMetrics, metrics_service
+from app.services.metrics_service import ServiceMetrics
+from app.services.metrics_service import metrics_service
 from app.services.project_manager import project_manager
 
 router = APIRouter()

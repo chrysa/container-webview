@@ -1,6 +1,6 @@
 import logging
 
-import ldap  # type: ignore[import]
+import ldap
 
 from app.config import get_settings
 

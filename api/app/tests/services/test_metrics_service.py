@@ -1,3 +1,4 @@
+import docker.errors
 import pytest
 
 from app.services.metrics_service import MetricsService
@@ -167,8 +168,6 @@ class TestMetricsService:
             When: Calling get_project_metrics()
             Then: Should return zeroed ServiceMetrics instead of raising
             """
-            import docker.errors
-
             container = mocker.MagicMock()
             container.short_id = "abc"
             container.status = "running"

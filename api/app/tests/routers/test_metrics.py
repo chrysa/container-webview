@@ -4,11 +4,16 @@ from app.services.metrics_service import ServiceMetrics
 def _make_metrics(service_name="web"):
     return ServiceMetrics(
         service=service_name,
+        container_id="abc123",
+        status="running",
         cpu_percent=12.5,
-        memory_mb=64.0,
-        memory_limit_mb=512.0,
-        rx_bytes=1024,
-        tx_bytes=2048,
+        mem_usage_mb=64.0,
+        mem_limit_mb=512.0,
+        mem_percent=12.5,
+        net_rx_mb=1.0,
+        net_tx_mb=0.5,
+        block_read_mb=0.0,
+        block_write_mb=0.0,
     )
 
 

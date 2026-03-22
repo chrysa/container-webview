@@ -5,7 +5,11 @@ import contextlib
 import logging
 import typing
 
-from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter
+from fastapi import HTTPException
+from fastapi import Query
+from fastapi import WebSocket
+from fastapi import WebSocketDisconnect
 
 from app.security import security
 from app.services.docker_client import docker_client
@@ -35,19 +39,16 @@ async def stream_logs(
         security.get_current_user(token)
     except HTTPException:
         await websocket.close(code=4001)
-        return
-
-    if not project_manager.load(project_id):
-        await websocket.close(code=4004)
-        return
-
-    container = docker_client.get_container_for_service(project_id, service_name)
-    if container is None:
-        await websocket.close(code=4004)
-        return
-
-    await websocket.accept()
-    await _pipe_logs(websocket, container, tail)
+    else:
+        if not project_manager.load(project_id):
+            await websocket.close(code=4004)
+        else:
+            container = docker_client.get_container_for_service(project_id, service_name)
+            if container is None:
+                await websocket.close(code=4004)
+            else:
+                await websocket.accept()
+                await _pipe_logs(websocket, container, tail)
 
 
 async def _pipe_logs(websocket: WebSocket, container: Container, tail: int) -> None:

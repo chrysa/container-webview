@@ -53,12 +53,13 @@ class ProjectManager:
     # ── Compose parsing helpers ─────────────────────────────────────────────
 
     @staticmethod
-    def _parse_compose(compose_path: Path) -> dict:
+    def _parse_compose(compose_path: Path) -> dict[str, object]:
+        """Read and parse a Compose YAML file."""
         with open(compose_path) as fh:
             return yaml.safe_load(fh) or {}
 
     @staticmethod
-    def _normalize_ports(raw) -> list[str]:
+    def _normalize_ports(raw: list | None) -> list[str]:
         if not raw:
             return []
         result = []
@@ -67,7 +68,7 @@ class ProjectManager:
         return result
 
     @staticmethod
-    def _normalize_list_or_dict_keys(raw) -> list[str]:
+    def _normalize_list_or_dict_keys(raw: list | dict | None) -> list[str]:
         """Work for both depends_on and networks which can be list or dict."""
         if not raw:
             return []
@@ -78,7 +79,8 @@ class ProjectManager:
         return []
 
     @staticmethod
-    def _normalize_volumes(raw) -> list[str]:
+    def _normalize_volumes(raw: list | None) -> list[str]:
+        """Extract host-side paths from all volume spec formats."""
         if not raw:
             return []
         result = []
@@ -90,13 +92,14 @@ class ProjectManager:
         return [v for v in result if v]
 
     @staticmethod
-    def _normalize_environment(raw) -> dict:
+    def _normalize_environment(raw: dict | list | None) -> dict[str, str]:
+        """Normalise both dict and KEY=VALUE list environment specs."""
         if not raw:
             return {}
         if isinstance(raw, dict):
             return {k: str(v) for k, v in raw.items() if v is not None}
         if isinstance(raw, list):
-            result = {}
+            result: dict[str, str] = {}
             for item in raw:
                 if "=" in item:
                     k, v = item.split("=", 1)
@@ -104,7 +107,7 @@ class ProjectManager:
             return result
         return {}
 
-    def _build_service(self, name: str, conf: dict) -> ServiceModel:
+    def _build_service(self, name: str, conf: dict[str, object]) -> ServiceModel:
         return ServiceModel(
             name=name,
             image=conf.get("image"),
@@ -120,47 +123,43 @@ class ProjectManager:
 
     def load(self, project_id: str) -> ProjectModel | None:
         """Return the parsed *ProjectModel* for *project_id*, or ``None`` if not found."""
+        project_model: ProjectModel | None = None
         try:
             project_dir = self._safe_project_path(project_id)
         except ValueError:
-            return None
+            project_dir = None
 
-        if not project_dir.is_dir():
-            return None
-
-        compose_file = next(
-            (c for c in self._COMPOSE_CANDIDATES if (project_dir / c).exists()),
-            None,
-        )
-        if not compose_file:
-            return None
-
-        data = self._parse_compose(project_dir / compose_file)
-        services = [
-            self._build_service(name, conf if isinstance(conf, dict) else {})
-            for name, conf in (data.get(self._YAML_KEY_SERVICES) or {}).items()
-        ]
-
-        return ProjectModel(
-            id=project_id,
-            name=project_id.replace("-", " ").replace("_", " ").title(),
-            path=str(project_dir),
-            compose_file=compose_file,
-            services=services,
-            networks=list((data.get(self._YAML_KEY_NETWORKS) or {}).keys()),
-        )
+        if project_dir is not None and project_dir.is_dir():
+            compose_file = next(
+                (c for c in self._COMPOSE_CANDIDATES if (project_dir / c).exists()),
+                None,
+            )
+            if compose_file:
+                data = self._parse_compose(project_dir / compose_file)
+                services = [
+                    self._build_service(name, conf if isinstance(conf, dict) else {})
+                    for name, conf in (data.get(self._YAML_KEY_SERVICES) or {}).items()
+                ]
+                project_model = ProjectModel(
+                    id=project_id,
+                    name=project_id.replace("-", " ").replace("_", " ").title(),
+                    path=str(project_dir),
+                    compose_file=compose_file,
+                    services=services,
+                    networks=list((data.get(self._YAML_KEY_NETWORKS) or {}).keys()),
+                )
+        return project_model
 
     def list_all(self) -> list[ProjectModel]:
         """Return all valid projects found under *projects_path*."""
         base = Path(get_settings().projects_path)
-        if not base.exists():
-            return []
-        projects = []
-        for entry in sorted(base.iterdir()):
-            if entry.is_dir():
-                project = self.load(entry.name)
-                if project:
-                    projects.append(project)
+        projects: list[ProjectModel] = []
+        if base.exists():
+            for entry in sorted(base.iterdir()):
+                if entry.is_dir():
+                    project = self.load(entry.name)
+                    if project:
+                        projects.append(project)
         return projects
 
 

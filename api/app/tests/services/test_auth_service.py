@@ -1,3 +1,4 @@
+import ldap
 import pytest
 
 from app.services.auth_service import AuthService
@@ -99,15 +100,13 @@ class TestAuthService:
             When: Calling _authenticate_ldap(...)
             Then: Should return False without propagating the exception
             """
-            import ldap as _ldap
-
             mock_settings = mocker.MagicMock(
                 ldap_server="ldap://ldap.example.com",
                 ldap_base_dn="dc=example,dc=com",
             )
             mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
             mock_conn = mocker.MagicMock()
-            mock_conn.simple_bind_s.side_effect = _ldap.LDAPError({"desc": "Invalid credentials"})
+            mock_conn.simple_bind_s.side_effect = ldap.LDAPError({"desc": "Invalid credentials"})
             mocker.patch("ldap.initialize", return_value=mock_conn)
 
             service = AuthService()
