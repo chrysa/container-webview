@@ -1,8 +1,8 @@
-from typing import Optional
+from __future__ import annotations
 
 from pydantic import BaseModel
 
-from app.constants import CONTAINER_RUNNING
+from app.constants import ContainerState
 from app.services.docker_client import docker_client
 from app.services.project_manager import ProjectModel, project_manager
 
@@ -21,33 +21,44 @@ _ID_PREFIX_DEP: str = "dep-"
 
 
 class NodePosition(BaseModel):
+    """2-D coordinates for a graph node."""
+
     x: float
     y: float
 
 
 class GraphNode(BaseModel):
+    """A node in the topology graph."""
+
     id: str
-    type: str  # "service" | "volume" | "network"
+    type: str  # "service" | "network"
     data: dict
     position: NodePosition
 
 
 class GraphEdge(BaseModel):
+    """A directed edge in the topology graph."""
+
     id: str
     source: str
     target: str
-    label: Optional[str] = None
+    label: str | None = None
     animated: bool = False
 
 
 class TopologyGraph(BaseModel):
+    """Full topology graph for a Compose project."""
+
     nodes: list[GraphNode]
     edges: list[GraphEdge]
 
 
 class TopologyService:
+    """Builds a topology graph from a Compose project definition."""
+
     @staticmethod
     def _network_color_map(networks: list[str]) -> dict[str, str]:
+        """Assign a distinct display colour to each network."""
         return {net: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, net in enumerate(networks)}
 
     @staticmethod
@@ -56,6 +67,7 @@ class TopologyService:
         project_id: str,
         color_map: dict[str, str],
     ) -> tuple[list[GraphNode], list[GraphEdge]]:
+        """Return service nodes and depends-on edges for a project."""
         nodes: list[GraphNode] = []
         edges: list[GraphEdge] = []
 
@@ -88,7 +100,7 @@ class TopologyService:
                     source=f"{_ID_PREFIX_SVC}{dep}",
                     target=f"{_ID_PREFIX_SVC}{svc.name}",
                     label=_EDGE_LABEL_DEPENDS_ON,
-                    animated=status == CONTAINER_RUNNING,
+                    animated=status == ContainerState.RUNNING,
                 ))
 
         return nodes, edges
@@ -98,6 +110,7 @@ class TopologyService:
         project: ProjectModel,
         color_map: dict[str, str],
     ) -> tuple[list[GraphNode], list[GraphEdge]]:
+        """Return network nodes and service-to-network membership edges."""
         nodes: list[GraphNode] = []
         edges: list[GraphEdge] = []
 
@@ -118,7 +131,8 @@ class TopologyService:
 
         return nodes, edges
 
-    def build(self, project_id: str) -> Optional[TopologyGraph]:
+    def build(self, project_id: str) -> TopologyGraph | None:
+        """Build and return the topology graph, or None if the project does not exist."""
         project = project_manager.load(project_id)
         if not project:
             return None

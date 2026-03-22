@@ -1,33 +1,58 @@
-# Docker Compose label keys (attached to every container by the Compose engine)
-COMPOSE_LABEL_PROJECT: str = "com.docker.compose.project"
-COMPOSE_LABEL_SERVICE: str = "com.docker.compose.service"
+from __future__ import annotations
 
-# Container lifecycle states (as returned by the Docker SDK)
-CONTAINER_EXITED: str = "exited"
-CONTAINER_RESTARTING: str = "restarting"
-CONTAINER_RUNNING: str = "running"
-CONTAINER_UNKNOWN: str = "unknown"
+import typing
+from enum import StrEnum
 
-# Docker health-check states
-HEALTH_UNHEALTHY: str = "unhealthy"
-HEALTH_STARTING: str = "starting"
+if typing.TYPE_CHECKING:
+    from typing import Final
 
-# Alert severity levels
-ALERT_INFO: str = "info"
-ALERT_WARNING: str = "warning"
-ALERT_CRITICAL: str = "critical"
 
-# HTTP error detail strings (user-facing)
-ERR_PROJECT_NOT_FOUND: str = "Project not found"
-ERR_SERVICE_NOT_FOUND: str = "Service '{}' not found"
-ERR_CONTAINER_NOT_FOUND: str = "No running container for '{}' (start via compose first)"
-ERR_UNKNOWN_ACTION: str = "Unknown action: {}"
-ERR_INVALID_TOKEN: str = "Invalid or expired token"
-ERR_INVALID_CREDENTIALS: str = "Invalid credentials"
+class DockerComposeLabel(StrEnum):
+    """Docker Compose metadata labels attached to every container."""
 
-# Auth
-TOKEN_TYPE_BEARER: str = "bearer"
-JWT_CLAIM_SUB: str = "sub"
+    PROJECT = "com.docker.compose.project"
+    SERVICE = "com.docker.compose.service"
 
-# OAuth2 token URL
-OAUTH2_TOKEN_URL: str = "/api/auth/login"
+
+class ContainerState(StrEnum):
+    """Container lifecycle states as returned by the Docker SDK."""
+
+    EXITED = "exited"
+    RESTARTING = "restarting"
+    RUNNING = "running"
+    UNKNOWN = "unknown"
+
+
+class HealthState(StrEnum):
+    """Docker healthcheck states."""
+
+    UNHEALTHY = "unhealthy"
+    STARTING = "starting"
+
+
+class AlertLevel(StrEnum):
+    """Alert severity levels."""
+
+    INFO = "info"
+    WARNING = "warning"
+    CRITICAL = "critical"
+
+
+class TokenType(StrEnum):
+    """OAuth2 token types."""
+
+    BEARER = "bearer"
+
+
+# ── Error message templates ────────────────────────────────────────────────
+# Use str.format() for interpolation where a {} placeholder is present.
+ERR_PROJECT_NOT_FOUND: Final[str] = "Project not found"
+ERR_SERVICE_NOT_FOUND: Final[str] = "Service '{}' not found"
+ERR_CONTAINER_NOT_FOUND: Final[str] = "No running container for '{}' (start via compose first)"
+ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
+ERR_INVALID_TOKEN: Final[str] = "Invalid or expired token"
+ERR_INVALID_CREDENTIALS: Final[str] = "Invalid credentials"
+
+# ── JWT / OAuth2 ───────────────────────────────────────────────────────────
+JWT_CLAIM_SUB: Final[str] = "sub"
+OAUTH2_TOKEN_URL: Final[str] = "/api/auth/login"

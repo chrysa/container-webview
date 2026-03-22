@@ -1,4 +1,4 @@
-from functools import lru_cache
+from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

@@ -1,11 +1,20 @@
-import asyncio
+from __future__ import annotations
 
-from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+import asyncio
+import contextlib
+import logging
+import typing
+
+from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from app.security import security
 from app.services.docker_client import docker_client
 from app.services.project_manager import project_manager
 
+if typing.TYPE_CHECKING:
+    from docker.models.containers import Container
+
+_logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -17,10 +26,14 @@ async def stream_logs(
     token: str = Query(...),
     tail: int = Query(100),
 ) -> None:
-    # Auth via query param (WebSocket does not support Authorization headers)
+    """Stream container logs over a WebSocket connection.
+
+    Authenticates via a `token` query parameter because WebSocket handshakes
+    do not carry the Authorization header.
+    """
     try:
-        security.get_current_user(token)  # raises HTTPException if invalid
-    except Exception:
+        security.get_current_user(token)
+    except HTTPException:
         await websocket.close(code=4001)
         return
 
@@ -34,6 +47,11 @@ async def stream_logs(
         return
 
     await websocket.accept()
+    await _pipe_logs(websocket, container, tail)
+
+
+async def _pipe_logs(websocket: WebSocket, container: Container, tail: int) -> None:
+    """Forward container log lines to the WebSocket until the client disconnects."""
     try:
         log_stream = container.logs(stream=True, follow=True, tail=tail, timestamps=True)
         for chunk in log_stream:
@@ -41,14 +59,7 @@ async def stream_logs(
             await websocket.send_text(line)
             await asyncio.sleep(0)
     except WebSocketDisconnect:
-        pass
-    except Exception as exc:
-        try:
-            await websocket.send_text(f"[ERROR] {exc}")
-        except Exception:
-            pass
+        _logger.debug("WebSocket client disconnected during log stream")
     finally:
-        try:
+        with contextlib.suppress(RuntimeError):
             await websocket.close()
-        except Exception:
-            pass
