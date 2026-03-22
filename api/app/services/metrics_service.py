@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 import docker.errors
@@ -64,17 +62,17 @@ class MetricsService:
         mem: dict = stats.get("memory_stats", {})
         mem_limit: int = max(mem.get("limit", 1), 1)
 
-        net_rx = net_tx = 0.0
-        for iface in stats.get("networks", {}).values():
-            net_rx += iface.get("rx_bytes", 0)
-            net_tx += iface.get("tx_bytes", 0)
+        network_rx_bytes = network_tx_bytes = 0.0
+        for network_interface in stats.get("networks", {}).values():
+            network_rx_bytes += network_interface.get("rx_bytes", 0)
+            network_tx_bytes += network_interface.get("tx_bytes", 0)
 
-        blk_read = blk_write = 0
-        for blk in stats.get("blkio_stats", {}).get("io_service_bytes_recursive") or []:
-            if blk.get("op") == _BLKIO_OP_READ:
-                blk_read += blk.get("value", 0)
-            elif blk.get("op") == _BLKIO_OP_WRITE:
-                blk_write += blk.get("value", 0)
+        block_read_bytes = block_write_bytes = 0
+        for block_stat in stats.get("blkio_stats", {}).get("io_service_bytes_recursive") or []:
+            if block_stat.get("op") == _BLKIO_OP_READ:
+                block_read_bytes += block_stat.get("value", 0)
+            elif block_stat.get("op") == _BLKIO_OP_WRITE:
+                block_write_bytes += block_stat.get("value", 0)
 
         return ServiceMetrics(
             service=service_name,
@@ -84,10 +82,10 @@ class MetricsService:
             mem_usage_mb=self._bytes_to_mb(mem.get("usage", 0)),
             mem_limit_mb=self._bytes_to_mb(mem.get("limit", 1)),
             mem_percent=round((mem.get("usage", 0) / mem_limit) * 100, 2),
-            net_rx_mb=self._bytes_to_mb(int(net_rx)),
-            net_tx_mb=self._bytes_to_mb(int(net_tx)),
-            block_read_mb=self._bytes_to_mb(blk_read),
-            block_write_mb=self._bytes_to_mb(blk_write),
+            net_rx_mb=self._bytes_to_mb(int(network_rx_bytes)),
+            net_tx_mb=self._bytes_to_mb(int(network_tx_bytes)),
+            block_read_mb=self._bytes_to_mb(block_read_bytes),
+            block_write_mb=self._bytes_to_mb(block_write_bytes),
         )
 
     def _zero_metrics(self, container) -> ServiceMetrics:

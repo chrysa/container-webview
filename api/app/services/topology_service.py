@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pydantic import BaseModel
 
 from app.constants import ContainerState
@@ -59,7 +57,7 @@ class TopologyService:
     @staticmethod
     def _network_color_map(networks: list[str]) -> dict[str, str]:
         """Assign a distinct display colour to each network."""
-        return {net: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, net in enumerate(networks)}
+        return {network_name: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, network_name in enumerate(networks)}
 
     @staticmethod
     def _service_nodes_and_edges(
@@ -71,34 +69,34 @@ class TopologyService:
         nodes: list[GraphNode] = []
         edges: list[GraphEdge] = []
 
-        for idx, svc in enumerate(project.services):
-            col, row = idx % _GRID_COLS, idx // _GRID_COLS
-            status: str = docker_client.get_container_status(project_id, svc.name)
+        for service_index, service in enumerate(project.services):
+            column_index, row_index = service_index % _GRID_COLS, service_index // _GRID_COLS
+            status: str = docker_client.get_container_status(project_id, service.name)
             bg_color: str = (
-                color_map.get(svc.networks[0], _DEFAULT_NODE_COLOR)
-                if svc.networks
+                color_map.get(service.networks[0], _DEFAULT_NODE_COLOR)
+                if service.networks
                 else _DEFAULT_NODE_COLOR
             )
 
             nodes.append(GraphNode(
-                id=f"{_ID_PREFIX_SVC}{svc.name}",
+                id=f"{_ID_PREFIX_SVC}{service.name}",
                 type=_NODE_TYPE_SERVICE,
-                position=NodePosition(x=100 + col * 280, y=100 + row * 200),
+                position=NodePosition(x=100 + column_index * 280, y=100 + row_index * 200),
                 data={
-                    "label": svc.name,
-                    "image": svc.image or "",
+                    "label": service.name,
+                    "image": service.image or "",
                     "status": status,
-                    "ports": svc.ports,
-                    "networks": svc.networks,
+                    "ports": service.ports,
+                    "networks": service.networks,
                     "bgColor": bg_color,
                 },
             ))
 
-            for dep in svc.depends_on:
+            for dependency_name in service.depends_on:
                 edges.append(GraphEdge(
-                    id=f"{_ID_PREFIX_DEP}{dep}-{svc.name}",
-                    source=f"{_ID_PREFIX_SVC}{dep}",
-                    target=f"{_ID_PREFIX_SVC}{svc.name}",
+                    id=f"{_ID_PREFIX_DEP}{dependency_name}-{service.name}",
+                    source=f"{_ID_PREFIX_SVC}{dependency_name}",
+                    target=f"{_ID_PREFIX_SVC}{service.name}",
                     label=_EDGE_LABEL_DEPENDS_ON,
                     animated=status == ContainerState.RUNNING,
                 ))
@@ -114,19 +112,19 @@ class TopologyService:
         nodes: list[GraphNode] = []
         edges: list[GraphEdge] = []
 
-        for i, net in enumerate(project.networks):
+        for i, network_name in enumerate(project.networks):
             nodes.append(GraphNode(
-                id=f"{_ID_PREFIX_NET}{net}",
+                id=f"{_ID_PREFIX_NET}{network_name}",
                 type=_NODE_TYPE_NETWORK,
                 position=NodePosition(x=50 + i * 200, y=600),
-                data={"label": net, "color": color_map[net]},
+                data={"label": network_name, "color": color_map[network_name]},
             ))
-            for svc in project.services:
-                if net in svc.networks:
+            for service in project.services:
+                if network_name in service.networks:
                     edges.append(GraphEdge(
-                        id=f"{_ID_PREFIX_NET}{svc.name}-{net}",
-                        source=f"{_ID_PREFIX_SVC}{svc.name}",
-                        target=f"{_ID_PREFIX_NET}{net}",
+                        id=f"{_ID_PREFIX_NET}{service.name}-{network_name}",
+                        source=f"{_ID_PREFIX_SVC}{service.name}",
+                        target=f"{_ID_PREFIX_NET}{network_name}",
                     ))
 
         return nodes, edges
