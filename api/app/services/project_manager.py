@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional
 
 import yaml
 from pydantic import BaseModel
@@ -8,17 +9,19 @@ from app.config import get_settings
 
 
 class ServiceModel(BaseModel):
+    """Schema for a single service entry in a Compose file."""
     name: str
-    image: Optional[str] = None
+    image: str | None = None
     ports: list[str] = []
     depends_on: list[str] = []
     networks: list[str] = []
     volumes: list[str] = []
     environment: dict = {}
-    healthcheck: Optional[dict] = None
+    healthcheck: dict | None = None
 
 
 class ProjectModel(BaseModel):
+    """High-level representation of a detected Compose project."""
     id: str
     name: str
     path: str
@@ -28,6 +31,7 @@ class ProjectModel(BaseModel):
 
 
 class ProjectManager:
+    """Discovers and parses Docker Compose projects from the configured projects directory."""
     _COMPOSE_CANDIDATES: tuple[str, ...] = (
         "docker-compose.yml",
         "docker-compose.yaml",
@@ -116,7 +120,8 @@ class ProjectManager:
 
     # ── Public API ──────────────────────────────────────────────────────────
 
-    def load(self, project_id: str) -> Optional[ProjectModel]:
+    def load(self, project_id: str) -> ProjectModel | None:
+        """Return the parsed *ProjectModel* for *project_id*, or ``None`` if not found."""
         try:
             project_dir = self._safe_project_path(project_id)
         except ValueError:
@@ -148,6 +153,7 @@ class ProjectManager:
         )
 
     def list_all(self) -> list[ProjectModel]:
+        """Return all valid projects found under *projects_path*."""
         base = Path(get_settings().projects_path)
         if not base.exists():
             return []

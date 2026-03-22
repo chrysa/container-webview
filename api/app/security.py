@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -12,9 +14,11 @@ _oauth2_scheme = OAuth2PasswordBearer(tokenUrl=OAUTH2_TOKEN_URL)
 
 
 class SecurityService:
+    """Creates and validates JWT access tokens for API authentication."""
     def create_access_token(
-        self, subject: str, expires_delta: Optional[timedelta] = None
+        self, subject: str, expires_delta: timedelta | None = None
     ) -> str:
+        """Encode a JWT access token for *subject*."""
         settings = get_settings()
         expire = datetime.now(timezone.utc) + (
             expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
@@ -28,6 +32,7 @@ class SecurityService:
     def get_current_user(
         self, token: Annotated[str, Depends(_oauth2_scheme)]
     ) -> dict:
+        """Validate bearer token and return decoded payload."""
         settings = get_settings()
         try:
             payload = jwt.decode(
