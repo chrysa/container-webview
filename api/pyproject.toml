@@ -1,0 +1,156 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "docker-overview-api"
+version = "1.0.0"
+description = "FastAPI backend for Docker Overview WebUI"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.111.0",
+    "uvicorn[standard]==0.29.0",
+    "docker==7.0.0",
+    "pyyaml==6.0.1",
+    "python-jose[cryptography]==3.3.0",
+    "python-multipart==0.0.9",
+    "websockets==12.0",
+    "httpx==0.27.0",
+    "python-ldap==3.4.4",
+    "pydantic-settings==2.2.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.2.0",
+    "pytest-mock==3.14.0",
+    "pytest-asyncio==0.23.7",
+    "coverage[toml]==7.5.1",
+    "faker==25.0.0",
+    "ruff==0.4.4",
+    "mypy==1.10.0",
+]
+
+# ── Pytest ─────────────────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["app/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--tb=short",
+    "-q",
+]
+
+# ── Coverage ───────────────────────────────────────────────────────────────
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/tests/*", "*/conftest.py"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "if typing.TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+
+[tool.coverage.html]
+directory = "/reports/coverage/html"
+
+[tool.coverage.xml]
+output = "/reports/coverage/coverage.xml"
+
+# ── Ruff ───────────────────────────────────────────────────────────────────
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py312"
+respect-gitignore = true
+extend-exclude = [
+    ".pytest_cache/*",
+    "**/__pycache__/*",
+    ".mypy_cache/*",
+    ".ruff_cache/*",
+    ".venv/*",
+]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "C4", "C90",
+    "A", "ANN", "ARG", "ASYNC", "BLE", "DTZ", "EM",
+    "FBT", "G", "ICN", "ISC", "LOG", "PERF", "PIE",
+    "PL", "PT", "PTH", "Q", "RET", "RSE", "RUF",
+    "S", "SIM", "SLF", "T20", "TC", "TID",
+]
+ignore = [
+    "E501",    # line length (handled by formatter)
+    "COM812",  # trailing comma (conflicts with formatter)
+    "ANN401",  # Any disallowed (too strict)
+    "RET501", "RET502", "RET503",  # return None
+    "S311",    # random is fine for non-crypto use
+    "RUF100",  # unused noqa
+    "TD002", "TD003", "FIX002",  # TODO pragmatics
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/tests/*" = [
+    "S101",    # assert in tests
+    "S106",    # hardcoded password in fixtures
+    "S105",    # hardcoded password in strings
+    "ANN",     # no type annotations in tests
+    "ARG001", "ARG002",
+    "PLR0913", "PLR2004",
+    "PT011",
+]
+"app/main.py" = ["ANN"]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+force-sort-within-sections = true
+known-first-party = ["app"]
+lines-after-imports = 2
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+ignore-fully-untyped = true
+suppress-none-returning = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 10
+max-locals = 15
+max-branches = 12
+max-statements = 50
+
+[tool.ruff.format]
+quote-style = "double"
+line-ending = "lf"
+skip-magic-trailing-comma = false
+docstring-code-format = true
+
+# ── Mypy ───────────────────────────────────────────────────────────────────
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+disallow_untyped_calls = false
+no_implicit_optional = true
+cache_dir = ".mypy_cache/"
+
+[[tool.mypy.overrides]]
+module = ["app.tests.*"]
+disallow_untyped_defs = false
