@@ -1,9 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 
 from app.security import security
-from app.services.alerts_service import Alert, alerts_service
+from app.services.alerts_service import Alert
+from app.services.alerts_service import alerts_service
 
 router = APIRouter()
 

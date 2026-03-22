@@ -1,11 +1,9 @@
 import pytest
 
-from app.constants import (
-    ERR_CONTAINER_NOT_FOUND,
-    ERR_PROJECT_NOT_FOUND,
-    ERR_SERVICE_NOT_FOUND,
-    ContainerState,
-)
+from app.constants import ContainerState
+from app.constants import ERR_CONTAINER_NOT_FOUND
+from app.constants import ERR_PROJECT_NOT_FOUND
+from app.constants import ERR_SERVICE_NOT_FOUND
 
 
 class TestLifecycleActions:

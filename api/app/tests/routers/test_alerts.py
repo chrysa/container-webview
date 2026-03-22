@@ -1,12 +1,15 @@
-from app.services.alerts_service import Alert, AlertLevel
+from app.services.alerts_service import Alert
+from app.services.alerts_service import AlertLevel
 
 
 def _make_alert(project="my-project", service="web"):
     return Alert(
+        id=f"{project}-{service}-test",
         project=project,
         service=service,
         level=AlertLevel.WARNING,
         message="Container is restarting",
+        timestamp="2026-01-01T00:00:00+00:00",
     )
 
 

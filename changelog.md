@@ -1,4 +1,4 @@
-cl-# Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
 ## [Unreleased]
+
+### Changed
+
+- Conformité ruff/mypy complète (zéro `# noqa`, zéro `# type: ignore`) :
+  - Tous les imports multi-symboles (`from x import a, b`) éclatés en lignes séparées (`force-single-line`)
+  - Suppression de tous les `return` vides et `return None` — patron *single return point* avec variable résultat
+  - `auth_service` : suppression du `# type: ignore[import]` ; `pyproject.toml` couvre déjà `ignore_missing_imports`
+  - `project_manager` : annotations de type sur tous les paramètres `raw` (ANN001) ; types de retour précisés
+  - `alerts_service` / `metrics_service` : bloc `TYPE_CHECKING` + annotation `container: Container`
+  - Tests : déplacement de tous les imports hors des méthodes de test ; suppression des imports inutilisés
+  - Tests : correction des noms de champs Pydantic (`ServiceMetrics`, `Alert`) ; ajout des champs requis manquants
 
 ### Added
 
