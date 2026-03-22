@@ -10,6 +10,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+      target: dev
     container_name: container-webview-api
     env_file: .env
     environment:
@@ -25,6 +26,22 @@ services:
       - ${PROJECTS_PATH:-./data/projects}:/projects:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
+
+  # ── FastAPI tests ────────────────────────────────────────────────────────
+  api-test:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: test
+    container_name: container-webview-api-test
+    volumes:
+      - ./api:/app
+    environment:
+      SECRET_KEY: test-secret-key-for-ci
+      ADMIN_USERNAME: testuser
+      ADMIN_PASSWORD: testpass
+      PROJECTS_PATH: /tmp/projects
+    profiles: [test]
 
   # ── React frontend (CRA dev server) ─────────────────────────────────────
   frontend:
