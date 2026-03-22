@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -29,4 +27,5 @@ app.include_router(alerts.router,    prefix="/api/alerts",      tags=["alerts"])
 
 @app.get("/api")
 def ping() -> dict:
+    """Health check endpoint."""
     return {"status": "ok"}

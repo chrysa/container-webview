@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from app.constants import (
     ERR_CONTAINER_NOT_FOUND,
     ERR_PROJECT_NOT_FOUND,
