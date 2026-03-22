@@ -1,0 +1,29 @@
+# Git
+**/.git
+**/.gitignore
+
+# Python cache
+**/__pycache__/
+**/*.py[cod]
+**/.mypy_cache/
+**/.ruff_cache/
+**/.pytest_cache/
+**/htmlcov/
+**/.coverage
+
+# Env & secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# IDE & OS
+**/.vscode/
+**/.idea/
+**/.DS_Store
+
+# Tests
+**/tests/
+**/reports/
+
+# Docs
+**/README.md
