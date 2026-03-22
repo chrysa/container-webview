@@ -1,24 +1,22 @@
+from __future__ import annotations
+
+import logging
 from datetime import datetime, timezone
 
+import docker.errors
 from pydantic import BaseModel
 
-from app.constants import (
-    ALERT_CRITICAL,
-    ALERT_INFO,
-    ALERT_WARNING,
-    COMPOSE_LABEL_PROJECT,
-    COMPOSE_LABEL_SERVICE,
-    CONTAINER_EXITED,
-    CONTAINER_RESTARTING,
-    HEALTH_STARTING,
-    HEALTH_UNHEALTHY,
-)
+from app.constants import AlertLevel, ContainerState, DockerComposeLabel, HealthState
 from app.services.docker_client import docker_client
+
+_logger = logging.getLogger(__name__)
 
 
 class Alert(BaseModel):
+    """A single operational alert for a Docker Compose service."""
+
     id: str
-    level: str  # ALERT_INFO | ALERT_WARNING | ALERT_CRITICAL
+    level: str  # AlertLevel value
     project: str
     service: str
     message: str
@@ -26,30 +24,33 @@ class Alert(BaseModel):
 
 
 class AlertsService:
+    """Inspects running containers and produces operational alerts."""
+
     def _alerts_for_container(self, container) -> list[Alert]:
-        project: str = container.labels.get(COMPOSE_LABEL_PROJECT, "")
+        """Return all alerts generated for a single container."""
+        project: str = container.labels.get(DockerComposeLabel.PROJECT, "")
         if not project:
             return []
 
-        service: str = container.labels.get(COMPOSE_LABEL_SERVICE, container.name)
+        service: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
         now: str = datetime.now(timezone.utc).isoformat()
         state: dict = container.attrs.get("State", {})
         alerts: list[Alert] = []
 
-        if container.status == CONTAINER_EXITED:
+        if container.status == ContainerState.EXITED:
             exit_code: int = state.get("ExitCode", 0)
             alerts.append(Alert(
                 id=f"{container.short_id}-exited",
-                level=ALERT_CRITICAL if exit_code != 0 else ALERT_INFO,
+                level=AlertLevel.CRITICAL if exit_code != 0 else AlertLevel.INFO,
                 project=project,
                 service=service,
                 message=f"Container stopped (exit code {exit_code})",
                 timestamp=now,
             ))
-        elif container.status == CONTAINER_RESTARTING:
+        elif container.status == ContainerState.RESTARTING:
             alerts.append(Alert(
                 id=f"{container.short_id}-restart",
-                level=ALERT_WARNING,
+                level=AlertLevel.WARNING,
                 project=project,
                 service=service,
                 message="Container is restarting",
@@ -57,19 +58,19 @@ class AlertsService:
             ))
 
         health_status: str = state.get("Health", {}).get("Status", "")
-        if health_status == HEALTH_UNHEALTHY:
+        if health_status == HealthState.UNHEALTHY:
             alerts.append(Alert(
                 id=f"{container.short_id}-health",
-                level=ALERT_CRITICAL,
+                level=AlertLevel.CRITICAL,
                 project=project,
                 service=service,
                 message="Healthcheck failed",
                 timestamp=now,
             ))
-        elif health_status == HEALTH_STARTING:
+        elif health_status == HealthState.STARTING:
             alerts.append(Alert(
                 id=f"{container.short_id}-starting",
-                level=ALERT_INFO,
+                level=AlertLevel.INFO,
                 project=project,
                 service=service,
                 message="Healthcheck pending (starting)",
@@ -78,14 +79,21 @@ class AlertsService:
 
         return alerts
 
-    def get_all_alerts(self) -> list[Alert]:
-        result: list[Alert] = []
+    def get_all(self) -> list[Alert]:
+        """Return all alerts across every running container."""
         try:
-            for container in docker_client.client().containers.list(all=True):
-                result.extend(self._alerts_for_container(container))
-        except Exception:
-            pass
+            containers = docker_client.client().containers.list(all=True)
+        except docker.errors.DockerException as docker_exc:
+            _logger.warning("Docker unavailable — cannot fetch alerts: %s", docker_exc)
+            return []
+        result: list[Alert] = []
+        for container in containers:
+            result.extend(self._alerts_for_container(container))
         return result
+
+    def get_for_project(self, project_id: str) -> list[Alert]:
+        """Return all alerts for a specific Compose project."""
+        return [alert for alert in self.get_all() if alert.project == project_id]
 
 
 alerts_service = AlertsService()

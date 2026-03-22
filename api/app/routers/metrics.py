@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -17,6 +19,7 @@ def get_metrics(
     project_id: str,
     _: Annotated[dict, Depends(security.get_current_user)],
 ) -> list[ServiceMetrics]:
+    """Return real-time resource metrics for all containers in a project."""
     if not project_manager.load(project_id):
         raise HTTPException(status_code=404, detail=ERR_PROJECT_NOT_FOUND)
     return metrics_service.get_project_metrics(project_id)

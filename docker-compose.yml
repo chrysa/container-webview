@@ -22,7 +22,7 @@ services:
       # Docker socket so the API can inspect running containers
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Mount a local directory that holds your docker-compose projects
-      - ${PROJECTS_PATH:-/tmp/projects}:/projects:ro
+      - ${PROJECTS_PATH:-./data/projects}:/projects:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
 
