@@ -4,7 +4,8 @@ import typing
 
 import docker
 
-from app.constants import ContainerState, DockerComposeLabel
+from app.constants import ContainerState
+from app.constants import DockerComposeLabel
 
 if typing.TYPE_CHECKING:
     from docker.models.containers import Container
@@ -19,14 +20,16 @@ class DockerClientService:
 
     def get_container_for_service(self, project_id: str, service_name: str) -> Container | None:
         """Return the Docker container matching a Compose service, or None."""
+        matching_container: Container | None = None
         for container in self.client().containers.list(all=True):
             labels = container.labels
             if (
                 labels.get(DockerComposeLabel.PROJECT) == project_id
                 and labels.get(DockerComposeLabel.SERVICE) == service_name
             ):
-                return container
-        return None
+                matching_container = container
+                break
+        return matching_container
 
     def get_all_containers_for_project(self, project_id: str) -> list[Container]:
         """Return all containers belonging to a Compose project."""

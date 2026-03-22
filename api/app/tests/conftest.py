@@ -1,8 +1,10 @@
 import pytest
 from faker import Faker
-from httpx import ASGITransport, AsyncClient
+from httpx import ASGITransport
+from httpx import AsyncClient
 
-from app.config import Settings, get_settings
+from app.config import Settings
+from app.config import get_settings
 from app.main import app
 from app.security import security
 

@@ -1,10 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from app.constants import ERR_INVALID_CREDENTIALS, TokenType
+from app.constants import ERR_INVALID_CREDENTIALS
+from app.constants import TokenType
 from app.security import security
 from app.services.auth_service import auth_service
 

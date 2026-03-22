@@ -2,7 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.routers import alerts, auth, lifecycle, logs, metrics, projects, topology
+from app.routers import alerts
+from app.routers import auth
+from app.routers import lifecycle
+from app.routers import logs
+from app.routers import metrics
+from app.routers import projects
+from app.routers import topology
 
 _API_PROJECTS = "/api/projects"
 

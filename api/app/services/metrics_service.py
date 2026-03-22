@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 import logging
+import typing
 
 import docker.errors
 from pydantic import BaseModel
 
 from app.constants import DockerComposeLabel
 from app.services.docker_client import docker_client
+
+if typing.TYPE_CHECKING:
+    from docker.models.containers import Container
 
 _logger = logging.getLogger(__name__)
 _BYTES_PER_MB: int = 1024 * 1024
@@ -56,7 +62,7 @@ class MetricsService:
             return 0.0
         return (cpu_delta / system_delta) * nb_cpus * 100.0
 
-    def _parse_stats(self, container, stats: dict) -> ServiceMetrics:
+    def _parse_stats(self, container: Container, stats: dict[str, object]) -> ServiceMetrics:
         """Build a ServiceMetrics instance from raw Docker stats."""
         service_name: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
         mem: dict = stats.get("memory_stats", {})
@@ -88,7 +94,7 @@ class MetricsService:
             block_write_mb=self._bytes_to_mb(block_write_bytes),
         )
 
-    def _zero_metrics(self, container) -> ServiceMetrics:
+    def _zero_metrics(self, container: Container) -> ServiceMetrics:
         """Return zeroed-out ServiceMetrics when stats cannot be retrieved."""
         return ServiceMetrics(
             service=container.labels.get(DockerComposeLabel.SERVICE, container.name),
