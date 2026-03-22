@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml .
+RUN pip install --no-cache-dir .
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 2 — development (uvicorn --reload)
@@ -23,7 +23,16 @@ EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 3 — production (no reload, no dev tools)
+# Stage 3 — test (run pytest with coverage)
+# ─────────────────────────────────────────────────────────────────────────────
+FROM base AS test
+
+RUN pip install --no-cache-dir ".[dev]"
+COPY . .
+CMD ["python", "-m", "pytest", "--cov=app", "--cov-report=term-missing", "--cov-report=xml"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 4 — production (no reload, no dev tools)
 # ─────────────────────────────────────────────────────────────────────────────
 FROM base AS production
 
