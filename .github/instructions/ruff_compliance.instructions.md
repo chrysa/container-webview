@@ -30,7 +30,25 @@ Ruff is the single linting authority for this project. It ensures:
 
 - **Automatic sorting**: Imports sorted by Ruff
 - **Group separation**: Standard library → third-party → local; separated by blank lines
+- **`force-single-line = true` (MANDATORY)**: Every `from x import` must import **exactly ONE symbol**. Multi-symbol imports are forbidden.
 - **Type checking imports**: Use `if typing.TYPE_CHECKING:` blocks for type-only imports
+
+```python
+# ❌ FORBIDDEN — multiple symbols on one line
+from datetime import datetime, timedelta, timezone
+from fastapi import APIRouter, Depends, HTTPException
+from app.constants import ERR_NOT_FOUND, TokenType
+
+# ✅ CORRECT — one symbol per line
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from app.constants import ERR_NOT_FOUND
+from app.constants import TokenType
+```
 
 ### Type Annotations (ANN Series)
 
@@ -179,6 +197,56 @@ def on_event(self, client, obj):
 # ✅ Good — prefix with underscore
 def on_event(self, _client, _obj):
     pass
+```
+
+### Pattern 8: `return None` / bare `return` (RET504 / RET501)
+
+Both `return None` and bare `return` are **PROHIBITED** regardless of context. Use the single return point pattern with a result variable.
+
+```python
+# ❌ FORBIDDEN
+def find(self, project_id: str) -> ProjectModel | None:
+    if not valid:
+        return None
+    ...
+    return ProjectModel(...)
+
+# ❌ FORBIDDEN
+async def handle(self, ws: WebSocket) -> None:
+    if not auth:
+        await ws.close()
+        return
+
+# ✅ CORRECT — nullable result
+def find(self, project_id: str) -> ProjectModel | None:
+    found_project: ProjectModel | None = None
+    if valid:
+        found_project = ProjectModel(...)
+    return found_project
+
+# ✅ CORRECT — void function, no return at all
+async def handle(self, ws: WebSocket) -> None:
+    if not auth:
+        await ws.close()
+    else:
+        await ws.accept()
+```
+
+### Pattern 9: Multi-symbol imports (I001 / isort force-single-line)
+
+```python
+# ❌ FORBIDDEN
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.constants import ERR_NOT_FOUND, ERR_INVALID_TOKEN, TokenType
+
+# ✅ CORRECT
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+from app.constants import ERR_INVALID_TOKEN
+from app.constants import ERR_NOT_FOUND
+from app.constants import TokenType
 ```
 
 ---
