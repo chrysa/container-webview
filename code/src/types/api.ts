@@ -1,3 +1,11 @@
+export interface HateoasLink {
+  href: string
+}
+
+export interface WithLinks {
+  _links?: Record<string, HateoasLink>
+}
+
 export interface LoginRequest {
   username: string
   password: string
@@ -19,7 +27,7 @@ export interface ServiceModel {
   depends_on: string[]
 }
 
-export interface ProjectModel {
+export interface ProjectModel extends WithLinks {
   id: string
   name: string
   path: string
@@ -28,7 +36,7 @@ export interface ProjectModel {
   networks: string[]
 }
 
-export interface ServiceMetrics {
+export interface ServiceMetrics extends WithLinks {
   service: string
   container_id: string
   status: string
@@ -42,7 +50,7 @@ export interface ServiceMetrics {
   block_write_mb: number
 }
 
-export interface Alert {
+export interface Alert extends WithLinks {
   id: string
   project: string
   service: string
@@ -65,7 +73,7 @@ export interface GraphEdge {
   label?: string
 }
 
-export interface TopologyGraph {
+export interface TopologyGraph extends WithLinks {
   nodes: GraphNode[]
   edges: GraphEdge[]
 }
