@@ -111,6 +111,11 @@ fixable = ["ALL"]
     "PT011",
 ]
 "app/main.py" = ["ANN"]
+# Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
+"app/services/project_manager.py" = ["TCH001"]
+"app/services/alerts_service.py"  = ["TCH001"]
+"app/services/metrics_service.py" = ["TCH001"]
+"app/services/topology_service.py" = ["TCH001"]
 
 [tool.ruff.lint.isort]
 force-single-line = true

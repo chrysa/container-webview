@@ -55,4 +55,7 @@ ERR_INVALID_CREDENTIALS: Final[str] = "Invalid credentials"
 
 # ── JWT / OAuth2 ───────────────────────────────────────────────────────────
 JWT_CLAIM_SUB: Final[str] = "sub"
-OAUTH2_TOKEN_URL: Final[str] = "/api/auth/login"
+
+# ── API versioning ────────────────────────────────────────────────────────
+API_V1_PREFIX: Final[str] = "/api/v1"
+OAUTH2_TOKEN_URL: Final[str] = "/api/v1/auth/login"
