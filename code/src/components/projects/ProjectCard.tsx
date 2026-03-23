@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ROUTES } from '../../constants/config'
 import type { ProjectModel } from '../../types/api'
 
 export function ProjectCard({ project }: { project: ProjectModel }) {
@@ -20,7 +21,7 @@ export function ProjectCard({ project }: { project: ProjectModel }) {
         </div>
       </div>
       <div className="card-footer bg-transparent">
-        <Link to={`/projects/${project.id}`} className="btn btn-outline-primary btn-sm w-100">
+        <Link to={ROUTES.projectDetail(project.id)} className="btn btn-outline-primary btn-sm w-100">
           Voir le détail →
         </Link>
       </div>

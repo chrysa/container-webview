@@ -5,8 +5,11 @@ import typing
 
 import docker.errors
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic import Field
 
 from app.constants import DockerComposeLabel
+from app.models.hateoas import MetricsLinks
 from app.services.docker_client import docker_client
 
 if typing.TYPE_CHECKING:
@@ -20,6 +23,7 @@ _BLKIO_OP_WRITE: str = "Write"
 
 class ServiceMetrics(BaseModel):
     """Resource usage snapshot for a single Compose service container."""
+    model_config = ConfigDict(populate_by_name=True)
 
     service: str
     container_id: str
@@ -32,6 +36,7 @@ class ServiceMetrics(BaseModel):
     net_tx_mb: float
     block_read_mb: float
     block_write_mb: float
+    links: MetricsLinks | None = Field(None, alias="_links")
 
 
 class MetricsService:

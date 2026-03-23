@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic import Field
 
 from app.constants import ContainerState
+from app.models.hateoas import TopologyLinks
 from app.services.docker_client import docker_client
 from app.services.project_manager import ProjectModel
 from app.services.project_manager import project_manager
+
 
 _NETWORK_COLORS: list[str] = [
     "#4f86f7", "#f76f4f", "#4ff79f", "#f7e94f",
@@ -47,9 +53,11 @@ class GraphEdge(BaseModel):
 
 class TopologyGraph(BaseModel):
     """Full topology graph for a Compose project."""
+    model_config = ConfigDict(populate_by_name=True)
 
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+    links: TopologyLinks | None = Field(None, alias="_links")
 
 
 class TopologyService:

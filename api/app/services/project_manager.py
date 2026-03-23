@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import yaml
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic import Field
 
 from app.config import get_settings
+from app.models.hateoas import ProjectLinks
+
 
 
 class ServiceModel(BaseModel):
@@ -20,12 +26,15 @@ class ServiceModel(BaseModel):
 
 class ProjectModel(BaseModel):
     """High-level representation of a detected Compose project."""
+    model_config = ConfigDict(populate_by_name=True)
+
     id: str
     name: str
     path: str
     compose_file: str
     services: list[ServiceModel] = []
     networks: list[str] = []
+    links: ProjectLinks | None = Field(None, alias="_links")
 
 
 class ProjectManager:
