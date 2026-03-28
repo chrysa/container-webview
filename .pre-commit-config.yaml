@@ -2,44 +2,58 @@
 default_language_version:
     python: python3.12
 fail_fast: false
-minimum_pre_commit_version: 3.7.0
+minimum_pre_commit_version: 3.7.1
 
 repos:
-  # - repo: meta
-  #   hooks:
-  #       - id: identity
-  #         stages:
-  #             - manual
-  #       - id: check-hooks-apply
-  #         stages:
-  #             - manual
-  #       - id: check-useless-excludes
-  #         stages:
-  #             - manual
+  # ── chrysa/pre-commit-tools ───────────────────────────────────────────────
+-   repo: https://github.com/chrysa/pre-commit-tools
+    rev: 0.0.63
+    hooks:
+    -   id: console-debug-detection
+    -   id: console-log-detection
+    -   id: console-table-detection
+    -   id: format-dockerfiles
+    -   id: python-print-detection
+    -   id: python-pprint-detection
+    -   id: debugger-detection
+    -   id: python-logger-detection
+    -   id: yaml-sorter
+        exclude: '^(\.pre-commit-config\.yaml|config-tools/|\.github/)'
+    -   id: json-sorter
+    -   id: requirements-sort
+    -   id: env-file-check
+  # ── chrysa/pre-commit-hooks-changelog ────────────────────────────────────
+-   repo: https://github.com/chrysa/pre-commit-hooks-changelog
+    rev: v0.1.4
+    hooks:
+    -   id: generate-changelog
+        stages:
+        -   manual
+  # ── hadolint ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/hadolint/hadolint.git
-    rev: 024fd640378acd5d8218f77ec2c744826cdda5ce
+    rev: v2.12.0
     hooks:
     -   id: hadolint-docker
         args: [--config=./config-tools/.hadolint.yaml]
+  # ── ESLint ────────────────────────────────────────────────────────────────
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.43.0
+    rev: v8.57.1
     hooks:
     -   id: eslint
+        files: \.(js|ts|tsx)$
         args: [--config, code/.eslintrc.cjs]
         additional_dependencies:
-        -   eslint
+        -   eslint@8.57.1
         -   typescript
         -   '@typescript-eslint/eslint-plugin'
         -   '@typescript-eslint/parser'
         -   eslint-config-prettier
+  # ── CSSLint ───────────────────────────────────────────────────────────────
 -   repo: https://github.com/pre-commit/mirrors-csslint
     rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
     hooks:
     -   id: csslint
--   repo: https://github.com/pre-commit/mirrors-csslint
-    rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
-    hooks:
-    -   id: csslint
+  # ── YAML lint & format ────────────────────────────────────────────────────
 -   repo: https://github.com/adrienverge/yamllint.git
     rev: v1.32.0
     hooks:
@@ -50,15 +64,7 @@ repos:
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --colons, --width, '200']
--   repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.13
-    hooks:
-    -   id: cmake-format
-        args: [-c, config-tools/.cmake-format.yaml]
-        files: Makefile
-    -   id: cmake-lint
-        args: [-c, config-tools/.cmake-format.yaml]
-        files: Makefile
+  # ── Markdown ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/frnmst/md-toc
     rev: 8.1.9
     hooks:
@@ -77,15 +83,15 @@ repos:
     -   id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
 -   repo: https://github.com/executablebooks/mdformat
-    rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
+    rev: 0.7.22
     hooks:
     -   id: mdformat
-    # Optionally add plugins
         additional_dependencies:
         -   mdformat-gfm
         -   mdformat-black
+  # ── Shell ─────────────────────────────────────────────────────────────────
 -   repo: https://github.com/lovesegfault/beautysh.git
-    rev: 9845efc3ea3e86cc0d41465d720a47f521b2799c
+    rev: v6.2.1
     hooks:
     -   id: beautysh
         args: [--indent-size, '4']
