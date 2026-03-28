@@ -1,0 +1,55 @@
+name: CI / CD Issue
+description: Report a problem with GitHub Actions workflows or the build pipeline
+title: "ci: "
+labels: ["ci/cd", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to report issues with GitHub Actions workflows,
+        Docker builds, GitVersion, or any part of the CI/CD pipeline.
+
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Affected workflow
+      options:
+        - CI (ci.yml)
+        - Release (release.yml)
+        - pre-commit
+        - GitVersion
+        - Docker build
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: run_url
+    attributes:
+      label: Failed workflow run URL
+      description: Link to the failed GitHub Actions run (if applicable)
+      placeholder: https://github.com/chrysa/container-webview/actions/runs/...
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: What went wrong in the pipeline?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / error output
+      render: shell
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched for existing issues before creating this one
+          required: true
