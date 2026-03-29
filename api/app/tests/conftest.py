@@ -1,9 +1,12 @@
 import pytest
 from faker import Faker
-from httpx import ASGITransport, AsyncClient
+from httpx import ASGITransport
+from httpx import AsyncClient
 
-from app.config import Settings, get_settings
+from app.config import Settings
+from app.config import get_settings
 from app.main import app
+from app.security import security
 
 
 @pytest.fixture(name="faker_instance")
@@ -58,9 +61,6 @@ async def fixt_api_client(override_settings):
 @pytest.fixture(name="valid_token")
 def fixt_valid_token():
     """Return a valid JWT token for test authentication."""
-    from app.services.auth_service import auth_service as _auth_svc  # noqa: PLC0415
-    from app.security import security  # noqa: PLC0415
-
     def _load(**kwargs):
         get_settings.cache_clear()
         return security.create_access_token(kwargs.get("username", "testuser"))

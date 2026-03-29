@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic import Field
 
 from app.constants import ContainerState
+from app.models.hateoas import TopologyLinks
 from app.services.docker_client import docker_client
-from app.services.project_manager import ProjectModel, project_manager
+from app.services.project_manager import ProjectModel
+from app.services.project_manager import project_manager
+
 
 _NETWORK_COLORS: list[str] = [
     "#4f86f7", "#f76f4f", "#4ff79f", "#f7e94f",
@@ -46,9 +53,11 @@ class GraphEdge(BaseModel):
 
 class TopologyGraph(BaseModel):
     """Full topology graph for a Compose project."""
+    model_config = ConfigDict(populate_by_name=True)
 
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+    links: TopologyLinks | None = Field(None, alias="_links")
 
 
 class TopologyService:
@@ -131,15 +140,14 @@ class TopologyService:
 
     def build(self, project_id: str) -> TopologyGraph | None:
         """Build and return the topology graph, or None if the project does not exist."""
+        topology_graph: TopologyGraph | None = None
         project = project_manager.load(project_id)
-        if not project:
-            return None
-
-        color_map = self._network_color_map(project.networks)
-        svc_nodes, svc_edges = self._service_nodes_and_edges(project, project_id, color_map)
-        net_nodes, net_edges = self._network_nodes_and_edges(project, color_map)
-
-        return TopologyGraph(nodes=svc_nodes + net_nodes, edges=svc_edges + net_edges)
+        if project:
+            color_map = self._network_color_map(project.networks)
+            svc_nodes, svc_edges = self._service_nodes_and_edges(project, project_id, color_map)
+            net_nodes, net_edges = self._network_nodes_and_edges(project, color_map)
+            topology_graph = TopologyGraph(nodes=svc_nodes + net_nodes, edges=svc_edges + net_edges)
+        return topology_graph
 
 
 topology_service = TopologyService()

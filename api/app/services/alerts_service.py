@@ -1,17 +1,31 @@
+from __future__ import annotations
+
 import logging
-from datetime import datetime, timezone
+import typing
+from datetime import datetime
+from datetime import timezone
 
 import docker.errors
 from pydantic import BaseModel
+from pydantic import ConfigDict
+from pydantic import Field
 
-from app.constants import AlertLevel, ContainerState, DockerComposeLabel, HealthState
+from app.constants import AlertLevel
+from app.constants import ContainerState
+from app.constants import DockerComposeLabel
+from app.constants import HealthState
+from app.models.hateoas import AlertLinks
 from app.services.docker_client import docker_client
+
+if typing.TYPE_CHECKING:
+    from docker.models.containers import Container
 
 _logger = logging.getLogger(__name__)
 
 
 class Alert(BaseModel):
     """A single operational alert for a Docker Compose service."""
+    model_config = ConfigDict(populate_by_name=True)
 
     id: str
     level: str  # AlertLevel value
@@ -19,12 +33,13 @@ class Alert(BaseModel):
     service: str
     message: str
     timestamp: str
+    links: AlertLinks | None = Field(None, alias="_links")
 
 
 class AlertsService:
     """Inspects running containers and produces operational alerts."""
 
-    def _alerts_for_container(self, container) -> list[Alert]:
+    def _alerts_for_container(self, container: Container) -> list[Alert]:
         """Return all alerts generated for a single container."""
         project: str = container.labels.get(DockerComposeLabel.PROJECT, "")
         if not project:
