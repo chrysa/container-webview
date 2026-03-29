@@ -1,123 +1,100 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# Release — Versioning + Changelog + GitHub Release
-#
-# Triggered on every push to main.
-# Uses GitVersion (gittools/actions) to compute the next semantic version,
-# then git-cliff to generate CHANGELOG.md from conventional commits.
-# Creates a signed tag and a GitHub Release.
-# The published Release then triggers the CD workflow (build + deploy).
-#
-# Permissions required: contents: write (commits, tags, releases)
-# ─────────────────────────────────────────────────────────────────────────────
+---
 name: Release
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-    inputs:
-      dry-run:
-        description: "Preview version without creating a release"
-        type: boolean
-        default: false
-
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: false
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+        inputs:
+            dry-run:
+                description: Preview version without creating a release
+                type: boolean
+                default: false
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  release:
-    name: Version & Changelog
-    runs-on: ubuntu-latest
+    release:
+        name: Version & Changelog
+        runs-on: ubuntu-latest
 
-    steps:
-      # ── 1. Full clone (required by GitVersion and git-cliff) ───────────────
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      # ── 2. Compute semantic version via GitVersion ─────────────────────────
-      - name: Setup GitVersion
-        uses: gittools/actions/gitversion/setup@v3
-        with:
-          versionSpec: "6.x"
+            - name: GitVersion
+              id: gitversion
+              uses: chrysa/github-actions/gitversion@main
 
-      - name: Execute GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v3
-        with:
-          useConfigFile: true
+            - name: Print version
+              run: |
+                  echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
 
-      - name: Print computed version
-        run: |
-          echo "SemVer : ${{ steps.gitversion.outputs.semVer }}"
-          echo "MajMin : ${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }}"
+            - name: Check existing tag
+              id: check-tag
+              run: |
+                  TAG="v${{ steps.gitversion.outputs.semVer }}"
+                  if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
+                      echo "Tag $TAG already exists — skipping release."
+                      echo "skip=true" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "skip=false" >> "$GITHUB_OUTPUT"
+                  fi
 
-      # ── 3. Skip if the tag already exists in the remote ───────────────────
-      - name: Check existing tag
-        id: check-tag
-        run: |
-          TAG="v${{ steps.gitversion.outputs.semVer }}"
-          if git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
-            echo "Tag $TAG already exists — skipping release."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
+            - name: Update CHANGELOG.md
+              if: steps.check-tag.outputs.skip == 'false'
+              uses: orhun/git-cliff-action@v4
+              with:
+                  config: cliff.toml
+                  args: --verbose --tag v${{ steps.gitversion.outputs.semVer }}
+              env:
+                  GITHUB_REPO: ${{ github.repository }}
+                  OUTPUT: CHANGELOG.md
 
-      # ── 4. Generate full CHANGELOG.md from git history ────────────────────
-      - name: Update CHANGELOG.md
-        if: steps.check-tag.outputs.skip == 'false'
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --verbose --tag v${{ steps.gitversion.outputs.semVer }}
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
+            - name: Generate release notes
+              id: release-notes
+              if: steps.check-tag.outputs.skip == 'false'
+              uses: orhun/git-cliff-action@v4
+              with:
+                  config: cliff.toml
+                  args: >-
+                      --verbose
+                      --tag v${{ steps.gitversion.outputs.semVer }}
+                      --unreleased
+                      --strip all
+              env:
+                  GITHUB_REPO: ${{ github.repository }}
 
-      # ── 5. Generate release notes (latest section only, no header/footer) ──
-      - name: Generate release notes
-        if: steps.check-tag.outputs.skip == 'false'
-        uses: orhun/git-cliff-action@v4
-        id: release-notes
-        with:
-          config: cliff.toml
-          args: >-
-            --verbose
-            --tag v${{ steps.gitversion.outputs.semVer }}
-            --unreleased
-            --strip all
-        env:
-          GITHUB_REPO: ${{ github.repository }}
+            - name: Commit changelog and tag
+              if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add CHANGELOG.md
+                  git diff --staged --quiet \
+                      || git commit -m "chore(release): update changelog for v${{ steps.gitversion.outputs.semVer }} [skip ci]"
+                  git tag -a "v${{ steps.gitversion.outputs.semVer }}" \
+                      -m "Release v${{ steps.gitversion.outputs.semVer }}"
+                  git push origin HEAD:main --follow-tags
 
-      # ── 6. Commit changelog + create annotated tag ────────────────────────
-      - name: Commit changelog and tag
-        if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
-          # Only commit if the file actually changed
-          git diff --staged --quiet \
-            || git commit -m "chore(release): update changelog for v${{ steps.gitversion.outputs.semVer }} [skip ci]"
-          git tag -a "v${{ steps.gitversion.outputs.semVer }}" \
-            -m "Release v${{ steps.gitversion.outputs.semVer }}"
-          git push origin HEAD:main --follow-tags
+            - name: Create GitHub Release
+              if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
+              uses: softprops/action-gh-release@v2
+              with:
+                  body: ${{ steps.release-notes.outputs.content }}
+                  draft: false
+                  name: v${{ steps.gitversion.outputs.semVer }}
+                  prerelease: false
+                  tag_name: v${{ steps.gitversion.outputs.semVer }}
 
-      # ── 7. Publish GitHub Release (triggers CD workflow) ──────────────────
-      - name: Create GitHub Release
-        if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.gitversion.outputs.semVer }}
-          name: v${{ steps.gitversion.outputs.semVer }}
-          body: ${{ steps.release-notes.outputs.content }}
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

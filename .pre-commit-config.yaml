@@ -2,121 +2,131 @@
 default_language_version:
     python: python3.12
 fail_fast: false
-minimum_pre_commit_version: 3.7.1
+minimum_pre_commit_version: 4.1.0
 
 repos:
+  # ── General hooks ─────────────────────────────────────────────────────────
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: f1dff44d3a9ae852957f34def96390f28719c232
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
   # ── chrysa/pre-commit-tools ───────────────────────────────────────────────
--   repo: https://github.com/chrysa/pre-commit-tools
-    rev: 0.0.63
+  - repo: https://github.com/chrysa/pre-commit-tools
+    rev: main
     hooks:
-    -   id: console-debug-detection
-    -   id: console-log-detection
-    -   id: console-table-detection
-    -   id: format-dockerfiles
-    -   id: python-print-detection
-    -   id: python-pprint-detection
-    -   id: debugger-detection
-    -   id: python-logger-detection
-    -   id: yaml-sorter
+      - id: console-debug-detection
+      - id: console-log-detection
+      - id: console-table-detection
+      - id: react-console-error-detection
+      - id: no-console-warn
+      - id: ts-unreachable-code
+        additional_dependencies:
+          - tree-sitter>=0.23
+          - tree-sitter-typescript>=0.23
+      - id: import-no-relative-parent
+      - id: format-dockerfiles
+      - id: dockerfile-no-latest
+      - id: python-print-detection
+      - id: python-pprint-detection
+      - id: python-unreachable-code
+      - id: python-dead-code
+        stages: [manual]
+      - id: python-logger-detection
+      - id: no-bare-except
+      - id: fastapi-missing-response-model
+        files: '(routers?)/.*\.py$'
+      - id: no-sync-in-async
+      - id: debugger-detection
+      - id: yaml-sorter
         exclude: '^(\.pre-commit-config\.yaml|config-tools/|\.github/)'
-    -   id: json-sorter
-    -   id: requirements-sort
-    -   id: env-file-check
+      - id: json-sorter
+      - id: requirements-sort
+      - id: env-file-check
+      - id: env-example-sync
+
   # ── chrysa/pre-commit-hooks-changelog ────────────────────────────────────
--   repo: https://github.com/chrysa/pre-commit-hooks-changelog
-    rev: v0.1.4
+  - repo: https://github.com/chrysa/pre-commit-hooks-changelog
+    rev: 40d13585c4c845c36108a565f00c23f2b946e9d9
     hooks:
-    -   id: generate-changelog
-        stages:
-        -   manual
+      - id: generate-changelog
+        stages: [manual]
+
   # ── hadolint ─────────────────────────────────────────────────────────────
--   repo: https://github.com/hadolint/hadolint.git
+  - repo: https://github.com/hadolint/hadolint.git
     rev: v2.12.0
     hooks:
-    -   id: hadolint-docker
+      - id: hadolint-docker
         args: [--config=./config-tools/.hadolint.yaml]
+
   # ── ESLint ────────────────────────────────────────────────────────────────
--   repo: https://github.com/pre-commit/mirrors-eslint
+  - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.57.1
     hooks:
-    -   id: eslint
-        files: \.(js|ts|tsx)$
+      - id: eslint
+        files: \.(js|ts|tsx|jsx)$
         args: [--config, code/.eslintrc.cjs]
         additional_dependencies:
-        -   eslint@8.57.1
-        -   typescript
-        -   '@typescript-eslint/eslint-plugin'
-        -   '@typescript-eslint/parser'
-        -   eslint-config-prettier
-  # ── CSSLint ───────────────────────────────────────────────────────────────
--   repo: https://github.com/pre-commit/mirrors-csslint
-    rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
-    hooks:
-    -   id: csslint
+          - eslint@8.57.1
+          - typescript
+          - '@typescript-eslint/eslint-plugin'
+          - '@typescript-eslint/parser'
+          - eslint-config-prettier
+
   # ── YAML lint & format ────────────────────────────────────────────────────
--   repo: https://github.com/adrienverge/yamllint.git
+  - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.32.0
     hooks:
-    -   id: yamllint
+      - id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
--   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.2.3
-    hooks:
-    -   id: yamlfmt
-        args: [--mapping, '4', --sequence, '4', --offset, '0', --colons, --width, '200']
+
   # ── Markdown ─────────────────────────────────────────────────────────────
--   repo: https://github.com/frnmst/md-toc
-    rev: 8.1.9
+  - repo: https://github.com/frnmst/md-toc
+    rev: 9.0.0
     hooks:
-    -   id: md-toc
-        stages:
-        -   manual
--   repo: https://github.com/smian/pre-commit-makefile.git
-    rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
+      - id: md-toc
+        args: [--in-place, github, --header-levels, '6']
+        stages: [manual]
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: f7ed74202ac8ec26bab4a68359556c5243df142f
     hooks:
-    -   id: makefile-doc
-        stages:
-        -   manual
--   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.35.0
+      - id: markdownlint
+        args: [--fix]
+        stages: [manual]
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 56b24ef0c6cfdab501844925971204f858185547
     hooks:
-    -   id: markdownlint
-        args: [-c, config-tools/.markdownlint.yml, --fix]
--   repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.22
-    hooks:
-    -   id: mdformat
-        additional_dependencies:
-        -   mdformat-gfm
-        -   mdformat-black
+      - id: mdformat
+        additional_dependencies: [mdformat-gfm]
+        stages: [manual]
+
   # ── Shell ─────────────────────────────────────────────────────────────────
--   repo: https://github.com/lovesegfault/beautysh.git
-    rev: v6.2.1
+  - repo: https://github.com/lovesegfault/beautysh
+    rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
     hooks:
-    -   id: beautysh
+      - id: beautysh
         args: [--indent-size, '4']
--   repo: https://github.com/openstack/bashate.git
-    rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+
+  - repo: https://github.com/openstack/bashate
+    rev: ec2f2400915200d633299612a02d7d285e4be24c
     hooks:
-    -   id: bashate
-        args:
-        -   --ignore=E006,E020
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: bb4e628bb475392bed0736990db6f33009bb8169
+      - id: bashate
+        args: [--ignore=E006,E020]
+
+  # ── Secrets detection ─────────────────────────────────────────────────────
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
     hooks:
-    -   id: check-json
-    -   id: check-yaml
-        args:
-        -   --allow-multiple-documents
-        files: .(yaml|yml)$
-    -   id: check-case-conflict
-    -   id: end-of-file-fixer
-    -   id: mixed-line-ending
-        args:
-        -   --fix=lf
-    -   id: pretty-format-json
-        args:
-        -   --indent=4
-        -   --autofix
-    -   id: trailing-whitespace
-    -   id: check-merge-conflict
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: \.pre-commit-config\.yaml
