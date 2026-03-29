@@ -17,12 +17,12 @@ repos:
   #         stages:
   #             - manual
 -   repo: https://github.com/hadolint/hadolint.git
-    rev: 024fd640378acd5d8218f77ec2c744826cdda5ce
+    rev: 0de1129e51101cec92859b4627f849a2716d2bf6
     hooks:
     -   id: hadolint-docker
         args: [--config=./config-tools/.hadolint.yaml]
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.43.0
+    rev: v9.39.1
     hooks:
     -   id: eslint
         args: [--config, code/.eslintrc.cjs]
@@ -41,12 +41,12 @@ repos:
     hooks:
     -   id: csslint
 -   repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
+    rev: e3b72f585b1bf8c779b7bae2f773b11a5fb80eb1
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
 -   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.2.3
+    rev: 7b8bca6012218d6804e586523b246cd0a8eb02a1
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --colons, --width, '200']
@@ -72,12 +72,12 @@ repos:
         stages:
         -   manual
 -   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.35.0
+    rev: 76208f1f418e7100334dfbf355b98f3e1f7c4fb0
     hooks:
     -   id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
 -   repo: https://github.com/executablebooks/mdformat
-    rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
+    rev: 56b24ef0c6cfdab501844925971204f858185547
     hooks:
     -   id: mdformat
     # Optionally add plugins
@@ -85,18 +85,18 @@ repos:
         -   mdformat-gfm
         -   mdformat-black
 -   repo: https://github.com/lovesegfault/beautysh.git
-    rev: 9845efc3ea3e86cc0d41465d720a47f521b2799c
+    rev: 0d03515ff30a542dc0a99410cfaf1a7bd2ed8251
     hooks:
     -   id: beautysh
         args: [--indent-size, '4']
 -   repo: https://github.com/openstack/bashate.git
-    rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+    rev: ec2f2400915200d633299612a02d7d285e4be24c
     hooks:
     -   id: bashate
         args:
         -   --ignore=E006,E020
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: bb4e628bb475392bed0736990db6f33009bb8169
+    rev: f4e025486b81198907fa79d1c14af09c0e67859d
     hooks:
     -   id: check-json
     -   id: check-yaml
@@ -114,3 +114,181 @@ repos:
         -   --autofix
     -   id: trailing-whitespace
     -   id: check-merge-conflict
+
+    # ─── Debug Detection ──────────────────────────────────────────────────────
+    - repo: https://github.com/chrysa/pre-commit-tools
+      rev: 3457e09bc07119385ea09da118027a56d02a521a
+      hooks:
+          - id: console-debug-detection
+            name: Detect console.debug
+          - id: console-log-detection
+            name: Detect console.log
+          - id: console-table-detection
+            name: Detect console.table
+          - id: yaml-sorter
+            name: Sort YAML files
+
+    # ─── Dockerfile ───────────────────────────────────────────────────────────
+    - repo: https://github.com/chrysa/pre-commit-tools
+      rev: 3457e09bc07119385ea09da118027a56d02a521a
+      hooks:
+          - id: format-dockerfiles
+            name: Format Dockerfile (frontend)
+            files: ^Dockerfile$
+          - id: format-dockerfiles
+            name: Format Dockerfile (api)
+            files: ^api/Dockerfile$
+
+    - repo: https://github.com/AleksaC/hadolint-py
+      rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
+      hooks:
+          - id: hadolint
+            name: Lint Dockerfile frontend
+            args: [-c, config-tools/.hadolint.yaml]
+            files: ^Dockerfile$
+          - id: hadolint
+            name: Lint Dockerfile api
+            args: [-c, config-tools/.hadolint.yaml]
+            files: ^api/Dockerfile$
+
+    # ─── Python (API — FastAPI) ────────────────────────────────────────────────
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.11.2
+      hooks:
+          - id: ruff-format
+            name: Format Python (ruff)
+            files: ^api/.*\.py$
+          - id: ruff
+            name: Lint Python (ruff)
+            args: [--fix, --exit-non-zero-on-fix]
+            files: ^api/.*\.py$
+
+    - repo: https://github.com/pre-commit/pygrep-hooks
+      rev: 84aa5ebaf906144146cbc33c5e71b364cda3d719
+      hooks:
+          - id: python-no-eval
+          - id: python-no-log-warn
+          - id: python-use-type-annotations
+          - id: python-check-mock-methods
+
+    # ─── TypeScript / JavaScript (Frontend — React 19 + Vite) ─────────────────
+    - repo: https://github.com/pre-commit/mirrors-prettier
+      rev: f62a70a3a7114896b062de517d72829ea1c884b6
+      hooks:
+          - id: prettier
+            name: Format code with Prettier
+            files: ^code/.*\.(css|scss|ts|tsx|json)$
+            args:
+                - --print-width=120
+                - --tab-width=2
+                - --use-tabs=false
+                - --single-quote
+                - --trailing-comma=es5
+            additional_dependencies:
+                - prettier@^3.0.0
+                - prettier-plugin-organize-imports@^3.2.0
+
+    - repo: https://github.com/pre-commit/mirrors-eslint
+      rev: v9.39.1
+      hooks:
+          - id: eslint
+            name: ESLint (TypeScript/React)
+            files: ^code/.*\.(ts|tsx)$
+            args: [--fix, --max-warnings=0, --config, code/eslint.config.js]
+            additional_dependencies:
+                - eslint@^9.15.0
+                - "@eslint/js@^9.15.0"
+                - globals@^15.0.0
+                - "@typescript-eslint/eslint-plugin@^8.0.0"
+                - "@typescript-eslint/parser@^8.0.0"
+                - typescript-eslint@^8.0.0
+                - eslint-plugin-react@^7.37.0
+                - eslint-plugin-react-hooks@^5.0.0
+                - eslint-plugin-react-refresh@^0.4.14
+
+    # ─── YAML ─────────────────────────────────────────────────────────────────
+    - repo: https://github.com/adrienverge/yamllint.git
+      rev: e3b72f585b1bf8c779b7bae2f773b11a5fb80eb1
+      hooks:
+          - id: yamllint
+            args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
+
+    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+      rev: 7b8bca6012218d6804e586523b246cd0a8eb02a1
+      hooks:
+          - id: yamlfmt
+            args: [--mapping, "4", --sequence, "4", --offset, "0", --colons, --width, "200"]
+
+    # ─── Markdown ─────────────────────────────────────────────────────────────
+    - repo: https://github.com/igorshubovych/markdownlint-cli
+      rev: 76208f1f418e7100334dfbf355b98f3e1f7c4fb0
+      hooks:
+          - id: markdownlint
+            args: [-c, config-tools/.markdownlint.yml, --fix]
+
+    - repo: https://github.com/executablebooks/mdformat
+      rev: 56b24ef0c6cfdab501844925971204f858185547
+      hooks:
+          - id: mdformat
+            additional_dependencies:
+                - mdformat-gfm
+
+    # ─── Shell ────────────────────────────────────────────────────────────────
+    - repo: https://github.com/lovesegfault/beautysh.git
+      rev: 0d03515ff30a542dc0a99410cfaf1a7bd2ed8251
+      hooks:
+          - id: beautysh
+            args: [--indent-size, "4"]
+
+    - repo: https://github.com/openstack/bashate.git
+      rev: ec2f2400915200d633299612a02d7d285e4be24c
+      hooks:
+          - id: bashate
+            args: [--ignore=E006,E020]
+
+    # ─── GitHub Actions ───────────────────────────────────────────────────────
+    - repo: https://github.com/rhysd/actionlint
+      rev: 0bdc95715fa58f64e3fd6e63b0f89be8733cbbab
+      hooks:
+          - id: actionlint
+            name: Lint GitHub Actions workflows
+
+    # ─── Security ─────────────────────────────────────────────────────────────
+    - repo: https://github.com/gitleaks/gitleaks
+      rev: v8.30.1
+      hooks:
+          - id: gitleaks
+            name: Detect secrets
+
+    # ─── General file checks ──────────────────────────────────────────────────
+    - repo: https://github.com/sirosen/texthooks
+      rev: d6c72a6690a6169863904e316536b52a80c18813
+      hooks:
+          - id: fix-smartquotes
+          - id: fix-spaces
+
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: f4e025486b81198907fa79d1c14af09c0e67859d
+      hooks:
+          - id: check-merge-conflict
+            name: Check for merge conflicts
+          - id: check-yaml
+            name: Validate YAML
+            args: [--allow-multiple-documents]
+            files: \.(yaml|yml)$
+          - id: check-json
+            name: Validate JSON
+          - id: check-case-conflict
+          - id: check-added-large-files
+            name: Check for large files
+            args: [--maxkb=500]
+          - id: end-of-file-fixer
+            name: Fix end of files
+          - id: mixed-line-ending
+            args: [--fix=lf]
+          - id: pretty-format-json
+            args: [--indent=4, --autofix]
+          - id: trailing-whitespace
+            name: Trim trailing whitespace
+          - id: no-commit-to-branch
+            args: [--branch, main]

@@ -1,0 +1,13 @@
+@use "../styles/mixins" as m;
+
+.wrapper {
+  @include m.flex-column;
+  gap: 24px;
+}
+
+.heading {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}

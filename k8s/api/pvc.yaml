@@ -1,0 +1,19 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# PersistentVolumeClaim — répertoire des projets docker-compose managés
+# Remplacer par un NFS/CephFS/hostPath selon l'infra.
+# ──────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: docker-overview-projects
+  namespace: docker-overview
+  labels:
+    app.kubernetes.io/name: docker-overview
+    app.kubernetes.io/component: api
+spec:
+  accessModes:
+    - ReadWriteMany   # RWX : plusieurs réplicas API peuvent lire simultanement
+  resources:
+    requests:
+      storage: 1Gi
+  # storageClassName: nfs-client   # décommenter selon le cluster

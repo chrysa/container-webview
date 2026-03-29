@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docker-overview-frontend
+  namespace: docker-overview
+  labels:
+    app.kubernetes.io/name: docker-overview
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: docker-overview
+    app.kubernetes.io/component: frontend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: http

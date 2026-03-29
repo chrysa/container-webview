@@ -1,0 +1,81 @@
+# Traefik IngressRoute (CRD traefik.io/v1alpha1)
+#
+# Architecture de routage :
+#   PathPrefix(`/api`) → docker-overview-api:8000   (FastAPI + WebSocket logs)
+#   PathPrefix(`/`)    → docker-overview-frontend:3000  (SPA React / serve)
+#
+# Le frontend est buildé avec VITE_API_URL="" pour utiliser des URLs relatives.
+# Traefik se charge de router /api/* vers le bon service sans configuration
+# supplémentaire côté frontend.
+#
+# Remplacer `docker-overview.example.com` par votre vrai hostname.
+
+---
+# Entrée HTTP (port 80) — redirige vers HTTPS
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: docker-overview-http
+  namespace: docker-overview
+  labels:
+    app.kubernetes.io/name: docker-overview
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`docker-overview.example.com`)
+      kind: Rule
+      middlewares:
+        - name: https-redirect
+          namespace: docker-overview
+      services:
+        - name: docker-overview-frontend
+          port: 3000
+
+---
+# Entrée HTTPS (port 443) — routage principal
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: docker-overview-https
+  namespace: docker-overview
+  labels:
+    app.kubernetes.io/name: docker-overview
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # API FastAPI + WebSocket logs (/api/projects/{id}/services/{name}/logs)
+    # Traefik supporte le WebSocket upgrade de manière transparente.
+    - match: Host(`docker-overview.example.com`) && PathPrefix(`/api`)
+      kind: Rule
+      priority: 20
+      middlewares:
+        - name: secure-headers
+          namespace: docker-overview
+      services:
+        - name: docker-overview-api
+          port: 8000
+
+    # Frontend SPA — catch-all, priorité basse
+    # `serve -s` gère le fallback vers index.html pour le routing client-side.
+    - match: Host(`docker-overview.example.com`)
+      kind: Rule
+      priority: 10
+      middlewares:
+        - name: secure-headers
+          namespace: docker-overview
+      services:
+        - name: docker-overview-frontend
+          port: 3000
+
+  tls:
+    # Utilise le resolver cert-manager ou le TLS par défaut de Traefik.
+    # Décommenter et adapter selon votre configuration TLS :
+    #
+    # Option A — cert-manager (recommandé)
+    # certResolver: letsencrypt
+    #
+    # Option B — Secret TLS existant
+    # secretName: docker-overview-tls
+    {}
