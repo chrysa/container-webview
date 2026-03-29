@@ -1,5 +1,14 @@
 node-upgradable-package: ## check outdated packages
-	@docker compose run --rm -it docker-overview-webui npm run outdated
+	@docker compose run --rm -it frontend npm outdated
 
-node-dev-upgradable-package: ## check outdated packages on dev
-	@docker compose run --rm -it docker-overview-webui-dev npm run outdated
+node-install: ## install frontend dependencies
+	@docker compose run --rm frontend npm install --legacy-peer-deps
+
+node-lint: ## run eslint on frontend code
+	@docker compose run --rm frontend npm run lint
+
+node-build: ## build frontend for production
+	@docker compose run --rm frontend npm run build
+
+node-test: ## run frontend tests
+	@docker compose run --rm frontend npm run test

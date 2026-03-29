@@ -15,8 +15,13 @@ api-tests-xml: ## run backend tests with XML coverage report (CI)
 api-lint: ## run ruff linter on backend code
 	@docker compose run --rm api python -m ruff check app/
 
+api-lint-fix: ## run ruff linter with auto-fix on backend code
+	@docker compose run --rm api python -m ruff check --fix app/
+
 api-format: ## run ruff formatter on backend code
 	@docker compose run --rm api python -m ruff format app/
 
 api-typecheck: ## run mypy type checking on backend code
 	@docker compose run --rm api python -m mypy app/
+
+api-quality: api-lint api-format api-typecheck api-tests ## run full quality checks (lint + format + type + tests)
