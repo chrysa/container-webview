@@ -9,7 +9,7 @@ updates:
     labels:
       - "dependencies"
       - "backend"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     groups:
       python-deps:
         patterns:
@@ -24,7 +24,7 @@ updates:
     labels:
       - "dependencies"
       - "frontend"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     groups:
       npm-deps:
         patterns:
@@ -39,7 +39,7 @@ updates:
     labels:
       - "dependencies"
       - "ci/cd"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
 
   # ── pre-commit hooks ──────────────────────────────────────────────────────
   - package-ecosystem: "pre-commit"
@@ -50,4 +50,4 @@ updates:
     labels:
       - "dependencies"
       - "pre-commit"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
