@@ -1,229 +1,264 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# CI — Continuous Integration
-#
-# Triggered on every push and pull request targeting main or develop.
-# - Computes the next semantic version via GitVersion
-# - Runs pre-commit checks (linting, formatting, security)
-# - Runs backend tests with coverage
-# - Builds Docker images to validate Dockerfiles
-#
-# Permissions: contents: read (default, no secrets needed)
-# ─────────────────────────────────────────────────────────────────────────────
+---
 name: CI
 
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
-  workflow_dispatch:
-
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+    pull_request:
+        types:
+            - opened
+            - ready_for_review
+            - reopened
+            - synchronize
+    workflow_dispatch:
 
 permissions:
-  contents: read
+    contents: read
+    pull-requests: write
+    checks: write
 
 jobs:
-  # ── 1. Version computation ─────────────────────────────────────────────────
-  version:
-    name: Compute Version
-    runs-on: ubuntu-latest
-    outputs:
-      semVer: ${{ steps.gitversion.outputs.semVer }}
-      majorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}
+    # ── 1. Version ─────────────────────────────────────────────────────────
+    version:
+        name: Compute Version
+        runs-on: ubuntu-latest
+        outputs:
+            semVer: ${{ steps.gitversion.outputs.semVer }}
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Setup GitVersion
-        uses: gittools/actions/gitversion/setup@v3
-        with:
-          versionSpec: "6.x"
+            - name: GitVersion
+              id: gitversion
+              uses: chrysa/github-actions/gitversion@main
 
-      - name: Execute GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v3
-        with:
-          useConfigFile: true
+            - name: Summary
+              run: |
+                  echo "## Version" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "|-----|-------|" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| SemVer | \`${{ steps.gitversion.outputs.semVer }}\` |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Branch | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Print computed version
-        run: |
-          echo "## Version computed by GitVersion" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-----|-------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| SemVer | \`${{ steps.gitversion.outputs.semVer }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Branch | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+    # ── 2. Pre-commit ──────────────────────────────────────────────────────
+    pre-commit:
+        name: Pre-commit Checks
+        runs-on: ubuntu-latest
 
-  # ── 2. Pre-commit checks ───────────────────────────────────────────────────
-  pre-commit:
-    name: Pre-commit Checks
-    runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+            - name: Set up Python
+              uses: actions/setup-python@v6
+              with:
+                  python-version: '3.12'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+            - name: Cache pre-commit environments
+              uses: actions/cache@v4
+              with:
+                  path: ~/.cache/pre-commit
+                  key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+                  restore-keys: |
+                      pre-commit-${{ runner.os }}-
 
-      - name: Install pre-commit-hooks-changelog
-        run: pip install pre-commit-hooks-changelog
+            - name: Run pre-commit
+              uses: pre-commit/action@v3.0.1
 
-      - name: Cache pre-commit environments
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: |
-            pre-commit-${{ runner.os }}-
+    # ── 3. Backend — lint & type check ────────────────────────────────────
+    backend-lint:
+        name: Backend Lint & Type Check
+        runs-on: ubuntu-latest
 
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-  # ── 3. Backend — lint & type check ────────────────────────────────────────
-  backend-lint:
-    name: Backend Lint & Type Check
-    runs-on: ubuntu-latest
+            - name: Setup Python
+              uses: chrysa/github-actions/python-setup@main
+              with:
+                  python-version: '3.12'
 
-    steps:
-      - uses: actions/checkout@v4
+            - name: Install project
+              uses: chrysa/github-actions/install-project@main
+              with:
+                  extras: 'dev'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+            - name: Ruff check
+              uses: chrysa/github-actions/ruff-check@main
+              with:
+                  python-version: '3.12'
+                  latest-python: '3.12'
+                  config: api/pyproject.toml
+                  sources: api/app
 
-      - name: Install dependencies
-        working-directory: api
-        run: pip install -e ".[dev]"
+            - name: Mypy check
+              uses: chrysa/github-actions/mypy-check@main
+              with:
+                  python-version: '3.12'
+                  latest-python: '3.12'
+                  config-file: api/pyproject.toml
+                  sources: api/app
 
-      - name: Ruff lint
-        working-directory: api
-        run: python -m ruff check app/
+    # ── 4. Backend — tests ─────────────────────────────────────────────────
+    backend-tests:
+        name: Backend Tests
+        runs-on: ubuntu-latest
+        needs: backend-lint
 
-      - name: Ruff format check
-        working-directory: api
-        run: python -m ruff format --check app/
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Mypy type check
-        working-directory: api
-        run: python -m mypy app/ || true
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
 
-  # ── 4. Backend — tests ─────────────────────────────────────────────────────
-  backend-tests:
-    name: Backend Tests
-    runs-on: ubuntu-latest
-    needs: backend-lint
+            - name: Build test image
+              run: docker compose build api-test
+              env:
+                  COMPOSE_BAKE: true
 
-    steps:
-      - uses: actions/checkout@v4
+            - name: Run tests with coverage
+              run: |
+                  docker compose --profile test run --rm api-test \
+                      python -m pytest \
+                          --cov=app \
+                          --cov-report=xml:reports/coverage.xml \
+                          --cov-report=term-missing \
+                          --junitxml=reports/junit.xml \
+                          -v
+              env:
+                  SECRET_KEY: ci-secret-key-not-for-production
+                  ADMIN_USERNAME: testuser
+                  ADMIN_PASSWORD: testpass
+                  PROJECTS_PATH: /tmp/projects
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+            - name: Upload test results
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: test-results-3.12
+                  path: reports/
+                  retention-days: 7
 
-      - name: Build test image
-        run: |
-          docker compose build api-test
-        env:
-          COMPOSE_BAKE: true
+            - name: Publish test results to PR
+              if: always()
+              uses: EnricoMi/publish-unit-test-result-action@v2
+              with:
+                  files: reports/junit.xml
+                  comment_title: Test Results
+                  check_name: pytest
 
-      - name: Run tests with coverage
-        run: |
-          docker compose --profile test run --rm api-test \
-            python -m pytest --cov=app --cov-report=xml --cov-report=term-missing -v
-        env:
-          SECRET_KEY: ci-secret-key-not-for-production
-          ADMIN_USERNAME: testuser
-          ADMIN_PASSWORD: testpass
-          PROJECTS_PATH: /tmp/projects
+    # ── 5. Frontend — lint & type check ───────────────────────────────────
+    frontend-lint:
+        name: Frontend Lint & Type Check
+        runs-on: ubuntu-latest
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'npm'
+                  cache-dependency-path: code/package-lock.json
+
+            - name: Install dependencies
+              working-directory: code
+              run: npm install --legacy-peer-deps
+
+            - name: ESLint
+              working-directory: code
+              run: npm run lint
+
+            - name: TypeScript check
+              working-directory: code
+              run: npm run type-check
+
+    # ── 6. Docker build validation ─────────────────────────────────────────
+    docker-build:
+        name: Docker Build Validation
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build API image (dev)
+              run: |
+                  docker build \
+                      --file api/Dockerfile \
+                      --target dev \
+                      --tag container-webview-api:ci \
+                      ./api
+
+            - name: Build API image (test)
+              run: |
+                  docker build \
+                      --file api/Dockerfile \
+                      --target test \
+                      --tag container-webview-api-test:ci \
+                      ./api
+
+    # ── 7. SonarCloud ──────────────────────────────────────────────────────
+    sonar:
+        name: SonarCloud
+        runs-on: ubuntu-latest
+        needs: [backend-tests]
         if: always()
-        with:
-          name: coverage-report
-          path: api/coverage.xml
-          retention-days: 7
 
-  # ── 5. Frontend — lint & type check ──────────────────────────────────────
-  frontend-lint:
-    name: Frontend Lint & Type Check
-    runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-    steps:
-      - uses: actions/checkout@v4
+            - name: SonarCloud scan
+              uses: chrysa/github-actions/sonar-scan@main
+              with:
+                  latest-python: '3.12'
+                  sonar-token: ${{ secrets.SONAR_TOKEN }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  project-key: chrysa_container-webview
+                  organization: chrysa
+                  project-name: container-webview
+                  sources: api/app
+                  tests: api/app/tests
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: code/package-lock.json
+    # ── 8. CI Summary ──────────────────────────────────────────────────────
+    ci-summary:
+        name: CI Summary
+        runs-on: ubuntu-latest
+        needs: [version, pre-commit, backend-lint, backend-tests, frontend-lint, docker-build, sonar]
+        if: always()
 
-      - name: Install dependencies
-        working-directory: code
-        run: npm install --legacy-peer-deps
-
-      - name: ESLint
-        working-directory: code
-        run: npm run lint
-
-      - name: TypeScript check
-        working-directory: code
-        run: npm run type-check
-
-  # ── 6. Docker image build validation ──────────────────────────────────────
-  docker-build:
-    name: Docker Build Validation
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build API image (dev target)
-        run: |
-          docker build \
-            --file api/Dockerfile \
-            --target dev \
-            --tag container-webview-api:ci \
-            ./api
-
-      - name: Build API image (test target)
-        run: |
-          docker build \
-            --file api/Dockerfile \
-            --target test \
-            --tag container-webview-api-test:ci \
-            ./api
-
-  # ── 7. CI summary ─────────────────────────────────────────────────────────
-  ci-summary:
-    name: CI Summary
-    runs-on: ubuntu-latest
-    needs: [version, pre-commit, backend-lint, backend-tests, frontend-lint, docker-build]
-    if: always()
-
-    steps:
-      - name: Summary
-        run: |
-          echo "## CI Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Job | Status |" >> "$GITHUB_STEP_SUMMARY"
-          echo "|-----|--------|" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Version | ${{ needs.version.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Pre-commit | ${{ needs.pre-commit.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Backend Lint | ${{ needs.backend-lint.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Backend Tests | ${{ needs.backend-tests.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Frontend Lint | ${{ needs.frontend-lint.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Docker Build | ${{ needs.docker-build.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "**Version:** \`${{ needs.version.outputs.semVer }}\`" >> "$GITHUB_STEP_SUMMARY"
+        steps:
+            - name: Summary
+              run: |
+                  echo "## CI Summary" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Job | Status |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "|-----|--------|" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Version | ${{ needs.version.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Pre-commit | ${{ needs.pre-commit.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Backend Lint | ${{ needs.backend-lint.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Backend Tests | ${{ needs.backend-tests.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Frontend Lint | ${{ needs.frontend-lint.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| Docker Build | ${{ needs.docker-build.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "| SonarCloud | ${{ needs.sonar.result }} |" >> "$GITHUB_STEP_SUMMARY"
+                  echo "" >> "$GITHUB_STEP_SUMMARY"
