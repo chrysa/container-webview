@@ -1,0 +1,71 @@
+---
+name: CI
+
+on:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - feature/**
+            - fix/**
+            - chore/**
+            - main
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+    pre-commit:
+        name: Pre-commit checks
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: '3.14'
+                  cache: pip
+            - uses: pre-commit/action@v3.0.1
+
+    lint-and-test:
+        name: Lint & Test (Node ${{ matrix.node-version }})
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        strategy:
+            fail-fast: false
+            matrix:
+                node-version:
+                    - '20'
+                    - '22'
+        defaults:
+            run:
+                working-directory: code
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: npm
+                  cache-dependency-path: code/package-lock.json
+
+            - name: Install dependencies
+              run: npm ci --no-audit
+
+            - name: Run tests
+              run: npm test -- --watchAll=false --passWithNoTests
+              env:
+                  CI: true
+
+            - name: Build
+              run: npm run build
+              env:
+                  CI: true
