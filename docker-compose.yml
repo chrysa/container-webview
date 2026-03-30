@@ -1,68 +1,54 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# Development stack
-#   api      : FastAPI + uvicorn --reload  (port 8000)
-#   frontend : React / CRA dev server      (port 3000)
-# ─────────────────────────────────────────────────────────────────────────────
 services:
-
-  # ── FastAPI backend ──────────────────────────────────────────────────────
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
       target: dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     container_name: container-webview-api
     env_file: .env
     environment:
       PROJECTS_PATH: /projects
     ports:
-      - "8000:8000"
-    volumes:
-      # Hot-reload: mount source code
-      - ./api:/app
-      # Docker socket so the API can inspect running containers
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      # Mount a local directory that holds your docker-compose projects
-      - ${PROJECTS_PATH:-./data/projects}:/projects:ro
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    - 8000:8000
     restart: unless-stopped
-
-  # ── FastAPI tests ────────────────────────────────────────────────────────
+    volumes:
+    - ${PROJECTS_PATH:-./data/projects}:/projects:ro
+    - ./api:/app
+    - /var/run/docker.sock:/var/run/docker.sock:ro
   api-test:
     build:
       context: ./api
       dockerfile: Dockerfile
       target: test
     container_name: container-webview-api-test
-    volumes:
-      - ./api:/app
     environment:
-      SECRET_KEY: test-secret-key-for-ci
-      ADMIN_USERNAME: testuser
       ADMIN_PASSWORD: testpass
+      ADMIN_USERNAME: testuser
       PROJECTS_PATH: /tmp/projects
-    profiles: [test]
-
-  # ── React frontend (CRA dev server) ─────────────────────────────────────
+      SECRET_KEY: test-secret-key-for-ci
+    profiles:
+    - test
+    volumes:
+    - ./api:/app
   frontend:
-    image: node:20-slim
+    command: sh -c "npm install --legacy-peer-deps && npm start"
     container_name: container-webview-frontend
-    working_dir: /app
+    depends_on:
+    - api
     env_file: .env
     environment:
-      WATCHPACK_POLLING: "true"
       NODE_ENV: development
-      PORT: "3000"
-      REACT_APP_API_URL: "http://localhost:8000"
+      PORT: '3000'
+      REACT_APP_API_URL: http://localhost:8000
+      WATCHPACK_POLLING: 'true'
+    image: node:20-slim
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-    volumes:
-      - ./code:/app
-      - frontend_node_modules:/app/node_modules
-    command: sh -c "npm install --legacy-peer-deps && npm start"
-    depends_on:
-      - api
+    - ${FRONTEND_PORT:-3000}:3000
     restart: unless-stopped
-
+    volumes:
+    - ./code:/app
+    - frontend_node_modules:/app/node_modules
+    working_dir: /app
 volumes:
-  frontend_node_modules:
+  frontend_node_modules: null
