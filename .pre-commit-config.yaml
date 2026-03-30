@@ -6,7 +6,7 @@ minimum_pre_commit_version: 4.1.0
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: f1dff44d3a9ae852957f34def96390f28719c232
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -17,7 +17,7 @@ repos:
         args: [--fix=lf]
 
   - repo: https://github.com/chrysa/pre-commit-tools
-    rev: 0.1.0
+    rev: b97ae91d8a45eb6f556fe938fa8bd58294c9a5e6
     hooks:
       - id: yaml-sorter
         exclude: ^\.github/workflows/
