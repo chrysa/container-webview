@@ -17,12 +17,12 @@ repos:
   #         stages:
   #             - manual
 -   repo: https://github.com/hadolint/hadolint.git
-    rev: 024fd640378acd5d8218f77ec2c744826cdda5ce
+    rev: 0d4f787e3f8211457c4423febc24680a313c43d0
     hooks:
     -   id: hadolint-docker
         args: [--config=./config-tools/.hadolint.yaml]
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.43.0
+    rev: v10.1.0
     hooks:
     -   id: eslint
         args: [--config, code/.eslintrc.cjs]
@@ -41,12 +41,12 @@ repos:
     hooks:
     -   id: csslint
 -   repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
+    rev: 30a25fe087e31d0345be0ffed4360e4651a44b6e
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
 -   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.2.3
+    rev: 7b8bca6012218d6804e586523b246cd0a8eb02a1
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --colons, --width, '200']
@@ -60,7 +60,7 @@ repos:
         args: [-c, config-tools/.cmake-format.yaml]
         files: Makefile
 -   repo: https://github.com/frnmst/md-toc
-    rev: 8.1.9
+    rev: 9.0.0
     hooks:
     -   id: md-toc
         stages:
@@ -72,12 +72,12 @@ repos:
         stages:
         -   manual
 -   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.35.0
+    rev: f7ed74202ac8ec26bab4a68359556c5243df142f
     hooks:
     -   id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
 -   repo: https://github.com/executablebooks/mdformat
-    rev: 0cbd2054dedf98ec8366001c8a16eacfa85cebc1
+    rev: 56b24ef0c6cfdab501844925971204f858185547
     hooks:
     -   id: mdformat
     # Optionally add plugins
@@ -85,18 +85,18 @@ repos:
         -   mdformat-gfm
         -   mdformat-black
 -   repo: https://github.com/lovesegfault/beautysh.git
-    rev: 9845efc3ea3e86cc0d41465d720a47f521b2799c
+    rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
     hooks:
     -   id: beautysh
         args: [--indent-size, '4']
 -   repo: https://github.com/openstack/bashate.git
-    rev: f5426a8c83b429b7bae80d9004bdebc73ebe8137
+    rev: ec2f2400915200d633299612a02d7d285e4be24c
     hooks:
     -   id: bashate
         args:
         -   --ignore=E006,E020
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: bb4e628bb475392bed0736990db6f33009bb8169
+    rev: f1dff44d3a9ae852957f34def96390f28719c232
     hooks:
     -   id: check-json
     -   id: check-yaml
