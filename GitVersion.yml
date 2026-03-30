@@ -1,27 +1,14 @@
 branches:
-  feature:
-    increment: Inherit
-    is-main-branch: false
-    mode: ContinuousDeployment
-    regex: ^(feature|feat)[\/\-]
-    tag: '{BranchName}'
-  main:
-    increment: Inherit
-    is-main-branch: true
-    mode: Mainline
-    prevent-increment-of-merged-branch-version: false
-    regex: ^main$
-    track-merge-target: false
-  pull-request:
-    increment: Inherit
-    is-main-branch: false
-    mode: ContinuousDeployment
-    regex: ^(pull-request|pr)[\/\-]
-    tag: PullRequest{}
-initial-version: 0.1.0
-major-version-bump-message: '^(feat|fix|refactor|perf|style|test|docs|build|ops|chore)(\(.+\))?!:'
-minor-version-bump-message: '^feat(\(.+\))?[^!]?:'
-mode: Mainline
-no-bump-message: '^(docs?|style|test|chore)(\(.+\))?:'
-patch-version-bump-message: '^(fix|perf|refactor)(\(.+\))?[^!]?:'
-tag-prefix: '[vV]'
+  fix:
+    increment: Patch
+    label: fix
+    regex: ^fix[/-]
+    source-branches:
+      - main
+  release:
+    increment: Patch
+    label: rc
+    regex: ^release[/-]
+    source-branches:
+      - main
+workflow: GitHubFlow/v1
