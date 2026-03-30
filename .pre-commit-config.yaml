@@ -1,116 +1,22 @@
 ---
 default_language_version:
-    python: python3.12
+    python: python3.14
 fail_fast: false
-minimum_pre_commit_version: 3.7.0
+minimum_pre_commit_version: 4.1.0
 
 repos:
-  # - repo: meta
-  #   hooks:
-  #       - id: identity
-  #         stages:
-  #             - manual
-  #       - id: check-hooks-apply
-  #         stages:
-  #             - manual
-  #       - id: check-useless-excludes
-  #         stages:
-  #             - manual
--   repo: https://github.com/hadolint/hadolint.git
-    rev: 0d4f787e3f8211457c4423febc24680a313c43d0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: f1dff44d3a9ae852957f34def96390f28719c262
     hooks:
-    -   id: hadolint-docker
-        args: [--config=./config-tools/.hadolint.yaml]
--   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.1.0
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: https://github.com/chrysa/pre-commit-tools
+    rev: 0ed8a1e245262ff5233ddbd96c456a76fde375a3
     hooks:
-    -   id: eslint
-        args: [--config, code/.eslintrc.cjs]
-        additional_dependencies:
-        -   eslint
-        -   typescript
-        -   '@typescript-eslint/eslint-plugin'
-        -   '@typescript-eslint/parser'
-        -   eslint-config-prettier
--   repo: https://github.com/pre-commit/mirrors-csslint
-    rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
-    hooks:
-    -   id: csslint
--   repo: https://github.com/pre-commit/mirrors-csslint
-    rev: ad9b0d72db73272bae05948632f13b5cada6f3ef
-    hooks:
-    -   id: csslint
--   repo: https://github.com/adrienverge/yamllint.git
-    rev: 30a25fe087e31d0345be0ffed4360e4651a44b6e
-    hooks:
-    -   id: yamllint
-        args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
--   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 7b8bca6012218d6804e586523b246cd0a8eb02a1
-    hooks:
-    -   id: yamlfmt
-        args: [--mapping, '4', --sequence, '4', --offset, '0', --colons, --width, '200']
--   repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.13
-    hooks:
-    -   id: cmake-format
-        args: [-c, config-tools/.cmake-format.yaml]
-        files: Makefile
-    -   id: cmake-lint
-        args: [-c, config-tools/.cmake-format.yaml]
-        files: Makefile
--   repo: https://github.com/frnmst/md-toc
-    rev: 9.0.0
-    hooks:
-    -   id: md-toc
-        stages:
-        -   manual
--   repo: https://github.com/smian/pre-commit-makefile.git
-    rev: 261f8fb4b31dfdc05d1a1d7fbde1f1462ecde66d
-    hooks:
-    -   id: makefile-doc
-        stages:
-        -   manual
--   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: f7ed74202ac8ec26bab4a68359556c5243df142f
-    hooks:
-    -   id: markdownlint
-        args: [-c, config-tools/.markdownlint.yml, --fix]
--   repo: https://github.com/executablebooks/mdformat
-    rev: 56b24ef0c6cfdab501844925971204f858185547
-    hooks:
-    -   id: mdformat
-    # Optionally add plugins
-        additional_dependencies:
-        -   mdformat-gfm
-        -   mdformat-black
--   repo: https://github.com/lovesegfault/beautysh.git
-    rev: 34c3b3da0233e76d7d1ad90a78f3679185ecf31c
-    hooks:
-    -   id: beautysh
-        args: [--indent-size, '4']
--   repo: https://github.com/openstack/bashate.git
-    rev: ec2f2400915200d633299612a02d7d285e4be24c
-    hooks:
-    -   id: bashate
-        args:
-        -   --ignore=E006,E020
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: f1dff44d3a9ae852957f34def96390f28719c232
-    hooks:
-    -   id: check-json
-    -   id: check-yaml
-        args:
-        -   --allow-multiple-documents
-        files: .(yaml|yml)$
-    -   id: check-case-conflict
-    -   id: end-of-file-fixer
-    -   id: mixed-line-ending
-        args:
-        -   --fix=lf
-    -   id: pretty-format-json
-        args:
-        -   --indent=4
-        -   --autofix
-    -   id: trailing-whitespace
-    -   id: check-merge-conflict
+      - id: yaml-sorter
