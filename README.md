@@ -1,5 +1,7 @@
 # web GUI for managing docker compose project dev
 
+[![CI](https://github.com/chrysa/container-webview/actions/workflows/ci.yml/badge.svg)](https://github.com/chrysa/container-webview/actions/workflows/ci.yml)
+
 generate graph for docker-compose
 
 ______________________________________________________________________
