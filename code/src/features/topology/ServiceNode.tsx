@@ -1,5 +1,5 @@
-import { Handle, Position, type NodeProps } from "@xyflow/react";
-import styles from "./ServiceNode.module.scss";
+import { Handle, Position, type NodeProps } from '@xyflow/react';
+import styles from './ServiceNode.module.scss';
 
 interface ServiceData {
   label: string;
@@ -22,7 +22,9 @@ export default function ServiceNode({ data }: NodeProps) {
       {d.ports?.length > 0 && (
         <div className={styles.ports}>
           {d.ports.map((p) => (
-            <span key={p} className={styles.port}>{p}</span>
+            <span key={p} className={styles.port}>
+              {p}
+            </span>
           ))}
         </div>
       )}

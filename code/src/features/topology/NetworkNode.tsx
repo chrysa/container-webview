@@ -1,5 +1,5 @@
-import { Handle, Position, type NodeProps } from "@xyflow/react";
-import styles from "./NetworkNode.module.scss";
+import { Handle, Position, type NodeProps } from '@xyflow/react';
+import styles from './NetworkNode.module.scss';
 
 interface NetworkData {
   label: string;

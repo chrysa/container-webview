@@ -1,4 +1,4 @@
-@use "../../styles/mixins" as m;
+@use '../../styles/mixins' as m;
 
 .wrapper {
   overflow-x: auto;
@@ -81,10 +81,22 @@
     cursor: not-allowed;
   }
 
-  &.start:hover:not(:disabled)   { background: var(--status-running); border-color: var(--status-running); }
-  &.stop:hover:not(:disabled)    { background: var(--status-exited);  border-color: var(--status-exited);  }
-  &.restart:hover:not(:disabled) { background: var(--primary);        border-color: var(--primary);        }
-  &.pause:hover:not(:disabled)   { background: var(--status-paused);  border-color: var(--status-paused);  }
+  &.start:hover:not(:disabled) {
+    background: var(--status-running);
+    border-color: var(--status-running);
+  }
+  &.stop:hover:not(:disabled) {
+    background: var(--status-exited);
+    border-color: var(--status-exited);
+  }
+  &.restart:hover:not(:disabled) {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  &.pause:hover:not(:disabled) {
+    background: var(--status-paused);
+    border-color: var(--status-paused);
+  }
 }
 
 .expandBtn {
@@ -96,7 +108,9 @@
   @include m.flex-center;
   @include m.smooth;
 
-  &:hover { color: var(--text); }
+  &:hover {
+    color: var(--text);
+  }
 }
 
 .detailRow td {

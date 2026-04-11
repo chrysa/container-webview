@@ -1,10 +1,13 @@
 import logging
 
-import docker.errors
 from pydantic import BaseModel
 
 from app.constants import DockerComposeLabel
-from app.services.docker_client import docker_client
+from app.services.docker_client import get_all_containers_for_project
+import docker
+import docker.errors
+import docker.models.containers
+
 
 _logger = logging.getLogger(__name__)
 _BYTES_PER_MB: int = 1024 * 1024
@@ -41,22 +44,16 @@ class MetricsService:
         """Compute CPU usage percentage from raw Docker stats, or 0.0 on missing data."""
         cpu_stats = stats.get("cpu_stats", {})
         precpu_stats = stats.get("precpu_stats", {})
-        cpu_delta = (
-            cpu_stats.get("cpu_usage", {}).get("total_usage", 0)
-            - precpu_stats.get("cpu_usage", {}).get("total_usage", 0)
+        cpu_delta = cpu_stats.get("cpu_usage", {}).get("total_usage", 0) - precpu_stats.get("cpu_usage", {}).get(
+            "total_usage", 0
         )
-        system_delta = (
-            cpu_stats.get("system_cpu_usage", 0)
-            - precpu_stats.get("system_cpu_usage", 0)
-        )
-        nb_cpus: int = cpu_stats.get("online_cpus") or len(
-            cpu_stats.get("cpu_usage", {}).get("percpu_usage", [None])
-        )
+        system_delta = cpu_stats.get("system_cpu_usage", 0) - precpu_stats.get("system_cpu_usage", 0)
+        nb_cpus: int = cpu_stats.get("online_cpus") or len(cpu_stats.get("cpu_usage", {}).get("percpu_usage", [None]))
         if system_delta <= 0 or nb_cpus <= 0:
             return 0.0
         return (cpu_delta / system_delta) * nb_cpus * 100.0
 
-    def _parse_stats(self, container, stats: dict) -> ServiceMetrics:
+    def _parse_stats(self, container: docker.models.containers.Container, stats: dict) -> ServiceMetrics:
         """Build a ServiceMetrics instance from raw Docker stats."""
         service_name: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
         mem: dict = stats.get("memory_stats", {})
@@ -88,7 +85,7 @@ class MetricsService:
             block_write_mb=self._bytes_to_mb(block_write_bytes),
         )
 
-    def _zero_metrics(self, container) -> ServiceMetrics:
+    def _zero_metrics(self, container: docker.models.containers.Container) -> ServiceMetrics:
         """Return zeroed-out ServiceMetrics when stats cannot be retrieved."""
         return ServiceMetrics(
             service=container.labels.get(DockerComposeLabel.SERVICE, container.name),
@@ -107,7 +104,7 @@ class MetricsService:
     def get_project_metrics(self, project_id: str) -> list[ServiceMetrics]:
         """Return resource metrics for all containers in a Compose project."""
         result: list[ServiceMetrics] = []
-        for container in docker_client.get_all_containers_for_project(project_id):
+        for container in get_all_containers_for_project(project_id):
             try:
                 raw_stats = container.stats(stream=False)
             except docker.errors.APIError as api_exc:

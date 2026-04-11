@@ -1,6 +1,6 @@
----
-applyTo: "{Dockerfile,api/Dockerfile,docker-compose.yml,k8s/**/*}"
----
+______________________________________________________________________
+
+## applyTo: "{Dockerfile,api/Dockerfile,docker-compose.yml,k8s/\*\*/\*}"
 
 # Docker & Kubernetes Guidelines
 
@@ -31,6 +31,7 @@ CMD ["serve", "-s", "/app/dist", "-l", "3000"]
 ```
 
 **Règles** :
+
 - `VITE_API_URL=""` (vide) en production K8s — Traefik proxifie `/api`
 - `VITE_API_URL=http://localhost:8000` en docker-compose local
 - Toujours utiliser `node:22-slim`, jamais `node:latest`
@@ -51,6 +52,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 **Règles** :
+
 - Toujours `python:3.12-slim`, jamais `python:latest`
 - `--no-install-recommends` + nettoyage `apt` dans la même layer
 - `--no-cache-dir` pour pip
@@ -58,6 +60,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ### hadolint
 
 Config dans `config-tools/.hadolint.yaml`. Règles ignorées :
+
 - `DL3008`, `DL3013`, `DL3018`, `DL3031`, `DL3033` — version pinning apt/pip (géré par requirements.txt)
 - `DL4006` — set -o pipefail (géré globalement)
 - `SC2086` — double quote (cas légitimes documentés)
@@ -75,6 +78,7 @@ services:
 ```
 
 **Règles** :
+
 - Le socket Docker est monté en bind : `/var/run/docker.sock:/var/run/docker.sock`
 - Le répertoire projets est monté depuis `.env` → `PROJECTS_PATH`
 - `frontend` dépend de `api` avec healthcheck `curl -f http://localhost:8000/api`
@@ -129,6 +133,7 @@ Le fichier `k8s/secret.yaml` est exclu de `kustomization.yaml`. Ne jamais le com
 ### Images en CI/CD
 
 Les images sont stockées dans **GitHub Container Registry** :
+
 ```
 ghcr.io/chrysa/container-webview/api:<SHA>
 ghcr.io/chrysa/container-webview/frontend:<SHA>
@@ -138,13 +143,13 @@ ghcr.io/chrysa/container-webview/frontend:<SHA>
 
 ## Makefile — commandes disponibles
 
-| Commande | Description |
-|---|---|
-| `make prod-up` | Lance api + frontend en mode production |
-| `make prod-down` | Arrête tous les services |
-| `make dev-up` | Lance api-dev + frontend-dev (hot-reload) |
-| `make docker-build` | Build les deux images Docker |
-| `make node-build` | Build le frontend (`npm run build`) |
-| `make node-lint` | Lint TypeScript (`npm run lint`) |
-| `make api-lint` | Lint Python (`ruff check api/`) |
-| `make api-install` | Install dépendances Python |
+| Commande            | Description                               |
+| ------------------- | ----------------------------------------- |
+| `make prod-up`      | Lance api + frontend en mode production   |
+| `make prod-down`    | Arrête tous les services                  |
+| `make dev-up`       | Lance api-dev + frontend-dev (hot-reload) |
+| `make docker-build` | Build les deux images Docker              |
+| `make node-build`   | Build le frontend (`npm run build`)       |
+| `make node-lint`    | Lint TypeScript (`npm run lint`)          |
+| `make api-lint`     | Lint Python (`ruff check api/`)           |
+| `make api-install`  | Install dépendances Python                |

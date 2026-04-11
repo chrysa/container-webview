@@ -4,6 +4,7 @@ import ldap  # type: ignore[import]
 
 from app.config import get_settings
 
+
 _logger = logging.getLogger(__name__)
 _LDAP_DN_TEMPLATE: str = "cn={},{}"
 
