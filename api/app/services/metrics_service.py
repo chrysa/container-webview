@@ -1,10 +1,13 @@
 import logging
 
 import docker.errors
+import docker.models.containers
 from pydantic import BaseModel
 
 from app.constants import DockerComposeLabel
-from app.services.docker_client import docker_client
+from app.services.docker_client import get_all_containers_for_project
+import docker
+
 
 _logger = logging.getLogger(__name__)
 _BYTES_PER_MB: int = 1024 * 1024
@@ -56,7 +59,7 @@ class MetricsService:
             return 0.0
         return (cpu_delta / system_delta) * nb_cpus * 100.0
 
-    def _parse_stats(self, container, stats: dict) -> ServiceMetrics:
+    def _parse_stats(self, container: docker.models.containers.Container, stats: dict) -> ServiceMetrics:
         """Build a ServiceMetrics instance from raw Docker stats."""
         service_name: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
         mem: dict = stats.get("memory_stats", {})
@@ -88,7 +91,7 @@ class MetricsService:
             block_write_mb=self._bytes_to_mb(block_write_bytes),
         )
 
-    def _zero_metrics(self, container) -> ServiceMetrics:
+    def _zero_metrics(self, container: docker.models.containers.Container) -> ServiceMetrics:
         """Return zeroed-out ServiceMetrics when stats cannot be retrieved."""
         return ServiceMetrics(
             service=container.labels.get(DockerComposeLabel.SERVICE, container.name),
@@ -107,7 +110,7 @@ class MetricsService:
     def get_project_metrics(self, project_id: str) -> list[ServiceMetrics]:
         """Return resource metrics for all containers in a Compose project."""
         result: list[ServiceMetrics] = []
-        for container in docker_client.get_all_containers_for_project(project_id):
+        for container in get_all_containers_for_project(project_id):
             try:
                 raw_stats = container.stats(stream=False)
             except docker.errors.APIError as api_exc:

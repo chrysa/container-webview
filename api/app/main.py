@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, projects, topology, lifecycle, logs, metrics, alerts
+from app.routers import alerts
+from app.routers import auth
+from app.routers import lifecycle
+from app.routers import logs
+from app.routers import metrics
+from app.routers import projects
+from app.routers import topology
+
 
 app = FastAPI(title="Docker Overview API", version="1.0.0")
 

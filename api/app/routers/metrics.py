@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List
+import docker.errors
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 
 from app.security import get_current_user
+from app.services.docker_client import get_all_containers_for_project
 from app.services.project_manager import load_project
-from app.services.docker_client import get_all_containers_for_project, get_docker_client
+
 
 router = APIRouter()
 
@@ -42,8 +45,8 @@ def _bytes_to_mb(b: int) -> float:
     return round(b / (1024 * 1024), 2)
 
 
-@router.get("/{project_id}/metrics", response_model=List[ServiceMetrics])
-def get_metrics(project_id: str, _: dict = Depends(get_current_user)):
+@router.get("/{project_id}/metrics", response_model=list[ServiceMetrics])
+def get_metrics(project_id: str, _: dict = Depends(get_current_user)) -> list[ServiceMetrics]:
     project = load_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Projet introuvable")
@@ -86,7 +89,7 @@ def get_metrics(project_id: str, _: dict = Depends(get_current_user)):
                 block_read_mb=_bytes_to_mb(blk_read),
                 block_write_mb=_bytes_to_mb(blk_write),
             ))
-        except Exception:
+        except docker.errors.APIError:
             result.append(ServiceMetrics(
                 service=service_name,
                 container_id=container.short_id,

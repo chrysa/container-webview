@@ -1,11 +1,18 @@
+from datetime import UTC
+from datetime import datetime
 import logging
-from datetime import datetime, timezone
 
 import docker.errors
+import docker.models.containers
 from pydantic import BaseModel
 
-from app.constants import AlertLevel, ContainerState, DockerComposeLabel, HealthState
-from app.services.docker_client import docker_client
+from app.constants import AlertLevel
+from app.constants import ContainerState
+from app.constants import DockerComposeLabel
+from app.constants import HealthState
+from app.services.docker_client import get_docker_client
+import docker
+
 
 _logger = logging.getLogger(__name__)
 
@@ -24,14 +31,14 @@ class Alert(BaseModel):
 class AlertsService:
     """Inspects running containers and produces operational alerts."""
 
-    def _alerts_for_container(self, container) -> list[Alert]:
+    def _alerts_for_container(self, container: docker.models.containers.Container) -> list[Alert]:
         """Return all alerts generated for a single container."""
         project: str = container.labels.get(DockerComposeLabel.PROJECT, "")
         if not project:
             return []
 
         service: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
-        now: str = datetime.now(timezone.utc).isoformat()
+        now: str = datetime.now(UTC).isoformat()
         state: dict = container.attrs.get("State", {})
         alerts: list[Alert] = []
 
@@ -80,7 +87,7 @@ class AlertsService:
     def get_all(self) -> list[Alert]:
         """Return all alerts across every running container."""
         try:
-            containers = docker_client.client().containers.list(all=True)
+            containers = get_docker_client().containers.list(all=True)
         except docker.errors.DockerException as docker_exc:
             _logger.warning("Docker unavailable — cannot fetch alerts: %s", docker_exc)
             return []

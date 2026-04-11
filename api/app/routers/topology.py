@@ -1,10 +1,15 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Optional
+import contextlib
+
+import docker.errors
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 
 from app.security import get_current_user
-from app.services.project_manager import load_project
 from app.services.docker_client import get_docker_client
+from app.services.project_manager import load_project
+
 
 router = APIRouter()
 
@@ -31,43 +36,39 @@ class GraphEdge(BaseModel):
     id: str
     source: str
     target: str
-    label: Optional[str] = None
+    label: str | None = None
     animated: bool = False
 
 
 class TopologyGraph(BaseModel):
-    nodes: List[GraphNode]
-    edges: List[GraphEdge]
+    nodes: list[GraphNode]
+    edges: list[GraphEdge]
 
 
 def _get_container_status(project_id: str, service_name: str) -> str:
-    try:
+    with contextlib.suppress(docker.errors.DockerException):
         client = get_docker_client()
         for container in client.containers.list(all=True):
             labels = container.labels
             if (labels.get("com.docker.compose.project") == project_id and
                     labels.get("com.docker.compose.service") == service_name):
-                return container.status  # running, exited, paused, etc.
-    except Exception:
-        pass
+                return container.status
     return "unknown"
 
 
 @router.get("/{project_id}/topology", response_model=TopologyGraph)
-def get_topology(project_id: str, _: dict = Depends(get_current_user)):
+def get_topology(project_id: str, _: dict = Depends(get_current_user)) -> TopologyGraph:
     project = load_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Projet introuvable")
 
-    nodes: List[GraphNode] = []
-    edges: List[GraphEdge] = []
+    nodes: list[GraphNode] = []
+    edges: list[GraphEdge] = []
 
-    # --- Couleur par réseau ---
     network_color_map: dict = {}
     for i, net in enumerate(project.networks):
         network_color_map[net] = NETWORK_COLORS[i % len(NETWORK_COLORS)]
 
-    # Placement automatique en grille (peut être overridé par le front)
     cols = 3
     for idx, svc in enumerate(project.services):
         col = idx % cols
@@ -77,7 +78,6 @@ def get_topology(project_id: str, _: dict = Depends(get_current_user)):
 
         status = _get_container_status(project_id, svc.name)
 
-        # Couleur de fond selon le réseau principal du service
         bg_color = "#334155"
         if svc.networks:
             bg_color = network_color_map.get(svc.networks[0], "#334155")
@@ -96,17 +96,17 @@ def get_topology(project_id: str, _: dict = Depends(get_current_user)):
             },
         ))
 
-        # Edges depends_on
-        for dep in svc.depends_on:
-            edges.append(GraphEdge(
+        edges.extend(
+            GraphEdge(
                 id=f"dep-{dep}-{svc.name}",
                 source=f"svc-{dep}",
                 target=f"svc-{svc.name}",
                 label="depends_on",
                 animated=status == "running",
-            ))
+            )
+            for dep in svc.depends_on
+        )
 
-    # --- Nœuds réseau ---
     for i, net in enumerate(project.networks):
         nodes.append(GraphNode(
             id=f"net-{net}",
@@ -114,14 +114,15 @@ def get_topology(project_id: str, _: dict = Depends(get_current_user)):
             position=NodePosition(x=50 + i * 200, y=600),
             data={"label": net, "color": network_color_map[net]},
         ))
-        # Edges service → réseau
-        for svc in project.services:
-            if net in svc.networks:
-                edges.append(GraphEdge(
-                    id=f"net-{svc.name}-{net}",
-                    source=f"svc-{svc.name}",
-                    target=f"net-{net}",
-                    animated=False,
-                ))
+        edges.extend(
+            GraphEdge(
+                id=f"net-{svc.name}-{net}",
+                source=f"svc-{svc.name}",
+                target=f"net-{net}",
+                animated=False,
+            )
+            for svc in project.services
+            if net in svc.networks
+        )
 
     return TopologyGraph(nodes=nodes, edges=edges)

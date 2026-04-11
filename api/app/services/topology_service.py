@@ -1,8 +1,12 @@
+import contextlib
+
 from pydantic import BaseModel
 
 from app.constants import ContainerState
-from app.services.docker_client import docker_client
-from app.services.project_manager import ProjectModel, project_manager
+from app.services.docker_client import get_docker_client
+from app.services.project_manager import ProjectModel
+from app.services.project_manager import load_project
+
 
 _NETWORK_COLORS: list[str] = [
     "#4f86f7", "#f76f4f", "#4ff79f", "#f7e94f",
@@ -57,7 +61,19 @@ class TopologyService:
     @staticmethod
     def _network_color_map(networks: list[str]) -> dict[str, str]:
         """Assign a distinct display colour to each network."""
-        return {network_name: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, network_name in enumerate(networks)}
+        return {net: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, net in enumerate(networks)}
+
+    @staticmethod
+    def _get_container_status(project_id: str, service_name: str) -> str:
+        """Query Docker for the current container status of a service."""
+        with contextlib.suppress(Exception):  # noqa: BLE001 — Docker may be unavailable
+            client = get_docker_client()
+            for container in client.containers.list(all=True):
+                labels = container.labels
+                if (labels.get("com.docker.compose.project") == project_id
+                        and labels.get("com.docker.compose.service") == service_name):
+                    return container.status
+        return ContainerState.UNKNOWN
 
     @staticmethod
     def _service_nodes_and_edges(
@@ -71,7 +87,7 @@ class TopologyService:
 
         for service_index, service in enumerate(project.services):
             column_index, row_index = service_index % _GRID_COLS, service_index // _GRID_COLS
-            status: str = docker_client.get_container_status(project_id, service.name)
+            status: str = TopologyService._get_container_status(project_id, service.name)
             bg_color: str = (
                 color_map.get(service.networks[0], _DEFAULT_NODE_COLOR)
                 if service.networks
@@ -92,14 +108,16 @@ class TopologyService:
                 },
             ))
 
-            for dependency_name in service.depends_on:
-                edges.append(GraphEdge(
-                    id=f"{_ID_PREFIX_DEP}{dependency_name}-{service.name}",
-                    source=f"{_ID_PREFIX_SVC}{dependency_name}",
+            edges.extend(
+                GraphEdge(
+                    id=f"{_ID_PREFIX_DEP}{dep_name}-{service.name}",
+                    source=f"{_ID_PREFIX_SVC}{dep_name}",
                     target=f"{_ID_PREFIX_SVC}{service.name}",
                     label=_EDGE_LABEL_DEPENDS_ON,
                     animated=status == ContainerState.RUNNING,
-                ))
+                )
+                for dep_name in service.depends_on
+            )
 
         return nodes, edges
 
@@ -119,19 +137,21 @@ class TopologyService:
                 position=NodePosition(x=50 + i * 200, y=600),
                 data={"label": network_name, "color": color_map[network_name]},
             ))
-            for service in project.services:
-                if network_name in service.networks:
-                    edges.append(GraphEdge(
-                        id=f"{_ID_PREFIX_NET}{service.name}-{network_name}",
-                        source=f"{_ID_PREFIX_SVC}{service.name}",
-                        target=f"{_ID_PREFIX_NET}{network_name}",
-                    ))
+            edges.extend(
+                GraphEdge(
+                    id=f"{_ID_PREFIX_NET}{service.name}-{network_name}",
+                    source=f"{_ID_PREFIX_SVC}{service.name}",
+                    target=f"{_ID_PREFIX_NET}{network_name}",
+                )
+                for service in project.services
+                if network_name in service.networks
+            )
 
         return nodes, edges
 
     def build(self, project_id: str) -> TopologyGraph | None:
         """Build and return the topology graph, or None if the project does not exist."""
-        project = project_manager.load(project_id)
+        project = load_project(project_id)
         if not project:
             return None
 

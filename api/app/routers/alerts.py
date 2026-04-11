@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends
-from typing import List
-from pydantic import BaseModel
+import contextlib
+from datetime import UTC
 from datetime import datetime
+
+import docker.errors
+from fastapi import APIRouter
+from fastapi import Depends
+from pydantic import BaseModel
 
 from app.security import get_current_user
 from app.services.docker_client import get_docker_client
+
 
 router = APIRouter()
 
@@ -18,9 +23,9 @@ class Alert(BaseModel):
     timestamp: str
 
 
-def _container_alerts() -> List[Alert]:
+def _container_alerts() -> list[Alert]:
     alerts = []
-    try:
+    with contextlib.suppress(docker.errors.DockerException):
         client = get_docker_client()
         for container in client.containers.list(all=True):
             project = container.labels.get("com.docker.compose.project", "")
@@ -28,7 +33,7 @@ def _container_alerts() -> List[Alert]:
             if not project:
                 continue
 
-            now = datetime.utcnow().isoformat()
+            now = datetime.now(UTC).isoformat()
 
             if container.status == "exited":
                 exit_code = container.attrs.get("State", {}).get("ExitCode", 0)
@@ -52,7 +57,6 @@ def _container_alerts() -> List[Alert]:
                     timestamp=now,
                 ))
 
-            # Santé
             health = container.attrs.get("State", {}).get("Health", {})
             if health.get("Status") == "unhealthy":
                 alerts.append(Alert(
@@ -73,11 +77,9 @@ def _container_alerts() -> List[Alert]:
                     timestamp=now,
                 ))
 
-    except Exception:
-        pass
     return alerts
 
 
-@router.get("", response_model=List[Alert])
-def get_alerts(_: dict = Depends(get_current_user)):
+@router.get("", response_model=list[Alert])
+def get_alerts(_: dict = Depends(get_current_user)) -> list[Alert]:
     return _container_alerts()
