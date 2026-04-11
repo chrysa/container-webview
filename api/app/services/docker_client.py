@@ -1,7 +1,9 @@
-import docker
-from typing import Optional
+import docker.models.containers
 
-_client: Optional[docker.DockerClient] = None
+import docker
+
+
+_client: docker.DockerClient | None = None
 
 
 def get_docker_client() -> docker.DockerClient:
@@ -11,23 +13,27 @@ def get_docker_client() -> docker.DockerClient:
     return _client
 
 
-def get_container_for_service(project_id: str, service_name: str):
-    """Trouve le container Docker correspondant à un service compose."""
+def get_container_for_service(
+    project_id: str,
+    service_name: str,
+) -> docker.models.containers.Container | None:
+    """Return the Docker container for a Compose service, or None."""
     client = get_docker_client()
-    # Docker Compose nomme les containers : <project>-<service>-<n> ou <project>_<service>_<n>
     for container in client.containers.list(all=True):
         labels = container.labels
-        compose_project = labels.get("com.docker.compose.project", "")
-        compose_service = labels.get("com.docker.compose.service", "")
-        if compose_project == project_id and compose_service == service_name:
+        if (
+            labels.get("com.docker.compose.project") == project_id
+            and labels.get("com.docker.compose.service") == service_name
+        ):
             return container
     return None
 
 
-def get_all_containers_for_project(project_id: str):
+def get_all_containers_for_project(project_id: str) -> list[docker.models.containers.Container]:
+    """Return all containers belonging to a Compose project."""
     client = get_docker_client()
-    result = []
-    for container in client.containers.list(all=True):
-        if container.labels.get("com.docker.compose.project", "") == project_id:
-            result.append(container)
-    return result
+    return [
+        container
+        for container in client.containers.list(all=True)
+        if container.labels.get("com.docker.compose.project", "") == project_id
+    ]

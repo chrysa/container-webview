@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import typing
 from enum import StrEnum
+import typing
+
 
 if typing.TYPE_CHECKING:
     from typing import Final

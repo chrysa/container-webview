@@ -1,6 +1,7 @@
 import pytest
 
-from app.constants import ContainerState, DockerComposeLabel
+from app.constants import ContainerState
+from app.constants import DockerComposeLabel
 from app.services.docker_client import DockerClientService
 
 
@@ -158,6 +159,4 @@ class TestDockerClientService:
             service = DockerClientService()
             result = service.get_container_status("myproject", "web")
 
-            assert result == ContainerState.UNKNOWN, (
-                f"Expected {ContainerState.UNKNOWN=} but got {result=}"
-            )
+            assert result == ContainerState.UNKNOWN, f"Expected {ContainerState.UNKNOWN=} but got {result=}"
