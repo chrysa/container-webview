@@ -2,13 +2,13 @@ import contextlib
 from datetime import UTC
 from datetime import datetime
 
+import docker.errors
 from fastapi import APIRouter
 from fastapi import Depends
 from pydantic import BaseModel
 
 from app.security import get_current_user
 from app.services.docker_client import get_docker_client
-import docker.errors
 
 
 router = APIRouter()

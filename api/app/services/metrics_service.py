@@ -1,12 +1,12 @@
 import logging
 
+import docker.errors
+import docker.models.containers
 from pydantic import BaseModel
 
 from app.constants import DockerComposeLabel
 from app.services.docker_client import get_all_containers_for_project
 import docker
-import docker.errors
-import docker.models.containers
 
 
 _logger = logging.getLogger(__name__)

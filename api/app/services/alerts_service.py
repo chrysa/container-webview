@@ -2,6 +2,8 @@ from datetime import UTC
 from datetime import datetime
 import logging
 
+import docker.errors
+import docker.models.containers
 from pydantic import BaseModel
 
 from app.constants import AlertLevel
@@ -10,8 +12,6 @@ from app.constants import DockerComposeLabel
 from app.constants import HealthState
 from app.services.docker_client import get_docker_client
 import docker
-import docker.errors
-import docker.models.containers
 
 
 _logger = logging.getLogger(__name__)

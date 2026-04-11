@@ -8,13 +8,6 @@ interface Props {
   projectId: string;
 }
 
-const STATUS_CLASS: Record<string, string> = {
-  running: 'running',
-  exited: 'exited',
-  paused: 'paused',
-  restarting: 'restarting',
-};
-
 export default function ServicesTable({ projectId }: Props) {
   const { data: project, isLoading } = useProject(projectId);
   const { mutate: doAction, isPending } = useServiceAction(projectId);
