@@ -1,6 +1,5 @@
-import docker.models.containers
-
 import docker
+import docker.models.containers
 
 
 _client: docker.DockerClient | None = None
