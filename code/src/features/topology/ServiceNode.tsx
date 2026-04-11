@@ -10,7 +10,7 @@ interface ServiceData {
 }
 
 export default function ServiceNode({ data }: NodeProps) {
-  const d = data as ServiceData;
+  const d = data as unknown as ServiceData;
   return (
     <div className={styles.node}>
       <Handle type="target" position={Position.Top} />

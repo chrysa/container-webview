@@ -7,7 +7,7 @@ interface NetworkData {
 }
 
 export default function NetworkNode({ data }: NodeProps) {
-  const d = data as NetworkData;
+  const d = data as unknown as NetworkData;
   return (
     <div className={styles.node} style={{ borderColor: d.color }}>
       <Handle type="target" position={Position.Top} />

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -35,29 +35,33 @@ interface Props {
 export default function TopologyGraph({ projectId }: Props) {
   const { data, isLoading, error } = useTopology(projectId);
 
-  const flowNodes: Node[] = (data?.nodes ?? []).map((n) => ({
-    id: n.id,
-    type: n.type,
-    position: n.position,
-    data: {
-      ...n.data,
-      statusColor: STATUS_COLORS[n.data.status ?? "unknown"] ?? STATUS_COLORS.unknown,
-    },
-  }));
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const flowEdges: Edge[] = (data?.edges ?? []).map((e) => ({
-    id: e.id,
-    source: e.source,
-    target: e.target,
-    label: e.label,
-    animated: e.animated,
-    style: { stroke: "var(--border-strong)" },
-  }));
-
-  const [nodes, , onNodesChange] = useNodesState(flowNodes);
-  const [edges, , onEdgesChange] = useEdgesState(flowEdges);
-
-  const onInit = useCallback(() => {}, []);
+  useEffect(() => {
+    if (!data) return;
+    setNodes(
+      data.nodes.map((n) => ({
+        id: n.id,
+        type: n.type,
+        position: n.position,
+        data: {
+          ...n.data,
+          statusColor: STATUS_COLORS[n.data.status as string ?? "unknown"] ?? STATUS_COLORS.unknown,
+        },
+      })),
+    );
+    setEdges(
+      data.edges.map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        label: e.label ?? undefined,
+        animated: e.animated,
+        style: { stroke: "var(--border-strong)" },
+      })),
+    );
+  }, [data, setNodes, setEdges]);
 
   if (isLoading) return <div className={styles.state}>Chargement de la topologie…</div>;
   if (error)     return <div className={styles.state}>Erreur lors du chargement.</div>;
@@ -70,7 +74,6 @@ export default function TopologyGraph({ projectId }: Props) {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onInit={onInit}
         nodeTypes={nodeTypes}
         fitView
         colorMode="dark"
