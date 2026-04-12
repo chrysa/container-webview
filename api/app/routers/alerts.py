@@ -2,13 +2,13 @@ import contextlib
 from datetime import UTC
 from datetime import datetime
 
+from docker.errors import DockerException
 from fastapi import APIRouter
 from fastapi import Depends
 from pydantic import BaseModel
 
 from app.security import get_current_user
 from app.services.docker_client import get_docker_client
-import docker.errors
 
 
 router = APIRouter()
@@ -25,7 +25,7 @@ class Alert(BaseModel):
 
 def _container_alerts() -> list[Alert]:
     alerts = []
-    with contextlib.suppress(docker.errors.DockerException):
+    with contextlib.suppress(DockerException):
         client = get_docker_client()
         for container in client.containers.list(all=True):
             project = container.labels.get("com.docker.compose.project", "")

@@ -1,3 +1,4 @@
+from docker.errors import APIError
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -6,7 +7,6 @@ from pydantic import BaseModel
 from app.security import get_current_user
 from app.services.docker_client import get_container_for_service
 from app.services.project_manager import load_project
-import docker.errors
 
 
 router = APIRouter()
@@ -53,7 +53,7 @@ def _perform_action(project_id: str, service_name: str, action: str) -> ActionRe
         return ActionResponse(service=service_name, action=action, status=container.status)
     except HTTPException:
         raise
-    except docker.errors.APIError as exc:
+    except APIError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 

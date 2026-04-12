@@ -1,3 +1,4 @@
+from docker.errors import APIError
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -6,7 +7,6 @@ from pydantic import BaseModel
 from app.security import get_current_user
 from app.services.docker_client import get_all_containers_for_project
 from app.services.project_manager import load_project
-import docker.errors
 
 
 router = APIRouter()
@@ -88,7 +88,7 @@ def get_metrics(project_id: str, _: dict = Depends(get_current_user)) -> list[Se
                     block_write_mb=_bytes_to_mb(blk_write),
                 )
             )
-        except docker.errors.APIError:
+        except APIError:
             result.append(
                 ServiceMetrics(
                     service=service_name,

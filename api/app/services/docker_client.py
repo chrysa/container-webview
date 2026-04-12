@@ -1,21 +1,22 @@
-import docker
-import docker.models.containers
+from docker import DockerClient
+from docker import from_env
+from docker.models.containers import Container
 
 
-_client: docker.DockerClient | None = None
+_client: DockerClient | None = None
 
 
-def get_docker_client() -> docker.DockerClient:
+def get_docker_client() -> DockerClient:
     global _client
     if _client is None:
-        _client = docker.from_env()
+        _client = from_env()
     return _client
 
 
 def get_container_for_service(
     project_id: str,
     service_name: str,
-) -> docker.models.containers.Container | None:
+) -> Container | None:
     """Return the Docker container for a Compose service, or None."""
     client = get_docker_client()
     for container in client.containers.list(all=True):
@@ -28,7 +29,7 @@ def get_container_for_service(
     return None
 
 
-def get_all_containers_for_project(project_id: str) -> list[docker.models.containers.Container]:
+def get_all_containers_for_project(project_id: str) -> list[Container]:
     """Return all containers belonging to a Compose project."""
     client = get_docker_client()
     return [
