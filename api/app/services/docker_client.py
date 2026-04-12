@@ -1,6 +1,7 @@
+from docker.models.containers import Container
+
 from docker import DockerClient
 from docker import from_env
-from docker.models.containers import Container
 
 
 _client: DockerClient | None = None
