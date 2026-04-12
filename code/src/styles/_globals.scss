@@ -1,11 +1,16 @@
-@use "./mixins" as *;
-@import "./reset";
-@import "./theme";
-@import "./variables";
+@use './mixins' as *;
+@import './reset';
+@import './theme';
+@import './variables';
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   background: var(--bg);
   color: var(--text);
 }

@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import { GitBranch, Server, ScrollText, BarChart2 } from "lucide-react";
-import { useProjects } from "@/domain/projects/queries";
-import styles from "./Projects.module.scss";
+import { Link } from 'react-router-dom';
+import { GitBranch, Server, ScrollText, BarChart2 } from 'lucide-react';
+import { useProjects } from '@/domain/projects/queries';
+import styles from './Projects.module.scss';
 
 export default function Projects() {
   const { data: projects = [], isLoading } = useProjects();
@@ -29,13 +29,17 @@ export default function Projects() {
               <span className={styles.cardIcon}>📦</span>
               <div>
                 <h2 className={styles.cardTitle}>{p.name}</h2>
-                <p className={styles.cardSub}>{p.services.length} service{p.services.length > 1 ? "s" : ""}</p>
+                <p className={styles.cardSub}>
+                  {p.services.length} service{p.services.length > 1 ? 's' : ''}
+                </p>
               </div>
             </div>
 
             <div className={styles.meta}>
               <span className={styles.metaItem}>📄 {p.compose_file}</span>
-              <span className={styles.metaItem}>🌐 {p.networks.length} réseau{p.networks.length > 1 ? "x" : ""}</span>
+              <span className={styles.metaItem}>
+                🌐 {p.networks.length} réseau{p.networks.length > 1 ? 'x' : ''}
+              </span>
             </div>
 
             <ul className={styles.services}>
@@ -46,9 +50,7 @@ export default function Projects() {
                   {s.image && <span className={styles.image}> — {s.image}</span>}
                 </li>
               ))}
-              {p.services.length > 5 && (
-                <li className={styles.more}>+{p.services.length - 5} autres…</li>
-              )}
+              {p.services.length > 5 && <li className={styles.more}>+{p.services.length - 5} autres…</li>}
             </ul>
 
             <div className={styles.links}>

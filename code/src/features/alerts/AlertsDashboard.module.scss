@@ -1,4 +1,4 @@
-@use "../../styles/mixins" as m;
+@use '../../styles/mixins' as m;
 
 .wrapper {
   @include m.flex-column;
@@ -18,11 +18,22 @@
   font-size: 15px;
   flex: 1;
 
-  strong { font-size: 24px; }
+  strong {
+    font-size: 24px;
+  }
 
-  &.critical { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
-  &.warning  { color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); }
-  &.info     { color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
+  &.critical {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  &.warning {
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  &.info {
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.3);
+  }
 }
 
 .list {
@@ -54,9 +65,15 @@
 
 .icon {
   flex-shrink: 0;
-  .critical & { color: #ef4444; }
-  .warning  & { color: #f59e0b; }
-  .info     & { color: #3b82f6; }
+  .critical & {
+    color: #ef4444;
+  }
+  .warning & {
+    color: #f59e0b;
+  }
+  .info & {
+    color: #3b82f6;
+  }
 }
 
 .body {

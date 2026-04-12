@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
-import ServicesTable from "@/features/services/ServicesTable";
-import styles from "./ProjectPage.module.scss";
+import { useParams } from 'react-router-dom';
+import ServicesTable from '@/features/services/ServicesTable';
+import styles from './ProjectPage.module.scss';
 
 export default function Services() {
   const { projectId } = useParams<{ projectId: string }>();

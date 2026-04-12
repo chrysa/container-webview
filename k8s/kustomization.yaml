@@ -1,28 +1,29 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 namespace: docker-overview
 
 resources:
-  - namespace.yaml
-  - configmap.yaml
+-   namespace.yaml
+-   configmap.yaml
   # secret.yaml est intentionnellement EXCLU de kustomize :
   # les secrets K8s doivent être gérés hors Git (Sealed Secrets, External Secrets, vault…)
   # Appliquer manuellement une seule fois :  kubectl apply -f k8s/secret.yaml
-  - api/pvc.yaml
-  - api/deployment.yaml
-  - api/service.yaml
-  - frontend/deployment.yaml
-  - frontend/service.yaml
-  - ingress/middleware.yaml
-  - ingress/ingressroute.yaml
+-   api/pvc.yaml
+-   api/deployment.yaml
+-   api/service.yaml
+-   frontend/deployment.yaml
+-   frontend/service.yaml
+-   ingress/middleware.yaml
+-   ingress/ingressroute.yaml
 
 # Substitution d'images — mis à jour automatiquement par le CI/CD
 # (cd.yml injecte le SHA court via sed avant kubectl apply)
 images:
-  - name: docker-overview-api
+-   name: docker-overview-api
     newName: ghcr.io/chrysa/container-webview/api
     newTag: latest
-  - name: docker-overview-frontend
+-   name: docker-overview-frontend
     newName: ghcr.io/chrysa/container-webview/frontend
     newTag: latest

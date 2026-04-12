@@ -1,6 +1,6 @@
----
-applyTo: "api/**/*.py"
----
+______________________________________________________________________
+
+## applyTo: "api/\*\*/\*.py"
 
 # Python Development Guidelines
 
@@ -8,7 +8,7 @@ applyTo: "api/**/*.py"
 
 **Version:** 1.0 (adapted from Padam-AV guidelines)
 
----
+______________________________________________________________________
 
 ## Project Overview
 
@@ -22,7 +22,7 @@ Docker Overview WebUI backend is built with FastAPI + Python 3.12+, Docker SDK, 
 
 **Golden Rule:** Ruff is the source of truth. If it fails, fix it. No exceptions.
 
----
+______________________________________________________________________
 
 ## Tech Stack
 
@@ -33,7 +33,7 @@ Docker Overview WebUI backend is built with FastAPI + Python 3.12+, Docker SDK, 
 - **Type Checking**: Ruff ANN rules
 - **Linting/Formatting**: Ruff
 
----
+______________________________________________________________________
 
 ## File and Module Organization
 
@@ -42,8 +42,8 @@ Docker Overview WebUI backend is built with FastAPI + Python 3.12+, Docker SDK, 
 - **Location**: All imports at the top of the file, never inside functions/methods
 - **Organization**: Must be sorted and grouped (Ruff I001):
   1. Standard library imports
-  2. Third-party library imports
-  3. Internal/local imports
+  1. Third-party library imports
+  1. Internal/local imports
 - **Separation**: Separate each group with a blank line
 - **Future imports**: Use `from __future__ import annotations` **only** in files that contain `if typing.TYPE_CHECKING:` blocks
 - **No unused imports**: Each import must be used (F401)
@@ -56,7 +56,7 @@ Docker Overview WebUI backend is built with FastAPI + Python 3.12+, Docker SDK, 
 - **Module naming**: Use descriptive, lowercase names with underscores
 - **No nested classes/functions**: Avoid nesting except for closures
 
----
+______________________________________________________________________
 
 ## Code Style and Structure
 
@@ -88,15 +88,15 @@ Docker Overview WebUI backend is built with FastAPI + Python 3.12+, Docker SDK, 
 ### Variable and Naming
 
 - **Explicit variable names**: Every variable name must unambiguously convey its content and role
-  - No single-letter names (except `i`, `j` loop counters)
-  - No abbreviations (`e`, `obj`, `val`, `res`, `tmp`, `msg`)
-  - No vague names (`data`, `info`, `result` when a more precise name is possible)
+    - No single-letter names (except `i`, `j` loop counters)
+    - No abbreviations (`e`, `obj`, `val`, `res`, `tmp`, `msg`)
+    - No vague names (`data`, `info`, `result` when a more precise name is possible)
 - **Descriptive names**: Use explicit, descriptive English names
 - **PEP 8 compliance**: `snake_case` for variables/functions, `PascalCase` for classes
 - **Constants**: Use `UPPER_CASE` for module-level constants
 - **Private members**: Use leading underscore for internal class properties/methods
 
----
+______________________________________________________________________
 
 ## Constants and Enums
 
@@ -138,7 +138,7 @@ ERR_PROJECT_NOT_FOUND: Final[str] = "Project not found"
 ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
 ```
 
----
+______________________________________________________________________
 
 ## Code Quality Requirements
 
@@ -164,7 +164,7 @@ ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
 - **Fail fast**: Validate inputs early
 - **No HTTP coupling in services**: Services raise `ValueError`; routers translate to `HTTPException`
 
----
+______________________________________________________________________
 
 ## Architecture and Design Patterns
 
@@ -189,7 +189,7 @@ ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
 - **Path traversal**: Use `pathlib.Path.resolve()` and verify path stays within base directory
 - **Authentication**: JWT via `python-jose`, `SecurityService` class
 
----
+______________________________________________________________________
 
 ## Performance Guidelines
 
@@ -197,7 +197,7 @@ ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
 - **Generator expressions**: Use for memory-efficient iteration
 - **Built-in functions**: Leverage Python built-ins
 
----
+______________________________________________________________________
 
 ## Development Workflow
 
@@ -213,7 +213,7 @@ ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
 - **Comments in French**: Comments and docstrings may be in French for team clarity
 - **Error messages**: User-facing messages in English
 
----
+______________________________________________________________________
 
 ## Enforcement
 

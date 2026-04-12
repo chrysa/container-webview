@@ -27,7 +27,7 @@ dev = [
     "pytest-asyncio==0.23.7",
     "coverage[toml]==7.5.1",
     "faker==25.0.0",
-    "ruff==0.4.4",
+    "ruff==0.11.2",
     "mypy==1.10.0",
 ]
 
@@ -97,6 +97,8 @@ ignore = [
     "S311",    # random is fine for non-crypto use
     "RUF100",  # unused noqa
     "TD002", "TD003", "FIX002",  # TODO pragmatics
+    "B008",    # FastAPI Depends() in argument defaults is intentional
+    "PLW0603", # global statement is acceptable for lazy Docker client singleton
 ]
 fixable = ["ALL"]
 
@@ -111,6 +113,8 @@ fixable = ["ALL"]
     "PT011",
 ]
 "app/main.py" = ["ANN"]
+"app/config.py" = ["S105", "S106"]   # pydantic-settings defaults, overridden by env
+"app/constants.py" = ["S105"]         # error-message strings, not passwords
 
 [tool.ruff.lint.isort]
 force-single-line = true

@@ -1,22 +1,13 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  Legend,
-} from "recharts";
-import { useMetrics } from "@/domain/metrics/queries";
-import styles from "./MetricsCharts.module.scss";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
+import { useMetrics } from '@/domain/metrics/queries';
+import styles from './MetricsCharts.module.scss';
 
 const STATUS_COLOR: Record<string, string> = {
-  running:    "#22c55e",
-  exited:     "#ef4444",
-  paused:     "#f59e0b",
-  restarting: "#8b5cf6",
-  unknown:    "#94a3b8",
+  running: '#22c55e',
+  exited: '#ef4444',
+  paused: '#f59e0b',
+  restarting: '#8b5cf6',
+  unknown: '#94a3b8',
 };
 
 interface Props {
@@ -38,10 +29,10 @@ export default function MetricsCharts({ projectId }: Props) {
           <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
             <XAxis dataKey="service" tick={{ fontSize: 11 }} />
             <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-            <Tooltip formatter={(v: number) => [`${v.toFixed(2)}%`, "CPU"]} />
+            <Tooltip formatter={(v: number) => [`${v.toFixed(2)}%`, 'CPU']} />
             <Bar dataKey="cpu_percent" radius={[4, 4, 0, 0]}>
               {data.map((entry) => (
-                <Cell key={entry.service} fill={STATUS_COLOR[entry.status] ?? "#94a3b8"} />
+                <Cell key={entry.service} fill={STATUS_COLOR[entry.status] ?? '#94a3b8'} />
               ))}
             </Bar>
           </BarChart>
@@ -55,7 +46,7 @@ export default function MetricsCharts({ projectId }: Props) {
           <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
             <XAxis dataKey="service" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
-            <Tooltip formatter={(v: number) => [`${v.toFixed(0)} MB`, "RAM"]} />
+            <Tooltip formatter={(v: number) => [`${v.toFixed(0)} MB`, 'RAM']} />
             <Legend />
             <Bar dataKey="mem_usage_mb" name="Utilisé" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             <Bar dataKey="mem_limit_mb" name="Limite" fill="#64748b" radius={[4, 4, 0, 0]} />
@@ -99,8 +90,11 @@ export default function MetricsCharts({ projectId }: Props) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Service</th><th>Statut</th><th>CPU%</th>
-              <th>RAM (MB)</th><th>RAM%</th>
+              <th>Service</th>
+              <th>Statut</th>
+              <th>CPU%</th>
+              <th>RAM (MB)</th>
+              <th>RAM%</th>
             </tr>
           </thead>
           <tbody>
@@ -108,15 +102,14 @@ export default function MetricsCharts({ projectId }: Props) {
               <tr key={m.service}>
                 <td>{m.service}</td>
                 <td>
-                  <span
-                    className={styles.status}
-                    style={{ background: STATUS_COLOR[m.status] ?? "#94a3b8" }}
-                  >
+                  <span className={styles.status} style={{ background: STATUS_COLOR[m.status] ?? '#94a3b8' }}>
                     {m.status}
                   </span>
                 </td>
                 <td>{m.cpu_percent.toFixed(2)}%</td>
-                <td>{m.mem_usage_mb.toFixed(0)} / {m.mem_limit_mb.toFixed(0)}</td>
+                <td>
+                  {m.mem_usage_mb.toFixed(0)} / {m.mem_limit_mb.toFixed(0)}
+                </td>
                 <td>{m.mem_percent.toFixed(1)}%</td>
               </tr>
             ))}

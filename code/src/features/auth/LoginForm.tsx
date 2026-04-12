@@ -1,20 +1,17 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLogin } from "@/domain/auth/queries";
-import styles from "./LoginForm.module.scss";
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLogin } from '@/domain/auth/queries';
+import styles from './LoginForm.module.scss';
 
 export default function LoginForm() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const { mutate, isPending, error } = useLogin();
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    mutate(
-      { username, password },
-      { onSuccess: () => navigate("/projects") },
-    );
+    mutate({ username, password }, { onSuccess: () => navigate('/projects') });
   };
 
   return (
@@ -27,7 +24,9 @@ export default function LoginForm() {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
-          <label htmlFor="username" className={styles.label}>Nom d&apos;utilisateur</label>
+          <label htmlFor="username" className={styles.label}>
+            Nom d&apos;utilisateur
+          </label>
           <input
             id="username"
             type="text"
@@ -41,7 +40,9 @@ export default function LoginForm() {
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="password" className={styles.label}>Mot de passe</label>
+          <label htmlFor="password" className={styles.label}>
+            Mot de passe
+          </label>
           <input
             id="password"
             type="password"
@@ -53,14 +54,10 @@ export default function LoginForm() {
           />
         </div>
 
-        {error && (
-          <div className={styles.error}>
-            Identifiants incorrects. Veuillez réessayer.
-          </div>
-        )}
+        {error && <div className={styles.error}>Identifiants incorrects. Veuillez réessayer.</div>}
 
         <button type="submit" className={styles.btn} disabled={isPending}>
-          {isPending ? "Connexion…" : "Se connecter"}
+          {isPending ? 'Connexion…' : 'Se connecter'}
         </button>
       </form>
     </div>

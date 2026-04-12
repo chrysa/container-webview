@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
-import LogsPanel from "@/features/logs/LogsPanel";
-import styles from "./ProjectPage.module.scss";
+import { useParams } from 'react-router-dom';
+import LogsPanel from '@/features/logs/LogsPanel';
+import styles from './ProjectPage.module.scss';
 
 export default function Logs() {
   const { projectId } = useParams<{ projectId: string }>();

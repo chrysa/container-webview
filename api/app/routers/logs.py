@@ -1,10 +1,16 @@
 import asyncio
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, Depends, Query
-from fastapi.security import OAuth2PasswordBearer
+import contextlib
+
+from fastapi import APIRouter
+from fastapi import HTTPException
+from fastapi import Query
+from fastapi import WebSocket
+from fastapi import WebSocketDisconnect
 
 from app.security import verify_token
-from app.services.project_manager import load_project
 from app.services.docker_client import get_container_for_service
+from app.services.project_manager import load_project
+
 
 router = APIRouter()
 
@@ -16,7 +22,7 @@ async def stream_logs(
     service_name: str,
     token: str = Query(...),
     tail: int = Query(100),
-):
+) -> None:
     # Auth via query param (WebSocket ne supporte pas les headers Authorization)
     try:
         verify_token(token)
@@ -43,13 +49,9 @@ async def stream_logs(
             await asyncio.sleep(0)  # yield control
     except WebSocketDisconnect:
         pass
-    except Exception as e:
-        try:
-            await websocket.send_text(f"[ERROR] {str(e)}")
-        except Exception:
-            pass
+    except Exception as exc:  # noqa: BLE001 — unknown errors during log streaming
+        with contextlib.suppress(Exception):  # noqa: BLE001
+            await websocket.send_text(f"[ERROR] {exc!s}")
     finally:
-        try:
+        with contextlib.suppress(Exception):  # noqa: BLE001
             await websocket.close()
-        except Exception:
-            pass

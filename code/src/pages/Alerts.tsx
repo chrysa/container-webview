@@ -1,5 +1,5 @@
-import AlertsDashboard from "@/features/alerts/AlertsDashboard";
-import styles from "./ProjectPage.module.scss";
+import AlertsDashboard from '@/features/alerts/AlertsDashboard';
+import styles from './ProjectPage.module.scss';
 
 export default function Alerts() {
   return (
