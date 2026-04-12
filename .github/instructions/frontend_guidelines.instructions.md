@@ -1,6 +1,6 @@
----
-applyTo: "code/**/*"
----
+______________________________________________________________________
+
+## applyTo: "code/\*\*/\*"
 
 # Frontend Guidelines — React 19 + Vite + TypeScript
 
@@ -103,26 +103,26 @@ export const useProjects = () =>
 
 ## Composants disponibles
 
-| Composant | Chemin | Usage |
-|---|---|---|
-| `Layout` | `components/layouts/Layout.tsx` | Wrapper général (Header + Sidebar + contenu) |
-| `Header` | `components/layouts/Header.tsx` | Barre du haut, toggle thème |
-| `Sidebar` | `components/layouts/Sidebar.tsx` | Nav latérale, collapsible |
-| `GlobalLoader` | `components/loaders/GlobalLoader.tsx` | Spinner pendant chargement initial |
-| `TopologyGraph` | `features/topology/TopologyGraph.tsx` | ReactFlow — visualisation des services |
-| `ServicesTable` | `features/services/ServicesTable.tsx` | Table services + actions lifecycle |
-| `LogsPanel` | `features/logs/LogsPanel.tsx` | Stream WebSocket natif |
-| `MetricsCharts` | `features/metrics/MetricsCharts.tsx` | CPU/RAM/net/IO via Recharts |
-| `AlertsDashboard` | `features/alerts/AlertsDashboard.tsx` | Alertes conteneurs |
-| `LoginForm` | `features/auth/LoginForm.tsx` | Formulaire de connexion |
+| Composant         | Chemin                                | Usage                                        |
+| ----------------- | ------------------------------------- | -------------------------------------------- |
+| `Layout`          | `components/layouts/Layout.tsx`       | Wrapper général (Header + Sidebar + contenu) |
+| `Header`          | `components/layouts/Header.tsx`       | Barre du haut, toggle thème                  |
+| `Sidebar`         | `components/layouts/Sidebar.tsx`      | Nav latérale, collapsible                    |
+| `GlobalLoader`    | `components/loaders/GlobalLoader.tsx` | Spinner pendant chargement initial           |
+| `TopologyGraph`   | `features/topology/TopologyGraph.tsx` | ReactFlow — visualisation des services       |
+| `ServicesTable`   | `features/services/ServicesTable.tsx` | Table services + actions lifecycle           |
+| `LogsPanel`       | `features/logs/LogsPanel.tsx`         | Stream WebSocket natif                       |
+| `MetricsCharts`   | `features/metrics/MetricsCharts.tsx`  | CPU/RAM/net/IO via Recharts                  |
+| `AlertsDashboard` | `features/alerts/AlertsDashboard.tsx` | Alertes conteneurs                           |
+| `LoginForm`       | `features/auth/LoginForm.tsx`         | Formulaire de connexion                      |
 
 ## Domaines disponibles
 
-| Domaine | Types | Queries |
-|---|---|---|
-| `auth` | `LoginRequest`, `TokenResponse` | `useLogin` |
-| `projects` | `Project`, `ServiceInfo` | `useProjects`, `useProject` |
-| `topology` | `TopologyGraph`, `TopologyNode`, `TopologyEdge` | `useTopology` |
-| `metrics` | `ServiceMetrics`, `MetricPoint` | `useMetrics` |
-| `alerts` | `Alert` | `useAlerts` |
-| `lifecycle` | — | `useServiceAction` (start/stop/restart/pause) |
+| Domaine     | Types                                           | Queries                                       |
+| ----------- | ----------------------------------------------- | --------------------------------------------- |
+| `auth`      | `LoginRequest`, `TokenResponse`                 | `useLogin`                                    |
+| `projects`  | `Project`, `ServiceInfo`                        | `useProjects`, `useProject`                   |
+| `topology`  | `TopologyGraph`, `TopologyNode`, `TopologyEdge` | `useTopology`                                 |
+| `metrics`   | `ServiceMetrics`, `MetricPoint`                 | `useMetrics`                                  |
+| `alerts`    | `Alert`                                         | `useAlerts`                                   |
+| `lifecycle` | —                                               | `useServiceAction` (start/stop/restart/pause) |

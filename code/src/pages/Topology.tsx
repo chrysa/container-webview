@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
-import TopologyGraph from "@/features/topology/TopologyGraph";
-import styles from "./ProjectPage.module.scss";
+import { useParams } from 'react-router-dom';
+import TopologyGraph from '@/features/topology/TopologyGraph';
+import styles from './ProjectPage.module.scss';
 
 export default function Topology() {
   const { projectId } = useParams<{ projectId: string }>();

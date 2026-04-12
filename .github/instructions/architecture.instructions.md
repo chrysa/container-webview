@@ -1,26 +1,26 @@
----
-applyTo: "**/*"
----
+______________________________________________________________________
+
+## applyTo: "\*\*/\*"
 
 # Architecture — Container WebView
 
 ## Stack technique
 
-| Couche | Technologie |
-|---|---|
-| Backend | Python 3.12, FastAPI, Uvicorn |
-| Frontend | React 19, Vite 6, TypeScript strict (ES2022) |
-| State | TanStack Query v5 |
-| Routing | React Router v7 (lazy + RequireAuth) |
-| UI | SCSS Modules, lucide-react |
-| Graph | @xyflow/react (ReactFlow) |
-| Charts | Recharts |
-| HTTP | Axios + intercepteurs Bearer/401 |
-| Linting Python | ruff (format + lint) |
-| Linting TS | ESLint v9 flat config |
-| Conteneurs | Docker multi-stage, serve@14 |
-| Orchestration | Kubernetes + Traefik IngressRoute |
-| CI/CD | GitHub Actions → GHCR → K8s |
+| Couche         | Technologie                                  |
+| -------------- | -------------------------------------------- |
+| Backend        | Python 3.12, FastAPI, Uvicorn                |
+| Frontend       | React 19, Vite 6, TypeScript strict (ES2022) |
+| State          | TanStack Query v5                            |
+| Routing        | React Router v7 (lazy + RequireAuth)         |
+| UI             | SCSS Modules, lucide-react                   |
+| Graph          | @xyflow/react (ReactFlow)                    |
+| Charts         | Recharts                                     |
+| HTTP           | Axios + intercepteurs Bearer/401             |
+| Linting Python | ruff (format + lint)                         |
+| Linting TS     | ESLint v9 flat config                        |
+| Conteneurs     | Docker multi-stage, serve@14                 |
+| Orchestration  | Kubernetes + Traefik IngressRoute            |
+| CI/CD          | GitHub Actions → GHCR → K8s                  |
 
 ## Structure du monorepo
 
@@ -86,11 +86,11 @@ container-webview/
 
 ## Variables d'environnement
 
-| Variable | Local (docker-compose) | K8s (Traefik) |
-|---|---|---|
-| `VITE_API_URL` | `http://localhost:8000` | `""` (URLs relatives) |
-| `SECRET_KEY` | `.env` | K8s Secret |
-| `PROJECTS_PATH` | `/home/.../projects` | K8s ConfigMap |
+| Variable        | Local (docker-compose)  | K8s (Traefik)         |
+| --------------- | ----------------------- | --------------------- |
+| `VITE_API_URL`  | `http://localhost:8000` | `""` (URLs relatives) |
+| `SECRET_KEY`    | `.env`                  | K8s Secret            |
+| `PROJECTS_PATH` | `/home/.../projects`    | K8s ConfigMap         |
 
 ## Flux réseau K8s
 

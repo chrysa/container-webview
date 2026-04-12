@@ -1,4 +1,4 @@
-@use "../styles/mixins" as m;
+@use '../styles/mixins' as m;
 
 .page {
   @include m.flex-column;
@@ -27,5 +27,7 @@
   font-size: var(--font-md);
   @include m.smooth;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }

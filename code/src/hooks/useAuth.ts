@@ -1,4 +1,4 @@
-import { getToken, getUsername, clearSession, isAuthenticated } from "@/utils/auth";
+import { getToken, getUsername, clearSession, isAuthenticated } from '@/utils/auth';
 
 export function useAuth() {
   return {
@@ -7,7 +7,7 @@ export function useAuth() {
     token: getToken(),
     logout: () => {
       clearSession();
-      window.location.href = "/login";
+      window.location.href = '/login';
     },
   };
 }

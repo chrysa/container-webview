@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { useProject } from "@/domain/projects/queries";
-import { getToken } from "@/utils/auth";
-import styles from "./LogsPanel.module.scss";
+import { useEffect, useRef, useState } from 'react';
+import { useProject } from '@/domain/projects/queries';
+import { getToken } from '@/utils/auth';
+import styles from './LogsPanel.module.scss';
 
 interface Props {
   projectId: string;
@@ -15,14 +15,14 @@ function LogViewer({ projectId, serviceName }: { projectId: string; serviceName:
 
   useEffect(() => {
     setLines([]);
-    const token = getToken() ?? "";
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const token = getToken() ?? '';
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const url = `${protocol}://${window.location.host}/api/projects/${projectId}/services/${serviceName}/logs?token=${encodeURIComponent(token)}&tail=200`;
 
     const ws = new WebSocket(url);
     wsRef.current = ws;
 
-    ws.onopen  = () => setConnected(true);
+    ws.onopen = () => setConnected(true);
     ws.onclose = () => setConnected(false);
     ws.onerror = () => setConnected(false);
     ws.onmessage = (ev) => {
@@ -49,11 +49,15 @@ function LogViewer({ projectId, serviceName }: { projectId: string; serviceName:
         <span className={`${styles.dot} ${connected ? styles.dotOnline : styles.dotOffline}`} />
         <span>{serviceName}</span>
         <span className={styles.countBadge}>{lines.length} lignes</span>
-        <button className={styles.clearBtn} onClick={() => setLines([])}>Vider</button>
+        <button className={styles.clearBtn} onClick={() => setLines([])}>
+          Vider
+        </button>
       </div>
       <div ref={containerRef} className={styles.terminal}>
         {lines.map((line, i) => (
-          <div key={i} className={styles.line}>{line}</div>
+          <div key={i} className={styles.line}>
+            {line}
+          </div>
         ))}
       </div>
     </div>
@@ -71,7 +75,7 @@ export default function LogsPanel({ projectId }: Props) {
   }, [project, active]);
 
   if (isLoading) return <div className={styles.state}>Chargement…</div>;
-  if (!project)  return <div className={styles.state}>Projet introuvable.</div>;
+  if (!project) return <div className={styles.state}>Projet introuvable.</div>;
 
   return (
     <div className={styles.wrapper}>
@@ -79,7 +83,7 @@ export default function LogsPanel({ projectId }: Props) {
         {project.services.map((svc) => (
           <button
             key={svc.name}
-            className={`${styles.tab} ${active === svc.name ? styles.tabActive : ""}`}
+            className={`${styles.tab} ${active === svc.name ? styles.tabActive : ''}`}
             onClick={() => setActive(svc.name)}
           >
             {svc.name}

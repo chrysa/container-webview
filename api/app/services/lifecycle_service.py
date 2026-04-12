@@ -1,9 +1,7 @@
-from app.constants import (
-    ERR_CONTAINER_NOT_FOUND,
-    ERR_PROJECT_NOT_FOUND,
-    ERR_SERVICE_NOT_FOUND,
-    ERR_UNKNOWN_ACTION,
-)
+from app.constants import ERR_CONTAINER_NOT_FOUND
+from app.constants import ERR_PROJECT_NOT_FOUND
+from app.constants import ERR_SERVICE_NOT_FOUND
+from app.constants import ERR_UNKNOWN_ACTION
 from app.services.docker_client import docker_client
 from app.services.project_manager import project_manager
 
@@ -11,9 +9,16 @@ from app.services.project_manager import project_manager
 class LifecycleService:
     """Executes start/stop/restart/pause/unpause/kill on Compose service containers."""
 
-    _VALID_ACTIONS: frozenset[str] = frozenset({
-        "kill", "pause", "restart", "start", "stop", "unpause",
-    })
+    _VALID_ACTIONS: frozenset[str] = frozenset(
+        {
+            "kill",
+            "pause",
+            "restart",
+            "start",
+            "stop",
+            "unpause",
+        }
+    )
 
     def perform(self, project_id: str, service_name: str, action: str) -> str:
         """Execute a lifecycle action and return the resulting container status.

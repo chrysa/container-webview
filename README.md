@@ -7,58 +7,58 @@ ______________________________________________________________________
 <!--TOC-->
 
 - [web GUI for managing docker compose project](#web-gui-for-managing-docker-compose-project)
-  - [Table Of Content](#table-of-content)
-  - [SPECS / Cahier des charges](#specs--cahier-des-charges)
-    - [Introduction](#introduction)
-    - [Fonctionnalités principales](#fonctionnalit%C3%A9s-principales)
-      - [Visualisation graphique](#visualisation-graphique)
-      - [Configuration personnalisable](#configuration-personnalisable)
-      - [Recherche et filtrage](#recherche-et-filtrage)
-      - [Autodétection des fichiers Docker Compose](#autod%C3%A9tection-des-fichiers-docker-compose)
-      - [Personnalisation du thème et du logo](#personnalisation-du-th%C3%A8me-et-du-logo)
-      - [Fichier de configuration du projet](#fichier-de-configuration-du-projet)
-      - [Utilisation du moteur de rendu JSX](#utilisation-du-moteur-de-rendu-jsx)
-      - [Gestion des erreurs](#gestion-des-erreurs)
-      - [Tableau de bord](#tableau-de-bord)
-      - [Menu horizontal et menu latéral](#menu-horizontal-et-menu-lat%C3%A9ral)
-    - [Utilisation](#utilisation)
-    - [Liste des évolutions possibles](#liste-des-%C3%A9volutions-possibles)
-      - [Intégration Docker Swarm](#int%C3%A9gration-docker-swarm)
-      - [Intégration avec d'autres outils DevOps](#int%C3%A9gration-avec-dautres-outils-devops)
-      - [Support d'autres formats de configuration](#support-dautres-formats-de-configuration)
-      - [Visualisation des dépendances entre services](#visualisation-des-d%C3%A9pendances-entre-services)
-      - [Analyse des performances](#analyse-des-performances)
-      - [Notifications et alertes](#notifications-et-alertes)
-      - [Versioning et historique des configurations](#versioning-et-historique-des-configurations)
-      - [Mode collaboratif](#mode-collaboratif)
-      - [Intégration avec des services de gestion des secrets externes](#int%C3%A9gration-avec-des-services-de-gestion-des-secrets-externes)
-      - [Optimisation des performances](#optimisation-des-performances)
-      - [Support multi-projets](#support-multi-projets)
-      - [Internationalisation](#internationalisation)
-    - [Roadmap](#roadmap)
-      - [Version 1.0](#version-10)
-      - [Version 2.0](#version-20)
-      - [Version 3.0](#version-30)
-      - [Version 4.0](#version-40)
-      - [Version 5.0](#version-50)
-    - [Plan de développement](#plan-de-d%C3%A9veloppement)
-      - [Mise en place du projet](#mise-en-place-du-projet)
-      - [Création des composants de base](#cr%C3%A9ation-des-composants-de-base)
-      - [Gestion des fichiers Docker Compose](#gestion-des-fichiers-docker-compose)
-      - [Configuration personnalisable](#configuration-personnalisable-1)
-      - [Recherche et filtrage](#recherche-et-filtrage-1)
-      - [Amélioration de la visualisation graphique](#am%C3%A9lioration-de-la-visualisation-graphique)
-      - [Tableau de bord](#tableau-de-bord-1)
-      - [Gestion des erreurs](#gestion-des-erreurs-1)
-      - [Intégration Docker Registry](#int%C3%A9gration-docker-registry)
-      - [Personnalisation du thème et du logo](#personnalisation-du-th%C3%A8me-et-du-logo-1)
-      - [Gestion des secrets](#gestion-des-secrets)
-      - [Export graphique paramétrable en PNG](#export-graphique-param%C3%A9trable-en-png)
-      - [Export des configurations au format tableau](#export-des-configurations-au-format-tableau)
-    - [Liste de références](#liste-de-r%C3%A9f%C3%A9rences)
-    - [Conseils](#conseils)
-  - [IDEAS](#ideas)
-  - [Makefile](#makefile)
+    - [Table Of Content](#table-of-content)
+    - [SPECS / Cahier des charges](#specs--cahier-des-charges)
+        - [Introduction](#introduction)
+        - [Fonctionnalités principales](#fonctionnalit%C3%A9s-principales)
+            - [Visualisation graphique](#visualisation-graphique)
+            - [Configuration personnalisable](#configuration-personnalisable)
+            - [Recherche et filtrage](#recherche-et-filtrage)
+            - [Autodétection des fichiers Docker Compose](#autod%C3%A9tection-des-fichiers-docker-compose)
+            - [Personnalisation du thème et du logo](#personnalisation-du-th%C3%A8me-et-du-logo)
+            - [Fichier de configuration du projet](#fichier-de-configuration-du-projet)
+            - [Utilisation du moteur de rendu JSX](#utilisation-du-moteur-de-rendu-jsx)
+            - [Gestion des erreurs](#gestion-des-erreurs)
+            - [Tableau de bord](#tableau-de-bord)
+            - [Menu horizontal et menu latéral](#menu-horizontal-et-menu-lat%C3%A9ral)
+        - [Utilisation](#utilisation)
+        - [Liste des évolutions possibles](#liste-des-%C3%A9volutions-possibles)
+            - [Intégration Docker Swarm](#int%C3%A9gration-docker-swarm)
+            - [Intégration avec d'autres outils DevOps](#int%C3%A9gration-avec-dautres-outils-devops)
+            - [Support d'autres formats de configuration](#support-dautres-formats-de-configuration)
+            - [Visualisation des dépendances entre services](#visualisation-des-d%C3%A9pendances-entre-services)
+            - [Analyse des performances](#analyse-des-performances)
+            - [Notifications et alertes](#notifications-et-alertes)
+            - [Versioning et historique des configurations](#versioning-et-historique-des-configurations)
+            - [Mode collaboratif](#mode-collaboratif)
+            - [Intégration avec des services de gestion des secrets externes](#int%C3%A9gration-avec-des-services-de-gestion-des-secrets-externes)
+            - [Optimisation des performances](#optimisation-des-performances)
+            - [Support multi-projets](#support-multi-projets)
+            - [Internationalisation](#internationalisation)
+        - [Roadmap](#roadmap)
+            - [Version 1.0](#version-10)
+            - [Version 2.0](#version-20)
+            - [Version 3.0](#version-30)
+            - [Version 4.0](#version-40)
+            - [Version 5.0](#version-50)
+        - [Plan de développement](#plan-de-d%C3%A9veloppement)
+            - [Mise en place du projet](#mise-en-place-du-projet)
+            - [Création des composants de base](#cr%C3%A9ation-des-composants-de-base)
+            - [Gestion des fichiers Docker Compose](#gestion-des-fichiers-docker-compose)
+            - [Configuration personnalisable](#configuration-personnalisable-1)
+            - [Recherche et filtrage](#recherche-et-filtrage-1)
+            - [Amélioration de la visualisation graphique](#am%C3%A9lioration-de-la-visualisation-graphique)
+            - [Tableau de bord](#tableau-de-bord-1)
+            - [Gestion des erreurs](#gestion-des-erreurs-1)
+            - [Intégration Docker Registry](#int%C3%A9gration-docker-registry)
+            - [Personnalisation du thème et du logo](#personnalisation-du-th%C3%A8me-et-du-logo-1)
+            - [Gestion des secrets](#gestion-des-secrets)
+            - [Export graphique paramétrable en PNG](#export-graphique-param%C3%A9trable-en-png)
+            - [Export des configurations au format tableau](#export-des-configurations-au-format-tableau)
+        - [Liste de références](#liste-de-r%C3%A9f%C3%A9rences)
+        - [Conseils](#conseils)
+    - [IDEAS](#ideas)
+    - [Makefile](#makefile)
 
 <!--TOC-->
 
@@ -112,7 +112,7 @@ Par défaut, le menu horizontal permettra d'accéder aux fonctions globales de n
 
 ### Utilisation
 
-le project est dans un container docker et est utilise en montant le projet a analyser sous forme d’un volume
+le project est dans un container docker et est utilise en montant le projet a analyser sous forme d'un volume
 
 ### Liste des évolutions possibles
 
@@ -303,20 +303,20 @@ Je suis enthousiaste à l'idée de développer ce projet, et j'attends avec impa
 - manage project dynamicly from graph
 - create/update service from GUI
 - export docker compose
-  - global
-  - splitted by service
-  - dev and prod
+    - global
+    - splitted by service
+    - dev and prod
 - launch makefile rules
 - add cli/web GUI for services management functionalities from composes files
-  - build selected services
-  - generate graphs
-  - interact with graphs
-  - run selected services
-  - remove selected services
-  - logs access selected services
-  - up selected services
-  - stats selected services
-  - add notification on docker container state modification on project
+    - build selected services
+    - generate graphs
+    - interact with graphs
+    - run selected services
+    - remove selected services
+    - logs access selected services
+    - up selected services
+    - stats selected services
+    - add notification on docker container state modification on project
 - add web IDE
 - add project overview
 - add browser and desktop notificatilons

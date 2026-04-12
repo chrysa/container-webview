@@ -1,51 +1,52 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: docker-overview-frontend
-  namespace: docker-overview
-  labels:
-    app.kubernetes.io/name: docker-overview
-    app.kubernetes.io/component: frontend
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: docker-overview
-      app.kubernetes.io/component: frontend
-  template:
-    metadata:
-      labels:
+    name: docker-overview-frontend
+    namespace: docker-overview
+    labels:
         app.kubernetes.io/name: docker-overview
         app.kubernetes.io/component: frontend
-    spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-      containers:
-        - name: frontend
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app.kubernetes.io/name: docker-overview
+            app.kubernetes.io/component: frontend
+    template:
+        metadata:
+            labels:
+                app.kubernetes.io/name: docker-overview
+                app.kubernetes.io/component: frontend
+        spec:
+            securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+            containers:
+            -   name: frontend
           # Image buildée avec VITE_API_URL="" (URLs relatives — Traefik gère /api)
-          image: docker-overview-frontend:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: http
-              containerPort: 3000
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 5
-            periodSeconds: 20
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-            initialDelaySeconds: 3
-            periodSeconds: 10
-          resources:
-            requests:
-              cpu: "50m"
-              memory: "64Mi"
-            limits:
-              cpu: "200m"
-              memory: "128Mi"
+                image: docker-overview-frontend:latest
+                imagePullPolicy: IfNotPresent
+                ports:
+                -   name: http
+                    containerPort: 3000
+                    protocol: TCP
+                livenessProbe:
+                    httpGet:
+                        path: /
+                        port: http
+                    initialDelaySeconds: 5
+                    periodSeconds: 20
+                readinessProbe:
+                    httpGet:
+                        path: /
+                        port: http
+                    initialDelaySeconds: 3
+                    periodSeconds: 10
+                resources:
+                    requests:
+                        cpu: 50m
+                        memory: 64Mi
+                    limits:
+                        cpu: 200m
+                        memory: 128Mi

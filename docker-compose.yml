@@ -4,129 +4,129 @@
 # ═══════════════════════════════════════════════════════════
 
 x-common: &common
-  restart: unless-stopped
-  volumes:
-    - source: /etc/localtime
-      target: /etc/localtime
-      type: bind
-      read_only: true
+    restart: unless-stopped
+    volumes:
+    -   source: /etc/localtime
+        target: /etc/localtime
+        type: bind
+        read_only: true
 
 services:
 
   # ─── Backend FastAPI ─────────────────────────────────────
-  api:
-    <<: *common
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-    container_name: docker-overview-api
-    hostname: api
-    image: docker-overview-api:latest
-    environment:
-      PROJECTS_PATH: /projects
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
-      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
-      LDAP_SERVER: ${LDAP_SERVER:-}
-      LDAP_BASE_DN: ${LDAP_BASE_DN:-}
-    volumes:
-      - source: /var/run/docker.sock
-        target: /var/run/docker.sock
-        type: bind
-        read_only: true
-      - source: /etc/localtime
-        target: /etc/localtime
-        type: bind
-        read_only: true
-      - source: ${PROJECTS_PATH:-/opt/projects}
-        target: /projects
-        type: bind
-        read_only: true
-    expose:
-      - "8000"
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    api:
+        <<: *common
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        container_name: docker-overview-api
+        hostname: api
+        image: docker-overview-api:latest
+        environment:
+            PROJECTS_PATH: /projects
+            SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+            ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+            ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+            LDAP_SERVER: ${LDAP_SERVER:-}
+            LDAP_BASE_DN: ${LDAP_BASE_DN:-}
+        volumes:
+        -   source: /var/run/docker.sock
+            target: /var/run/docker.sock
+            type: bind
+            read_only: true
+        -   source: /etc/localtime
+            target: /etc/localtime
+            type: bind
+            read_only: true
+        -   source: ${PROJECTS_PATH:-/opt/projects}
+            target: /projects
+            type: bind
+            read_only: true
+        expose:
+        -   '8000'
+        ports:
+        -   8000:8000
+        healthcheck:
+            test: [CMD, curl, -f, http://localhost:8000/api]
+            interval: 30s
+            timeout: 5s
+            retries: 3
 
   # ─── Frontend (serve + React build) ──────────────────────
-  frontend:
-    <<: *common
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-      args:
+    frontend:
+        <<: *common
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: production
+            args:
         # URL absolue de l'API vue depuis le navigateur
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
-    container_name: docker-overview-frontend
-    hostname: frontend
-    image: docker-overview-frontend:latest
-    ports:
-      - "${FRONTEND_PORT:-3000}:3000"
-    depends_on:
-      api:
-        condition: service_healthy
+                VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        container_name: docker-overview-frontend
+        hostname: frontend
+        image: docker-overview-frontend:latest
+        ports:
+        -   ${FRONTEND_PORT:-3000}:3000
+        depends_on:
+            api:
+                condition: service_healthy
 
   # ─── Dev : API (hot-reload) ───────────────────────────────
-  api-dev:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-    container_name: docker-overview-api-dev
-    hostname: api
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    environment:
-      PROJECTS_PATH: /projects
-      SECRET_KEY: dev-secret-key
-      ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: admin
-    volumes:
-      - source: ./api
-        target: /app
-        type: bind
-      - source: /var/run/docker.sock
-        target: /var/run/docker.sock
-        type: bind
-        read_only: true
-      - source: /etc/localtime
-        target: /etc/localtime
-        type: bind
-        read_only: true
-      - source: ${PROJECTS_PATH:-/opt/projects}
-        target: /projects
-        type: bind
-        read_only: true
-    ports:
-      - "8000:8000"
-    profiles:
-      - dev
+    api-dev:
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        container_name: docker-overview-api-dev
+        hostname: api
+        command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+        environment:
+            PROJECTS_PATH: /projects
+            SECRET_KEY: dev-secret-key
+            ADMIN_USERNAME: admin
+            ADMIN_PASSWORD: admin
+        volumes:
+        -   source: ./api
+            target: /app
+            type: bind
+        -   source: /var/run/docker.sock
+            target: /var/run/docker.sock
+            type: bind
+            read_only: true
+        -   source: /etc/localtime
+            target: /etc/localtime
+            type: bind
+            read_only: true
+        -   source: ${PROJECTS_PATH:-/opt/projects}
+            target: /projects
+            type: bind
+            read_only: true
+        ports:
+        -   8000:8000
+        profiles:
+        -   dev
 
   # ─── Dev : Frontend (Vite HMR) ───────────────────────────
-  frontend-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: deps
-    container_name: docker-overview-frontend-dev
-    hostname: frontend-dev
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-    volumes:
-      - source: ./code
-        target: /app
-        type: bind
-      - source: docker-overview-node-modules
-        target: /app/node_modules
-        type: volume
-    ports:
-      - "5173:5173"
-    profiles:
-      - dev
+    frontend-dev:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: deps
+        container_name: docker-overview-frontend-dev
+        hostname: frontend-dev
+        command: npm run dev
+        environment:
+            NODE_ENV: development
+        volumes:
+        -   source: ./code
+            target: /app
+            type: bind
+        -   source: docker-overview-node-modules
+            target: /app/node_modules
+            type: volume
+        ports:
+        -   5173:5173
+        profiles:
+        -   dev
 
 volumes:
-  docker-overview-node-modules:
+    docker-overview-node-modules:

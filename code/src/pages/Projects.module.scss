@@ -1,4 +1,4 @@
-@use "../styles/mixins" as m;
+@use '../styles/mixins' as m;
 
 .wrapper {
   @include m.flex-column;
@@ -125,7 +125,8 @@
   }
 }
 
-.state, .empty {
+.state,
+.empty {
   padding: 60px;
   text-align: center;
   color: var(--text-muted);
