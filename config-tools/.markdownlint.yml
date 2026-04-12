@@ -1,9 +1,12 @@
 ---
-default     : true
-MD013       : false
-MD040       : false
-MD041       : false
-MD007       :
+default: true
+MD013: false
+MD024:
+    siblings_only: true
+MD040: false
+MD041: false
+MD060: false
+MD007:
     indent: 4
 no-hard-tabs: false
-whitespace  : false
+whitespace: false

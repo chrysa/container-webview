@@ -1,13 +1,12 @@
 # Docker Overview WebUI — Testing Instructions
 
----
-description: "Comprehensive testing guidelines for the Docker Overview WebUI project. STRICT: All user requirements are MANDATORY. Mock ALL external dependencies (Docker SDK, filesystem) in unit tests. Strict compliance: assertions, fixture patterns, no typing in tests, Given-When-Then docstrings."
-applyTo: "api/**/tests/**/*.py"
----
+______________________________________________________________________
+
+## description: "Comprehensive testing guidelines for the Docker Overview WebUI project. STRICT: All user requirements are MANDATORY. Mock ALL external dependencies (Docker SDK, filesystem) in unit tests. Strict compliance: assertions, fixture patterns, no typing in tests, Given-When-Then docstrings." applyTo: "api/**/tests/**/\*.py"
 
 > **⚠️ IMPORTANT**: This file is an **additional layer** on top of [`python_guidelines.instructions.md`](./python_guidelines.instructions.md). All general Python rules apply to test code; conflicts favor this file for test-specific rules.
 
----
+______________________________________________________________________
 
 ## Tech Stack for Testing
 
@@ -38,7 +37,7 @@ make tests-cov        # Run with coverage report
 make tests-html       # Run with HTML coverage report
 ```
 
----
+______________________________________________________________________
 
 ## MANDATORY REQUIREMENTS
 
@@ -55,7 +54,7 @@ make tests-html       # Run with HTML coverage report
 
 **ANY deviation from these rules must be corrected immediately.**
 
----
+______________________________________________________________________
 
 ## Critical Rules
 
@@ -105,11 +104,11 @@ def test_get_containers(self, mocker):
 
 **Test Classification:**
 
-| Test Type | Mock Required? | Marker | Real Docker? |
-|---|---|---|---|
-| **Services** | ✅ YES | ❌ none | ❌ NO |
-| **Routers** | ✅ YES (mock services) | ❌ none | ❌ NO |
-| **Docker integration** | ❌ NO | ✅ `@pytest.mark.integration` | ✅ YES |
+| Test Type              | Mock Required?         | Marker                        | Real Docker? |
+| ---------------------- | ---------------------- | ----------------------------- | ------------ |
+| **Services**           | ✅ YES                 | ❌ none                       | ❌ NO        |
+| **Routers**            | ✅ YES (mock services) | ❌ none                       | ❌ NO        |
+| **Docker integration** | ❌ NO                  | ✅ `@pytest.mark.integration` | ✅ YES       |
 
 ### 3. No Typing in Tests (MANDATORY)
 
@@ -138,7 +137,7 @@ def test_get_project_containers(self, mocker):
     # implementation
 ```
 
----
+______________________________________________________________________
 
 ## Test Class Structure (MANDATORY)
 
@@ -191,7 +190,7 @@ class TestDockerClientServiceLookup:  # WRONG — split at module level
     pass
 ```
 
----
+______________________________________________________________________
 
 ## Fixture Patterns (MANDATORY)
 
@@ -242,7 +241,7 @@ def fixt_container_mock(mocker):
 - **OPTIMIZE**: Use wider scope only when data is immutable and never modified by tests
 - **REQUIRED** function scope: when fixture creates Docker mock objects, uses `mocker`
 
----
+______________________________________________________________________
 
 ## Integration Tests (Docker)
 
@@ -267,7 +266,7 @@ class TestDockerClientIntegration:
         assert isinstance(result, list), f"Expected list but got {type(result)=}"
 ```
 
----
+______________________________________________________________________
 
 ## Router Testing with FastAPI TestClient
 
@@ -322,7 +321,7 @@ class TestProjectsRouter:
             assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
 ```
 
----
+______________________________________________________________________
 
 ## Parametrized Tests (PREFERRED over loops)
 
@@ -354,7 +353,7 @@ def test_container_state_active(self, state, expected_active, mocker):
     assert result == expected_active, f"For {state=} expected {expected_active=} but got {result=}"
 ```
 
----
+______________________________________________________________________
 
 ## File Structure
 

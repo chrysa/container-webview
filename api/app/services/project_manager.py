@@ -1,23 +1,20 @@
-import os
-import re
 from pathlib import Path
-from typing import List, Optional
 
-import yaml
 from pydantic import BaseModel
+import yaml
 
 from app.config import settings
 
 
 class ServiceModel(BaseModel):
     name: str
-    image: Optional[str] = None
-    ports: List[str] = []
-    depends_on: List[str] = []
-    networks: List[str] = []
-    volumes: List[str] = []
+    image: str | None = None
+    ports: list[str] = []
+    depends_on: list[str] = []
+    networks: list[str] = []
+    volumes: list[str] = []
     environment: dict = {}
-    healthcheck: Optional[dict] = None
+    healthcheck: dict | None = None
 
 
 class ProjectModel(BaseModel):
@@ -25,8 +22,8 @@ class ProjectModel(BaseModel):
     name: str
     path: str
     compose_file: str
-    services: List[ServiceModel] = []
-    networks: List[str] = []
+    services: list[ServiceModel] = []
+    networks: list[str] = []
 
 
 def _safe_project_path(project_id: str) -> Path:
@@ -34,20 +31,21 @@ def _safe_project_path(project_id: str) -> Path:
     base = Path(settings.projects_path).resolve()
     target = (base / project_id).resolve()
     if not str(target).startswith(str(base)):
-        raise ValueError(f"Chemin invalide : {project_id}")
+        msg = f"Chemin invalide : {project_id}"
+        raise ValueError(msg)
     return target
 
 
 def _parse_compose(compose_path: Path) -> dict:
-    with open(compose_path, "r") as f:
+    with compose_path.open() as f:
         return yaml.safe_load(f) or {}
 
 
-def _normalize_ports(ports_raw) -> List[str]:
+def _normalize_ports(ports_raw: object) -> list[str]:
     if not ports_raw:
         return []
     result = []
-    for p in ports_raw:
+    for p in ports_raw:  # type: ignore[union-attr]
         if isinstance(p, dict):
             result.append(f"{p.get('target', '')}")
         else:
@@ -55,7 +53,7 @@ def _normalize_ports(ports_raw) -> List[str]:
     return result
 
 
-def _normalize_depends(depends_raw) -> List[str]:
+def _normalize_depends(depends_raw: object) -> list[str]:
     if not depends_raw:
         return []
     if isinstance(depends_raw, list):
@@ -65,7 +63,7 @@ def _normalize_depends(depends_raw) -> List[str]:
     return []
 
 
-def _normalize_networks(nets_raw) -> List[str]:
+def _normalize_networks(nets_raw: object) -> list[str]:
     if not nets_raw:
         return []
     if isinstance(nets_raw, list):
@@ -75,11 +73,11 @@ def _normalize_networks(nets_raw) -> List[str]:
     return []
 
 
-def _normalize_volumes(vols_raw) -> List[str]:
+def _normalize_volumes(vols_raw: object) -> list[str]:
     if not vols_raw:
         return []
     result = []
-    for v in vols_raw:
+    for v in vols_raw:  # type: ignore[union-attr]
         if isinstance(v, dict):
             result.append(v.get("source", ""))
         else:
@@ -87,14 +85,14 @@ def _normalize_volumes(vols_raw) -> List[str]:
     return [v for v in result if v]
 
 
-def _normalize_environment(env_raw) -> dict:
+def _normalize_environment(env_raw: object) -> dict:
     if not env_raw:
         return {}
     if isinstance(env_raw, dict):
-        return {k: str(v) for k, v in env_raw.items() if v is not None}
+        return {k: str(v) for k, v in env_raw.items() if v is not None}  # type: ignore[union-attr]
     if isinstance(env_raw, list):
         result = {}
-        for item in env_raw:
+        for item in env_raw:  # type: ignore[union-attr]
             if "=" in item:
                 k, v = item.split("=", 1)
                 result[k] = v
@@ -102,7 +100,7 @@ def _normalize_environment(env_raw) -> dict:
     return {}
 
 
-def load_project(project_id: str) -> Optional[ProjectModel]:
+def load_project(project_id: str) -> ProjectModel | None:
     try:
         project_dir = _safe_project_path(project_id)
     except ValueError:
@@ -125,18 +123,19 @@ def load_project(project_id: str) -> Optional[ProjectModel]:
 
     services = []
     for svc_name, svc_conf in (data.get("services") or {}).items():
-        if not isinstance(svc_conf, dict):
-            svc_conf = {}
-        services.append(ServiceModel(
-            name=svc_name,
-            image=svc_conf.get("image"),
-            ports=_normalize_ports(svc_conf.get("ports")),
-            depends_on=_normalize_depends(svc_conf.get("depends_on")),
-            networks=_normalize_networks(svc_conf.get("networks")),
-            volumes=_normalize_volumes(svc_conf.get("volumes")),
-            environment=_normalize_environment(svc_conf.get("environment")),
-            healthcheck=svc_conf.get("healthcheck"),
-        ))
+        svc_data: dict = svc_conf if isinstance(svc_conf, dict) else {}
+        services.append(
+            ServiceModel(
+                name=svc_name,
+                image=svc_data.get("image"),
+                ports=_normalize_ports(svc_data.get("ports")),
+                depends_on=_normalize_depends(svc_data.get("depends_on")),
+                networks=_normalize_networks(svc_data.get("networks")),
+                volumes=_normalize_volumes(svc_data.get("volumes")),
+                environment=_normalize_environment(svc_data.get("environment")),
+                healthcheck=svc_data.get("healthcheck"),
+            )
+        )
 
     top_networks = list((data.get("networks") or {}).keys())
 
@@ -150,7 +149,7 @@ def load_project(project_id: str) -> Optional[ProjectModel]:
     )
 
 
-def list_projects() -> List[ProjectModel]:
+def list_projects() -> list[ProjectModel]:
     base = Path(settings.projects_path)
     if not base.exists():
         return []

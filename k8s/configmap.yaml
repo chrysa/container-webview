@@ -1,12 +1,13 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: docker-overview-config
-  namespace: docker-overview
-  labels:
-    app.kubernetes.io/name: docker-overview
+    name: docker-overview-config
+    namespace: docker-overview
+    labels:
+        app.kubernetes.io/name: docker-overview
 data:
-  PROJECTS_PATH: /projects
-  ADMIN_USERNAME: admin
+    PROJECTS_PATH: /projects
+    ADMIN_USERNAME: admin
   # Port interne FastAPI
-  API_PORT: "8000"
+    API_PORT: '8000'

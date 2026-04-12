@@ -1,5 +1,5 @@
-import pytest
-from httpx import ASGITransport, AsyncClient
+from httpx import ASGITransport
+from httpx import AsyncClient
 
 from app.main import app
 
@@ -14,9 +14,7 @@ class TestPing:
         When: GET /api
         Then: Should return 200 with {"status": "ok"}
         """
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/api")
 
         assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"

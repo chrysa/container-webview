@@ -13,7 +13,7 @@
 
 **Apply pattern**: `**/*` — Ces règles s'appliquent à l'ensemble du projet.
 
----
+______________________________________________________________________
 
 ## 🏗️ Architecture Overview
 
@@ -55,7 +55,7 @@ container-webview/
 - **Routing Traefik** : `PathPrefix(/api)` → FastAPI:8000, `PathPrefix(/)` → Frontend:3000
 - **VITE_API_URL** : vide en K8s (URLs relatives), `http://localhost:8000` en local
 
----
+______________________________________________________________________
 
 ## ⚠️ RÈGLES NON NÉGOCIABLES
 
@@ -67,11 +67,13 @@ container-webview/
 ### 2. Typage strict partout
 
 **Python** :
+
 - Toutes les fonctions ont des annotations de type (`-> None`, `-> str`, etc.)
 - Pas de `Any` sauf exception documentée
 - Utiliser `ruff` pour le format et le lint
 
 **TypeScript** :
+
 - Pas de `any` implicite
 - Interfaces dans `src/domain/*/types.ts`
 - Pas de `// @ts-ignore` sans commentaire explicatif
@@ -114,14 +116,14 @@ code/src/
 - Les tokens JWT sont stockés en `localStorage` via `utils/auth.ts`
 - Les WebSocket logs passent le token via query param (seule exception au header Bearer)
 
----
+______________________________________________________________________
 
 ## 🔄 Flux de développement
 
 1. `make dev-up` — démarre API + frontend en mode watch
-2. Frontend : `http://localhost:3000`, API : `http://localhost:8000`
-3. Hot-reload : Vite pour le frontend, `--reload` Uvicorn pour l'API
-4. Proxy Vite : `/api` → `http://api:8000` (WebSocket inclus)
+1. Frontend : `http://localhost:3000`, API : `http://localhost:8000`
+1. Hot-reload : Vite pour le frontend, `--reload` Uvicorn pour l'API
+1. Proxy Vite : `/api` → `http://api:8000` (WebSocket inclus)
 
 ## 🚀 CI/CD — GitHub Actions
 

@@ -1,4 +1,4 @@
-import styles from "./GlobalLoader.module.scss";
+import styles from './GlobalLoader.module.scss';
 
 export default function GlobalLoader() {
   return (

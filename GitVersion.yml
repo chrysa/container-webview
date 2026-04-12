@@ -1,3 +1,4 @@
+---
 # ─────────────────────────────────────────────────────────────────────────────
 # GitVersion configuration
 # Docs: https://gitversion.net/docs/reference/configuration
@@ -10,8 +11,8 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 mode: Mainline
-tag-prefix: "[vV]"
-initial-version: "0.1.0"
+tag-prefix: '[vV]'
+initial-version: 0.1.0
 
 major-version-bump-message: '^(feat|fix|refactor|perf|style|test|docs|build|ops|chore)(\(.+\))?!:'
 minor-version-bump-message: '^feat(\(.+\))?[^!]?:'
@@ -19,24 +20,24 @@ patch-version-bump-message: '^(fix|perf|refactor)(\(.+\))?[^!]?:'
 no-bump-message: '^(docs?|style|test|chore)(\(.+\))?:'
 
 branches:
-  main:
-    regex: "^main$"
-    mode: Mainline
-    increment: Inherit
-    is-main-branch: true
-    prevent-increment-of-merged-branch-version: false
-    track-merge-target: false
+    main:
+        regex: ^main$
+        mode: Mainline
+        increment: Inherit
+        is-main-branch: true
+        prevent-increment-of-merged-branch-version: false
+        track-merge-target: false
 
-  feature:
-    regex: "^(feature|feat)[\\/\\-]"
-    mode: ContinuousDeployment
-    increment: Inherit
-    is-main-branch: false
-    tag: "{BranchName}"
+    feature:
+        regex: ^(feature|feat)[\/\-]
+        mode: ContinuousDeployment
+        increment: Inherit
+        is-main-branch: false
+        tag: '{BranchName}'
 
-  pull-request:
-    regex: "^(pull-request|pr)[\\/\\-]"
-    mode: ContinuousDeployment
-    increment: Inherit
-    is-main-branch: false
-    tag: "PullRequest{}"
+    pull-request:
+        regex: ^(pull-request|pr)[\/\-]
+        mode: ContinuousDeployment
+        increment: Inherit
+        is-main-branch: false
+        tag: PullRequest{}
