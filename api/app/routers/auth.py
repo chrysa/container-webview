@@ -34,9 +34,10 @@ def _authenticate_ldap(username: str, password: str) -> bool:
     if not settings.ldap_server or not _HAS_LDAP:
         return False
     try:
+        safe_username = _ldap.dn.escape_dn_chars(username)  # prevent LDAP injection
         conn = _ldap.initialize(settings.ldap_server)
         conn.simple_bind_s(
-            f"cn={username},{settings.ldap_base_dn}",
+            f"cn={safe_username},{settings.ldap_base_dn}",
             password,
         )
         return True
