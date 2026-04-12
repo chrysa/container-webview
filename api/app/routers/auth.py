@@ -56,7 +56,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
             detail="Identifiants incorrects",
         )
     token = create_access_token({"sub": form_data.username})
-    return Token(access_token=token, token_type="bearer", username=form_data.username)  # noqa: S106
+    return Token(access_token=token, token_type="bearer", username=form_data.username)  # noqa: S106  # nosec B106
 
 
 @router.get("/check")
