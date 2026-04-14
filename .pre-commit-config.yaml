@@ -130,7 +130,7 @@ repos:
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
 
 -   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 7b8bca6012218d6804e586523b246cd0a8eb02a1
+    rev: 0.2.3
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --width, '200']
