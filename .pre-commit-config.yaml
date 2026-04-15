@@ -42,7 +42,7 @@ repos:
 
     # ─── Debug Detection ──────────────────────────────────────────────────────
 -   repo: https://github.com/chrysa/pre-commit-tools
-    rev: 3457e09bc07119385ea09da118027a56d02a521a
+    rev: ee9629f42e27aa3c6f73e9ca1da59e40f26e4421
     hooks:
     -   id: console-debug-detection
         name: Detect console.debug
