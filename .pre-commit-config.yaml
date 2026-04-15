@@ -20,6 +20,7 @@ repos:
     -   id: check-yaml
         name: Validate YAML
         args: [--allow-multiple-documents]
+        exclude: ^(\.github/ISSUE_TEMPLATE/)
         files: \.(yaml|yml)$
     -   id: check-json
         name: Validate JSON
@@ -51,7 +52,8 @@ repos:
         exclude: ^code/src/serviceWorker\.js$
     -   id: console-table-detection
         name: Detect console.table
-    -   id: yaml-sorter
+    -   exclude: ^(\.github/ISSUE_TEMPLATE/|docker-compose\.yml|\.pre-commit-config\.yaml)
+        id: yaml-sorter
         name: Sort YAML files
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
@@ -128,12 +130,14 @@ repos:
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
+        exclude: ^(\.github/ISSUE_TEMPLATE/)
 
 -   repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
     rev: 0.2.3
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --width, '200']
+        exclude: ^(\.github/ISSUE_TEMPLATE/)
 
     # ─── Markdown ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/igorshubovych/markdownlint-cli
