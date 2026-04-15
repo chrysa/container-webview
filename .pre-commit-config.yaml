@@ -52,7 +52,7 @@ repos:
         exclude: ^code/src/serviceWorker\.js$
     -   id: console-table-detection
         name: Detect console.table
-    -   exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml)
+    -   exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
         id: yaml-sorter
         name: Sort YAML files
 
@@ -137,7 +137,7 @@ repos:
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --width, '200']
-        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/)
+        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml)
 
     # ─── Markdown ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/igorshubovych/markdownlint-cli
