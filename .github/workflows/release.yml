@@ -126,8 +126,10 @@ jobs:
         -   name: Dry-run summary
             if: inputs.dry-run == true
             run: |
-                echo "### Dry-run: no release created" >> "$GITHUB_STEP_SUMMARY"
-                echo "Next version would be: **v${{ steps.gitversion.outputs.semVer }}**" >> "$GITHUB_STEP_SUMMARY"
-                echo "" >> "$GITHUB_STEP_SUMMARY"
-                echo "#### Release notes preview" >> "$GITHUB_STEP_SUMMARY"
-                echo "${{ steps.release-notes.outputs.content }}" >> "$GITHUB_STEP_SUMMARY"
+                {
+                    echo "### Dry-run: no release created"
+                    echo "Next version would be: **v${{ steps.gitversion.outputs.semVer }}**"
+                    echo ""
+                    echo "#### Release notes preview"
+                    echo "${{ steps.release-notes.outputs.content }}"
+                } >> "$GITHUB_STEP_SUMMARY"
