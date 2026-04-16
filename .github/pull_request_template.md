@@ -17,7 +17,7 @@ Closes #<!-- issue number — required: 1 PR = 1 issue -->
 
 ## Changes
 <!-- List the concrete changes made -->
-- 
+-
 
 ## Dependencies
 <!-- PRs this depends on (must be merged first). Format: chrysa/REPO#NUMBER -->
@@ -27,6 +27,7 @@ Closes #<!-- issue number — required: 1 PR = 1 issue -->
 <!-- How was this tested? Unit tests / manual steps / CI only -->
 
 ## Checklist
+
 - [ ] Conventional commit messages used (`fix:`, `feat:`, `chore:`, etc.)
 - [ ] Pre-commit hooks pass locally (`pre-commit run --all-files`)
 - [ ] CI is green (all checks pass)
