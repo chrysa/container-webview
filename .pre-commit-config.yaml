@@ -2,7 +2,7 @@
 default_language_version:
     python: python3.12
 fail_fast: false
-minimum_pre_commit_version: 3.7.0
+minimum_pre_commit_version: 4.1.0
 
 repos:
     # ─── General file checks (run first to fix encoding/whitespace) ───────────
@@ -96,6 +96,7 @@ repos:
     -   id: prettier
         name: Format code with Prettier
         files: ^code/.*\.(css|scss|ts|tsx|json)$
+        exclude: ^code/package(-lock)?\.json$
         args:
         -   --print-width=120
         -   --tab-width=2
