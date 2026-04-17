@@ -112,7 +112,7 @@ jobs:
       # ── 7. Publish GitHub Release (triggers CD workflow) ──────────────────
         -   name: Create GitHub Release
             if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
-            uses: softprops/action-gh-release@v2
+            uses: softprops/action-gh-release@v3
             with:
                 tag_name: v${{ steps.gitversion.outputs.semVer }}
                 name: v${{ steps.gitversion.outputs.semVer }}
