@@ -53,6 +53,7 @@ repos:
         name: Detect console.table
     -   id: yaml-sorter
         name: Sort YAML files
+        exclude: ^\.github/dependabot\.yml$
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
