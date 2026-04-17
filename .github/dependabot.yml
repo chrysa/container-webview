@@ -1,3 +1,4 @@
+version: 2
 updates:
 - commit-message:
     prefix: ci(deps)
@@ -19,4 +20,3 @@ updates:
   schedule:
     day: monday
     interval: weekly
-version: 2
