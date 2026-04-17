@@ -49,7 +49,7 @@ export default function TopologyGraph({ projectId }: Props) {
           ...n.data,
           statusColor: STATUS_COLORS[(n.data.status as string) ?? 'unknown'] ?? STATUS_COLORS.unknown,
         },
-      })),
+      }))
     );
     setEdges(
       data.edges.map((e) => ({
@@ -59,7 +59,7 @@ export default function TopologyGraph({ projectId }: Props) {
         label: e.label ?? undefined,
         animated: e.animated,
         style: { stroke: 'var(--border-strong)' },
-      })),
+      }))
     );
   }, [data, setNodes, setEdges]);
 
