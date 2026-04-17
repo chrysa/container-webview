@@ -142,6 +142,7 @@ repos:
     hooks:
     -   id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
+        exclude: ^CLAUDE\.md$
 
     # ─── Shell ────────────────────────────────────────────────────────────────
 -   repo: https://github.com/lovesegfault/beautysh.git
