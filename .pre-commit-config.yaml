@@ -135,6 +135,7 @@ repos:
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --width, '200']
+        exclude: ^\.github/(dependabot|FUNDING)\.yml$
 
     # ─── Markdown ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/igorshubovych/markdownlint-cli
