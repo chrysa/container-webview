@@ -8,10 +8,9 @@ ignored:
 -   DL4006
 -   SC2086
 -   SC2102
-
 trustedRegistries:
 -   docker.elastic.co
 -   docker.io
 -   ghcr.io
--   registry.gitlab.com
 -   lscr.io
+-   registry.gitlab.com

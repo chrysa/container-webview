@@ -3,19 +3,19 @@ extends: default
 
 rules:
     colons:
-        max-spaces-before: 0
         max-spaces-after: 1
+        max-spaces-before: 0
     commas:
+        max-spaces-after: 1
         max-spaces-before: 0
         min-spaces-after: 1
-        max-spaces-after: 1
+    comments-indentation: disable
+    document-start: disable
     hyphens:
         max-spaces-after: 4
     indentation:
-        level: warning
         indent-sequences: consistent
+        level: warning
     line-length:
         max: 200
-    comments-indentation: disable
-    document-start: disable
     truthy: disable
