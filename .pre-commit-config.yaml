@@ -52,10 +52,9 @@ repos:
         exclude: ^code/src/serviceWorker\.js$
     -   id: console-table-detection
         name: Detect console.table
-    -   exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
-        id: yaml-sorter
+    -   id: yaml-sorter
         name: Sort YAML files
-        exclude: ^\.github/dependabot\.yml$
+        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
