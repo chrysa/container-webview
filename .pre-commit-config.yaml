@@ -1,8 +1,8 @@
 ---
 default_language_version:
-    python: python3.12
+    python: python3.13
 fail_fast: false
-minimum_pre_commit_version: 3.7.0
+minimum_pre_commit_version: 4.1.0
 
 repos:
     # ─── General file checks (run first to fix encoding/whitespace) ───────────
@@ -55,6 +55,7 @@ repos:
     -   exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
         id: yaml-sorter
         name: Sort YAML files
+        exclude: ^\.github/dependabot\.yml$
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
@@ -96,6 +97,7 @@ repos:
     -   id: prettier
         name: Format code with Prettier
         files: ^code/.*\.(css|scss|ts|tsx|json)$
+        exclude: ^code/package(-lock)?\.json$
         args:
         -   --print-width=120
         -   --tab-width=2
@@ -137,7 +139,7 @@ repos:
     hooks:
     -   id: yamlfmt
         args: [--mapping, '4', --sequence, '4', --offset, '0', --width, '200']
-        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml)
+        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml)
 
     # ─── Markdown ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/igorshubovych/markdownlint-cli
@@ -145,6 +147,7 @@ repos:
     hooks:
     -   id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
+        exclude: ^CLAUDE\.md$
 
     # ─── Shell ────────────────────────────────────────────────────────────────
 -   repo: https://github.com/lovesegfault/beautysh.git
