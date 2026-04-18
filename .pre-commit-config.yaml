@@ -83,7 +83,7 @@ repos:
         files: ^api/.*\.py$
 
 -   repo: https://github.com/pre-commit/pygrep-hooks
-    rev: 84aa5ebaf906144146cbc33c5e71b364cda3d719
+    rev: v1.9.0
     hooks:
     -   id: python-no-eval
     -   id: python-no-log-warn
