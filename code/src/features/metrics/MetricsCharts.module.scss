@@ -59,10 +59,36 @@
   font-weight: 600;
   color: white;
   text-transform: uppercase;
+  background: var(--status-unknown);
+}
+
+.status_running {
+  background: var(--status-running);
+}
+.status_exited {
+  background: var(--status-exited);
+}
+.status_paused {
+  background: var(--status-paused);
+}
+.status_restarting {
+  background: var(--status-restarting);
+}
+.status_unknown {
+  background: var(--status-unknown);
 }
 
 .state {
   padding: 40px;
   text-align: center;
   color: var(--text-muted);
+}
+
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--status-exited);
+  font-size: 14px;
 }

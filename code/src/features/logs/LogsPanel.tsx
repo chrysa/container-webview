@@ -7,7 +7,7 @@ interface Props {
   projectId: string;
 }
 
-function LogViewer({ projectId, serviceName }: { projectId: string; serviceName: string }) {
+function LogViewer({ projectId, serviceName }: Readonly<{ projectId: string; serviceName: string }>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<string[]>([]);
   const [connected, setConnected] = useState(false);
@@ -16,8 +16,8 @@ function LogViewer({ projectId, serviceName }: { projectId: string; serviceName:
   useEffect(() => {
     setLines([]);
     const token = getToken() ?? '';
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const url = `${protocol}://${window.location.host}/api/projects/${projectId}/services/${serviceName}/logs?token=${encodeURIComponent(token)}&tail=200`;
+    const protocol = globalThis.location.protocol === 'https:' ? 'wss' : 'ws';
+    const url = `${protocol}://${globalThis.location.host}/api/projects/${projectId}/services/${serviceName}/logs?token=${encodeURIComponent(token)}&tail=200`;
 
     const ws = new WebSocket(url);
     wsRef.current = ws;
@@ -37,11 +37,20 @@ function LogViewer({ projectId, serviceName }: { projectId: string; serviceName:
     };
   }, [projectId, serviceName]);
 
-  // Auto-scroll
+  const [autoScroll, setAutoScroll] = useState(true);
+
+  // Auto-scroll conditionnel
   useEffect(() => {
     const el = containerRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [lines]);
+    if (el && autoScroll) el.scrollTop = el.scrollHeight;
+  }, [lines, autoScroll]);
+
+  function handleScroll() {
+    const el = containerRef.current;
+    if (!el) return;
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
+    setAutoScroll(atBottom);
+  }
 
   return (
     <div className={styles.viewer}>
@@ -49,12 +58,25 @@ function LogViewer({ projectId, serviceName }: { projectId: string; serviceName:
         <span className={`${styles.dot} ${connected ? styles.dotOnline : styles.dotOffline}`} />
         <span>{serviceName}</span>
         <span className={styles.countBadge}>{lines.length} lignes</span>
+        <button
+          className={`${styles.scrollBtn} ${autoScroll ? styles.scrollBtnActive : ''}`}
+          onClick={() => {
+            setAutoScroll((v) => {
+              if (!v && containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight;
+              return !v;
+            });
+          }}
+          title={autoScroll ? 'Auto-scroll actif' : 'Auto-scroll désactivé'}
+        >
+          Auto-scroll
+        </button>
         <button className={styles.clearBtn} onClick={() => setLines([])}>
           Vider
         </button>
       </div>
-      <div ref={containerRef} className={styles.terminal}>
+      <div ref={containerRef} className={styles.terminal} onScroll={handleScroll}>
         {lines.map((line, i) => (
+          // eslint-disable-next-line react/no-array-index-key -- log lines have no unique ID
           <div key={i} className={styles.line}>
             {line}
           </div>
@@ -64,7 +86,7 @@ function LogViewer({ projectId, serviceName }: { projectId: string; serviceName:
   );
 }
 
-export default function LogsPanel({ projectId }: Props) {
+export default function LogsPanel({ projectId }: Readonly<Props>) {
   const { data: project, isLoading } = useProject(projectId);
   const [active, setActive] = useState<string | null>(null);
 

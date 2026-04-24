@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -16,13 +16,20 @@ import styles from './Sidebar.module.scss';
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { projectId } = useParams<{ projectId?: string }>();
+  const lastProjectId = useRef<string | undefined>(undefined);
 
-  const projectLinks = projectId
+  useEffect(() => {
+    if (projectId) lastProjectId.current = projectId;
+  }, [projectId]);
+
+  const activeProjectId = projectId ?? lastProjectId.current;
+
+  const projectLinks = activeProjectId
     ? [
-        { to: `/projects/${projectId}/topology`, icon: <GitBranch size={20} />, label: 'Topologie' },
-        { to: `/projects/${projectId}/services`, icon: <Server size={20} />, label: 'Services' },
-        { to: `/projects/${projectId}/logs`, icon: <ScrollText size={20} />, label: 'Logs' },
-        { to: `/projects/${projectId}/metrics`, icon: <BarChart2 size={20} />, label: 'Métriques' },
+        { to: `/projects/${activeProjectId}/topology`, icon: <GitBranch size={20} />, label: 'Topologie' },
+        { to: `/projects/${activeProjectId}/services`, icon: <Server size={20} />, label: 'Services' },
+        { to: `/projects/${activeProjectId}/logs`, icon: <ScrollText size={20} />, label: 'Logs' },
+        { to: `/projects/${activeProjectId}/metrics`, icon: <BarChart2 size={20} />, label: 'Métriques' },
       ]
     : [];
 

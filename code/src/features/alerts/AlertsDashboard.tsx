@@ -1,4 +1,4 @@
-import { AlertTriangle, Info, XCircle } from 'lucide-react';
+import { AlertTriangle, Info, XCircle, AlertCircle } from 'lucide-react';
 import { useAlerts } from '@/domain/alerts/queries';
 import type { Alert } from '@/domain/alerts/types';
 import styles from './AlertsDashboard.module.scss';
@@ -9,8 +9,12 @@ const LEVEL_CONFIG = {
   critical: { icon: <XCircle size={16} />, label: 'Critique', cls: 'critical' },
 };
 
-function AlertRow({ alert }: { alert: Alert }) {
+function AlertRow({ alert }: Readonly<{ alert: Alert }>) {
   const cfg = LEVEL_CONFIG[alert.level] ?? LEVEL_CONFIG.info;
+  const dateStr = new Date(alert.timestamp).toLocaleString('fr-FR', {
+    dateStyle: 'short',
+    timeStyle: 'medium',
+  });
   return (
     <div className={`${styles.alertRow} ${styles[cfg.cls]}`}>
       <div className={styles.icon}>{cfg.icon}</div>
@@ -22,13 +26,13 @@ function AlertRow({ alert }: { alert: Alert }) {
         </div>
         <div className={styles.message}>{alert.message}</div>
       </div>
-      <div className={styles.time}>{new Date(alert.timestamp).toLocaleTimeString('fr-FR')}</div>
+      <div className={styles.time}>{dateStr}</div>
     </div>
   );
 }
 
 export default function AlertsDashboard() {
-  const { data = [], isLoading } = useAlerts();
+  const { data = [], isLoading, error } = useAlerts();
 
   const counts = {
     critical: data.filter((a) => a.level === 'critical').length,
@@ -37,7 +41,13 @@ export default function AlertsDashboard() {
   };
 
   if (isLoading) return <div className={styles.state}>Chargement des alertes…</div>;
-
+  if (error)
+    return (
+      <div className={styles.errorState}>
+        <AlertCircle size={20} />
+        <span>Erreur lors du chargement des alertes.</span>
+      </div>
+    );
   return (
     <div className={styles.wrapper}>
       <div className={styles.summary}>
