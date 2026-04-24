@@ -77,7 +77,8 @@
   font-weight: normal;
 }
 
-.clearBtn {
+.clearBtn,
+.scrollBtn {
   padding: 3px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -90,6 +91,11 @@
   &:hover {
     background: var(--surface-hover);
   }
+}
+
+.scrollBtnActive {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .terminal {

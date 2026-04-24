@@ -129,3 +129,12 @@
   text-align: center;
   color: var(--text-muted);
 }
+
+.errorState {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--status-exited);
+  font-size: 14px;
+}

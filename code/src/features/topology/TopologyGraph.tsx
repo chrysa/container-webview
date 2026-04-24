@@ -11,6 +11,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useTopology } from '@/domain/topology/queries';
+import { useTheme } from '@/hooks/useTheme';
 import ServiceNode from './ServiceNode';
 import NetworkNode from './NetworkNode';
 import styles from './TopologyGraph.module.scss';
@@ -32,8 +33,9 @@ interface Props {
   projectId: string;
 }
 
-export default function TopologyGraph({ projectId }: Props) {
+export default function TopologyGraph({ projectId }: Readonly<Props>) {
   const { data, isLoading, error } = useTopology(projectId);
+  const { theme } = useTheme();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -76,7 +78,7 @@ export default function TopologyGraph({ projectId }: Props) {
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         fitView
-        colorMode="dark"
+        colorMode={theme}
       >
         <Background />
         <Controls />

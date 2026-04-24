@@ -20,3 +20,9 @@ api-format: ## run ruff formatter on backend code
 
 api-typecheck: ## run mypy type checking on backend code
 	@docker compose run --rm api python -m mypy app/
+
+e2e: ## run E2E Playwright tests (requires prod stack running)
+	@docker compose --profile e2e run --rm e2e
+
+e2e-report: ## open Playwright HTML report
+	@npx playwright show-report e2e/playwright-report

@@ -7,129 +7,251 @@ name: CI
 
 on:
     push:
-        branches: ['**']
+        branches: [ "**" ]
     pull_request:
-        branches: ['**']
+        branches: [ "**" ]
 
 concurrency:
     group: ci-${{ github.ref }}
     cancel-in-progress: true
 
 jobs:
-  # ───────────────────────────────────────────────────────────────────────────
+    # ───────────────────────────────────────────────────────────────────────────
     lint-frontend:
         name: Lint — TypeScript / ESLint
         runs-on: ubuntu-latest
         steps:
-        -   uses: actions/checkout@v6
+            - uses: actions/checkout@v6
 
-        -   name: Setup Node 22
-            uses: actions/setup-node@v4
-            with:
-                node-version: '22'
-                cache: npm
-                cache-dependency-path: code/package.json
+            - name: Setup Node 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: npm
+                  cache-dependency-path: code/package.json
 
-        -   name: Install dependencies
-            working-directory: code
-            run: npm install --legacy-peer-deps
+            - name: Install dependencies
+              working-directory: code
+              run: npm install --legacy-peer-deps
 
-        -   name: Run ESLint
-            working-directory: code
-            run: npm run lint
+            - name: Run ESLint
+              working-directory: code
+              run: npm run lint
 
-  # ───────────────────────────────────────────────────────────────────────────
+    # ───────────────────────────────────────────────────────────────────────────
     lint-api:
         name: Lint — Python / Ruff
         runs-on: ubuntu-latest
         steps:
-        -   uses: actions/checkout@v6
+            - uses: actions/checkout@v6
 
-        -   name: Setup Python 3.12
-            uses: actions/setup-python@v6
-            with:
-                python-version: '3.12'
-                cache: pip
-                cache-dependency-path: api/requirements.txt
+            - name: Setup Python 3.12
+              uses: actions/setup-python@v6
+              with:
+                  python-version: "3.12"
+                  cache: pip
+                  cache-dependency-path: api/requirements.txt
 
-        -   name: Install ruff
-            run: pip install ruff==0.11.2
+            - name: Install ruff
+              run: pip install ruff==0.11.2
 
-        -   name: Run ruff check
-            run: ruff check api/
+            - name: Run ruff check
+              run: ruff check api/
 
-        -   name: Run ruff format check
-            run: ruff format --check api/
+            - name: Run ruff format check
+              run: ruff format --check api/
 
-  # ───────────────────────────────────────────────────────────────────────────
+    # ───────────────────────────────────────────────────────────────────────────
     build-frontend:
         name: Build — Frontend (Vite)
         runs-on: ubuntu-latest
-        needs: [lint-frontend]
+        needs: [ lint-frontend ]
         steps:
-        -   uses: actions/checkout@v6
+            - uses: actions/checkout@v6
 
-        -   name: Setup Node 22
-            uses: actions/setup-node@v4
-            with:
-                node-version: '22'
-                cache: npm
-                cache-dependency-path: code/package.json
+            - name: Setup Node 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: npm
+                  cache-dependency-path: code/package.json
 
-        -   name: Install dependencies
-            working-directory: code
-            run: npm install --legacy-peer-deps
+            - name: Install dependencies
+              working-directory: code
+              run: npm install --legacy-peer-deps
 
-        -   name: Build
-            working-directory: code
-            env:
-                VITE_API_URL: ''
-            run: npm run build
+            - name: Build
+              working-directory: code
+              env:
+                  VITE_API_URL: ""
+              run: npm run build
 
-        -   name: Upload build artifact
-            uses: actions/upload-artifact@v7
-            with:
-                name: frontend-dist
-                path: code/dist/
-                retention-days: 1
+            - name: Upload build artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: frontend-dist
+                  path: code/dist/
+                  retention-days: 1
 
-  # ───────────────────────────────────────────────────────────────────────────
+    # ───────────────────────────────────────────────────────────────────────────
     build-docker-api:
         name: Build — Docker API
         runs-on: ubuntu-latest
-        needs: [lint-api]
+        needs: [ lint-api ]
         steps:
-        -   uses: actions/checkout@v6
+            - uses: actions/checkout@v6
 
-        -   name: Set up Docker Buildx
-            uses: docker/setup-buildx-action@v4
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
 
-        -   name: Build API image (no push)
-            uses: docker/build-push-action@v7
-            with:
-                context: ./api
-                push: false
-                tags: ghcr.io/${{ github.repository_owner }}/container-webview/api:${{ github.sha }}
-                cache-from: type=gha
-                cache-to: type=gha,mode=max
+            - name: Build API image (no push)
+              uses: docker/build-push-action@v7
+              with:
+                  context: ./api
+                  push: false
+                  tags: ghcr.io/${{ github.repository_owner }}/container-webview/api:${{
+                      github.sha }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
 
-  # ───────────────────────────────────────────────────────────────────────────
+    # ───────────────────────────────────────────────────────────────────────────
     build-docker-frontend:
         name: Build — Docker Frontend
         runs-on: ubuntu-latest
-        needs: [lint-frontend]
+        needs: [ lint-frontend ]
         steps:
-        -   uses: actions/checkout@v6
+            - uses: actions/checkout@v6
 
-        -   name: Set up Docker Buildx
-            uses: docker/setup-buildx-action@v4
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
 
-        -   name: Build Frontend image (no push)
-            uses: docker/build-push-action@v7
-            with:
-                context: .
-                push: false
-                build-args: VITE_API_URL=
-                tags: ghcr.io/${{ github.repository_owner }}/container-webview/frontend:${{ github.sha }}
-                cache-from: type=gha
-                cache-to: type=gha,mode=max
+            - name: Build Frontend image (no push)
+              uses: docker/build-push-action@v7
+              with:
+                  context: .
+                  push: false
+                  build-args: VITE_API_URL=
+                  tags: ghcr.io/${{ github.repository_owner }}/container-webview/frontend:${{
+                      github.sha }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+
+    # ───────────────────────────────────────────────────────────────────────────
+    test-api:
+        name: Tests — Python (pytest + coverage)
+        runs-on: ubuntu-latest
+        needs: [ lint-api ]
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Build API test image
+              run: docker compose build api-test
+              env:
+                  COMPOSE_PROFILES: test
+
+            - name: Run pytest with coverage
+              run: >
+                  docker compose --profile test run --rm api-test python -m
+                  pytest --cov=app --cov-report=xml --cov-report=term-missing
+              env:
+                  SECRET_KEY: test-secret-key-for-ci
+                  ADMIN_USERNAME: testuser
+                  ADMIN_PASSWORD: testpass
+
+            - name: Upload coverage report
+              uses: actions/upload-artifact@v7
+              if: always()
+              with:
+                  name: api-coverage
+                  path: api/coverage.xml
+                  retention-days: 7
+
+    # ───────────────────────────────────────────────────────────────────────────
+    test-frontend:
+        name: Tests — Frontend (Vitest + coverage)
+        runs-on: ubuntu-latest
+        needs: [ lint-frontend ]
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Setup Node 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: npm
+                  cache-dependency-path: code/package.json
+
+            - name: Install dependencies
+              working-directory: code
+              run: npm install --legacy-peer-deps
+
+            - name: Run Vitest with coverage
+              working-directory: code
+              run: npm run test:coverage
+
+            - name: Upload coverage report
+              uses: actions/upload-artifact@v7
+              if: always()
+              with:
+                  name: frontend-coverage
+                  path: code/coverage/
+                  retention-days: 7
+
+    # ───────────────────────────────────────────────────────────────────────────
+    test-e2e:
+        name: Tests — E2E (Playwright)
+        runs-on: ubuntu-latest
+        needs: [ build-docker-api, build-docker-frontend ]
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Setup Node 22
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+                  cache: npm
+                  cache-dependency-path: code/package.json
+
+            - name: Install dependencies
+              working-directory: code
+              run: npm install --legacy-peer-deps
+
+            - name: Install Playwright browsers
+              run: npx playwright install --with-deps chromium
+
+            - name: Start stack (API + frontend)
+              run: docker compose up -d api frontend
+              env:
+                  VITE_API_URL: ""
+                  SECRET_KEY: e2e-secret-key-for-ci
+                  ADMIN_USERNAME: admin
+                  ADMIN_PASSWORD: admin
+
+            - name: Wait for API healthcheck
+              run: |
+                  for i in $(seq 1 30); do
+                      curl -sf http://localhost:8000/api && break
+                      sleep 2
+                  done
+
+            - name: Run Playwright E2E tests
+              run: npx playwright test --config=playwright.config.ts
+              env:
+                  BASE_URL: http://localhost:3000
+                  ADMIN_USERNAME: admin
+                  ADMIN_PASSWORD: admin
+
+            - name: Upload Playwright report
+              uses: actions/upload-artifact@v7
+              if: always()
+              with:
+                  name: playwright-report
+                  path: e2e/playwright-report/
+                  retention-days: 7
+
+            - name: Stop stack
+              if: always()
+              run: docker compose down

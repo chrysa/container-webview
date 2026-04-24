@@ -1,12 +1,22 @@
 import { Link } from 'react-router-dom';
-import { GitBranch, Server, ScrollText, BarChart2 } from 'lucide-react';
+import { GitBranch, Server, ScrollText, BarChart2, Package, FileText, Network, AlertCircle } from 'lucide-react';
 import { useProjects } from '@/domain/projects/queries';
 import styles from './Projects.module.scss';
 
 export default function Projects() {
-  const { data: projects = [], isLoading } = useProjects();
+  const { data: projects = [], isLoading, error } = useProjects();
 
   if (isLoading) return <div className={styles.state}>Chargement des projets…</div>;
+
+  if (error) {
+    return (
+      <div className={styles.error}>
+        <AlertCircle size={32} />
+        <p>Impossible de charger les projets.</p>
+        <p className={styles.hint}>{error.message}</p>
+      </div>
+    );
+  }
 
   if (projects.length === 0) {
     return (
@@ -26,7 +36,9 @@ export default function Projects() {
         {projects.map((p) => (
           <div key={p.id} className={styles.card}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardIcon}>📦</span>
+              <span className={styles.cardIcon}>
+                <Package size={20} />
+              </span>
               <div>
                 <h2 className={styles.cardTitle}>{p.name}</h2>
                 <p className={styles.cardSub}>
@@ -36,9 +48,11 @@ export default function Projects() {
             </div>
 
             <div className={styles.meta}>
-              <span className={styles.metaItem}>📄 {p.compose_file}</span>
               <span className={styles.metaItem}>
-                🌐 {p.networks.length} réseau{p.networks.length > 1 ? 'x' : ''}
+                <FileText size={12} /> {p.compose_file}
+              </span>
+              <span className={styles.metaItem}>
+                <Network size={12} /> {p.networks.length} réseau{p.networks.length > 1 ? 'x' : ''}
               </span>
             </div>
 
