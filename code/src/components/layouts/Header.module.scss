@@ -20,9 +20,43 @@
 }
 
 .brand {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb {
+  @include m.flex-center-y;
+  gap: 2px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.crumbItem {
+  @include m.flex-center-y;
+  gap: 2px;
+}
+
+.crumbSep {
+  opacity: 0.4;
+}
+
+.crumbLink {
+  font-size: var(--font-sm);
+  color: rgba(255, 255, 255, 0.55);
+  @include m.smooth;
+
+  &:hover { color: rgba(255, 255, 255, 0.95); }
+}
+
+.crumbCurrent {
+  font-size: var(--font-sm);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
 }
 
 .right {
@@ -47,6 +81,6 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    color: var(--text-inverse);
   }
 }

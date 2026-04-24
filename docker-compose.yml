@@ -6,14 +6,14 @@
 x-common: &common
     restart: unless-stopped
     volumes:
-    -   source: /etc/localtime
-        target: /etc/localtime
-        type: bind
-        read_only: true
+        - source: /etc/localtime
+          target: /etc/localtime
+          type: bind
+          read_only: true
 
 services:
 
-  # ─── Backend FastAPI ─────────────────────────────────────
+    # ─── Backend FastAPI ─────────────────────────────────────
     api:
         <<: *common
         build:
@@ -30,29 +30,29 @@ services:
             LDAP_SERVER: ${LDAP_SERVER:-}
             LDAP_BASE_DN: ${LDAP_BASE_DN:-}
         volumes:
-        -   source: /var/run/docker.sock
-            target: /var/run/docker.sock
-            type: bind
-            read_only: true
-        -   source: /etc/localtime
-            target: /etc/localtime
-            type: bind
-            read_only: true
-        -   source: ${PROJECTS_PATH:-/opt/projects}
-            target: /projects
-            type: bind
-            read_only: true
+            - source: /var/run/docker.sock
+              target: /var/run/docker.sock
+              type: bind
+              read_only: true
+            - source: /etc/localtime
+              target: /etc/localtime
+              type: bind
+              read_only: true
+            - source: ${PROJECTS_PATH:-/opt/projects}
+              target: /projects
+              type: bind
+              read_only: true
         expose:
-        -   '8000'
+            - "8000"
         ports:
-        -   8000:8000
+            - 8000:8000
         healthcheck:
-            test: [CMD, curl, -f, http://localhost:8000/api]
+            test: [ CMD, curl, -f, http://localhost:8000/api ]
             interval: 30s
             timeout: 5s
             retries: 3
 
-  # ─── Frontend (serve + React build) ──────────────────────
+    # ─── Frontend (serve + React build) ──────────────────────
     frontend:
         <<: *common
         build:
@@ -60,18 +60,18 @@ services:
             dockerfile: Dockerfile
             target: production
             args:
-        # URL absolue de l'API vue depuis le navigateur
+                # URL absolue de l'API vue depuis le navigateur
                 VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
         container_name: docker-overview-frontend
         hostname: frontend
         image: docker-overview-frontend:latest
         ports:
-        -   ${FRONTEND_PORT:-3000}:3000
+            - ${FRONTEND_PORT:-3000}:3000
         depends_on:
             api:
                 condition: service_healthy
 
-  # ─── Dev : API (hot-reload) ───────────────────────────────
+    # ─── Dev : API (hot-reload) ───────────────────────────────
     api-dev:
         build:
             context: ./api
@@ -85,27 +85,27 @@ services:
             ADMIN_USERNAME: admin
             ADMIN_PASSWORD: admin
         volumes:
-        -   source: ./api
-            target: /app
-            type: bind
-        -   source: /var/run/docker.sock
-            target: /var/run/docker.sock
-            type: bind
-            read_only: true
-        -   source: /etc/localtime
-            target: /etc/localtime
-            type: bind
-            read_only: true
-        -   source: ${PROJECTS_PATH:-/opt/projects}
-            target: /projects
-            type: bind
-            read_only: true
+            - source: ./api
+              target: /app
+              type: bind
+            - source: /var/run/docker.sock
+              target: /var/run/docker.sock
+              type: bind
+              read_only: true
+            - source: /etc/localtime
+              target: /etc/localtime
+              type: bind
+              read_only: true
+            - source: ${PROJECTS_PATH:-/opt/projects}
+              target: /projects
+              type: bind
+              read_only: true
         ports:
-        -   8000:8000
+            - 8000:8000
         profiles:
-        -   dev
+            - dev
 
-  # ─── Dev : Frontend (Vite HMR) ───────────────────────────
+    # ─── Dev : Frontend (Vite HMR) ───────────────────────────
     frontend-dev:
         build:
             context: .
@@ -117,16 +117,92 @@ services:
         environment:
             NODE_ENV: development
         volumes:
-        -   source: ./code
-            target: /app
-            type: bind
-        -   source: docker-overview-node-modules
-            target: /app/node_modules
-            type: volume
+            - source: ./code
+              target: /app
+              type: bind
+            - source: docker-overview-node-modules
+              target: /app/node_modules
+              type: volume
         ports:
-        -   5173:5173
+            - 5173:5173
         profiles:
-        -   dev
+            - dev
+
+    # ─── Test : API (pytest) ──────────────────────────────────
+    api-test:
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            target: test
+        container_name: docker-overview-api-test
+        hostname: api-test
+        environment:
+            SECRET_KEY: test-secret-key-for-tests
+            ADMIN_USERNAME: testuser
+            ADMIN_PASSWORD: testpass
+            PROJECTS_PATH: /tmp/projects
+        volumes:
+            - source: ./api
+              target: /app
+              type: bind
+        profiles:
+            - test
+
+    # ─── Test : Frontend (Vitest) ─────────────────────────────
+    frontend-test:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: deps
+        container_name: docker-overview-frontend-test
+        hostname: frontend-test
+        command: npm run test
+        environment:
+            NODE_ENV: test
+            CI: "true"
+        volumes:
+            - source: ./code
+              target: /app
+              type: bind
+            - source: docker-overview-node-modules
+              target: /app/node_modules
+              type: volume
+        profiles:
+            - test
+
+    # ─── Test : E2E (Playwright) ─────────────────────────────
+    e2e:
+        build:
+            context: .
+            dockerfile: e2e/Dockerfile
+        container_name: docker-overview-e2e
+        hostname: e2e
+        environment:
+            BASE_URL: http://frontend:3000
+            API_URL: http://api:8000
+            ADMIN_USERNAME: admin
+            ADMIN_PASSWORD: admin
+        depends_on:
+            api:
+                condition: service_healthy
+            frontend:
+                condition: service_started
+        volumes:
+            - source: ./e2e
+              target: /app/e2e
+              type: bind
+            - source: ./e2e/test-results
+              target: /app/test-results
+              type: bind
+              bind:
+                  create_host_path: true
+            - source: ./e2e/playwright-report
+              target: /app/playwright-report
+              type: bind
+              bind:
+                  create_host_path: true
+        profiles:
+            - e2e
 
 volumes:
     docker-overview-node-modules:

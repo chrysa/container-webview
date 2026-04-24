@@ -1,23 +1,36 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
+import { AlertCircle } from 'lucide-react';
 import { useMetrics } from '@/domain/metrics/queries';
 import styles from './MetricsCharts.module.scss';
 
-const STATUS_COLOR: Record<string, string> = {
-  running: '#22c55e',
-  exited: '#ef4444',
-  paused: '#f59e0b',
-  restarting: '#8b5cf6',
-  unknown: '#94a3b8',
+const STATUS_CSS_VAR: Record<string, string> = {
+  running: '--status-running',
+  exited: '--status-exited',
+  paused: '--status-paused',
+  restarting: '--status-restarting',
+  unknown: '--status-unknown',
 };
+
+function getStatusColor(status: string): string {
+  const varName = STATUS_CSS_VAR[status] ?? '--status-unknown';
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || '#94a3b8';
+}
 
 interface Props {
   projectId: string;
 }
 
-export default function MetricsCharts({ projectId }: Props) {
-  const { data, isLoading } = useMetrics(projectId);
+export default function MetricsCharts({ projectId }: Readonly<Props>) {
+  const { data, isLoading, error } = useMetrics(projectId);
 
   if (isLoading) return <div className={styles.state}>Chargement des métriques…</div>;
+  if (error)
+    return (
+      <div className={styles.errorState}>
+        <AlertCircle size={20} />
+        <span>Erreur lors du chargement des métriques.</span>
+      </div>
+    );
   if (!data?.length) return <div className={styles.state}>Aucune donnée disponible.</div>;
 
   return (
@@ -32,7 +45,7 @@ export default function MetricsCharts({ projectId }: Props) {
             <Tooltip formatter={(v: number) => [`${v.toFixed(2)}%`, 'CPU']} />
             <Bar dataKey="cpu_percent" radius={[4, 4, 0, 0]}>
               {data.map((entry) => (
-                <Cell key={entry.service} fill={STATUS_COLOR[entry.status] ?? '#94a3b8'} />
+                <Cell key={entry.service} fill={getStatusColor(entry.status)} />
               ))}
             </Bar>
           </BarChart>
@@ -102,9 +115,7 @@ export default function MetricsCharts({ projectId }: Props) {
               <tr key={m.service}>
                 <td>{m.service}</td>
                 <td>
-                  <span className={styles.status} style={{ background: STATUS_COLOR[m.status] ?? '#94a3b8' }}>
-                    {m.status}
-                  </span>
+                  <span className={[styles.status, styles[`status_${m.status}`]].join(' ')}>{m.status}</span>
                 </td>
                 <td>{m.cpu_percent.toFixed(2)}%</td>
                 <td>

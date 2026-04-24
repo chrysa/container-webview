@@ -13,6 +13,9 @@ body {
     sans-serif;
   background: var(--bg);
   color: var(--text);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 * {
