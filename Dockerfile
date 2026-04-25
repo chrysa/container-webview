@@ -2,7 +2,7 @@
 
 # ─────────────── Stage 1 : dépendances ───────────────
 
-FROM node:22-slim AS deps
+FROM node:25-slim AS deps
 
 WORKDIR /app
 
@@ -26,7 +26,7 @@ RUN npm run build
 
 # ─────────────── Stage 3 : production (serve) ───────
 
-FROM node:22-slim AS production
+FROM node:25-slim AS production
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
