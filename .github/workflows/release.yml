@@ -72,7 +72,7 @@ jobs:
       # ── 4. Generate full CHANGELOG.md from git history ────────────────────
         -   name: Update CHANGELOG.md
             if: steps.check-tag.outputs.skip == 'false'
-            uses: orhun/git-cliff-action@v4
+            uses: orhun/git-cliff-action@v4.7.1
             with:
                 config: cliff.toml
                 args: --verbose --tag v${{ steps.gitversion.outputs.semVer }}
@@ -83,7 +83,7 @@ jobs:
       # ── 5. Generate release notes (latest section only, no header/footer) ──
         -   name: Generate release notes
             if: steps.check-tag.outputs.skip == 'false'
-            uses: orhun/git-cliff-action@v4
+            uses: orhun/git-cliff-action@v4.7.1
             id: release-notes
             with:
                 config: cliff.toml
