@@ -127,7 +127,7 @@ repos:
 
     # ─── YAML ─────────────────────────────────────────────────────────────────
 -   repo: https://github.com/adrienverge/yamllint.git
-    rev: e3b72f585b1bf8c779b7bae2f773b11a5fb80eb1
+    rev: 30a25fe087e31d0345be0ffed4360e4651a44b6e
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
