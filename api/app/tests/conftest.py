@@ -6,6 +6,7 @@ import pytest
 from app.config import Settings
 from app.config import get_settings
 from app.main import app
+from app.security import security
 
 
 @pytest.fixture(name="faker_instance")
@@ -67,8 +68,15 @@ async def fixt_api_client(override_settings):
 @pytest.fixture(name="valid_token")
 def fixt_valid_token():
     """Return a valid JWT token for test authentication."""
+<<<<<<< HEAD
     from app.security import security  # noqa: PLC0415
 
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+    from app.services.auth_service import auth_service as _auth_svc  # noqa: PLC0415
+    from app.security import security  # noqa: PLC0415
+
+=======
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
     def _load(**kwargs):
         get_settings.cache_clear()
         return security.create_access_token(kwargs.get("username", "testuser"))
