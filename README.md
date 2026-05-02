@@ -1,10 +1,36 @@
+<<<<<<< HEAD
+
 # web GUI for managing docker compose project
 
-______________________________________________________________________
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
 
-## Table Of Content
+# web GUI for managing docker compose project dev
 
-<!--TOC-->
+generate graph for docker-compose
+=======
+
+# Docker Overview WebUI
+
+Interface web pour gérer et visualiser vos projets Docker Compose — topologie interactive, métriques en temps réel, alertes et gestion du cycle de vie des services.
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+---
+
+## Table des matières
+
+- [Docker Overview WebUI](#docker-overview-webui)
+    - [Table des matières](#table-des-matières)
+    - [Fonctionnalités](#fonctionnalités)
+    - [Architecture](#architecture)
+    - [Prérequis](#prérequis)
+    - [Démarrage rapide](#démarrage-rapide)
+    - [Configuration](#configuration)
+    - [Endpoints API](#endpoints-api)
+    - [Commandes Make](#commandes-make)
+    - [Tests](#tests)
+    - [Roadmap](#roadmap)
+
+<<<<<<< HEAD
 
 - [web GUI for managing docker compose project](#web-gui-for-managing-docker-compose-project)
     - [Table Of Content](#table-of-content)
@@ -59,13 +85,53 @@ ______________________________________________________________________
         - [Conseils](#conseils)
     - [IDEAS](#ideas)
     - [Makefile](#makefile)
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+- [web GUI for managing docker compose project dev](#web-gui-for-managing-docker-compose-project-dev)
+    - [Table Of Content](#table-of-content)
+    - [TO FIX](#to-fix)
+    - [TODO](#todo)
+        - [WEbUI](#webui)
+    - [Makefile](#makefile)
+=======
 
-<!--TOC-->
+---
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+## Fonctionnalités
+
+<<<<<<< HEAD
 
 ## SPECS / Cahier des charges
 
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+## TO FIX
+
+=======
+
+- **Vue d'ensemble** — liste tous les projets Compose détectés dans le répertoire configuré
+- **Topologie** — graphe interactif des services et réseaux d'un projet
+- **Métriques** — CPU, mémoire et réseau en temps réel par conteneur
+- **Alertes** — détection automatique des conteneurs en anomalie (exited, restarting, unhealthy)
+- **Cycle de vie** — start / stop / restart / pause / unpause depuis l'interface
+- **Authentification** — JWT Bearer, fallback local + LDAP optionnel
+
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+<<<<<<< HEAD
+
 ### Introduction
 
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+## TODO
+
+=======
+---
+>>>>>>>
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+<<<<<<< HEAD
 Le projet Docker Compose Overview vise à fournir un outil convivial pour visualiser et gérer des projects Docker Compose. L'application offrira une interface graphique interactive permettant aux utilisateurs de mieux comprendre la structure et les dépendances des services, réseaux, secrets, configs, volumes, et autres clés définies dans les fichiers Docker Compose. Le projet sera développé en utilisant ReactJS avec le moteur de rendu JSX pour faciliter la création de composants réutilisables.
 
 ### Fonctionnalités principales
@@ -329,8 +395,47 @@ Je suis enthousiaste à l'idée de développer ce projet, et j'attends avec impa
 ## Makefile
 
 <!-- START makefile-doc -->
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+
+### WEbUI
+
+- manage project dynamicly from graph
+- create/update service from GUI
+- export docker compose
+    - global
+    - splitted by service
+    - dev and prod
+- launch makefile rules
+- add cli/web GUI for services management functionalities from composes files
+    - build selected services
+    - generate graphs
+    - interact with graphs
+    - run selected services
+    - remove selected services
+    - logs access selected services
+    - up selected services
+    - stats selected services
+    - add notification on docker container state modification on project
+- add web IDE
+- add project overview
+- add browser and desktop notificatilons
+- add companion IA companion to debug
+- possibility to deploy in registries
+- git management
+- ci-support and management
+- make docker desktop extenssion
+
+## Makefile
+
+<!-- START makefile-doc -->
+=======
+
+## Architecture
+>>>>>>>
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
 
 ```
+<<<<<<< HEAD
 $ make help
 make[1]: Entering directory '/home/anthony/Documents/perso/projects/docker-overview-webui'
 Hello to the `docker-overview-webui` Makefile
@@ -353,6 +458,210 @@ Hello to the `docker-overview-webui` Makefile
 | ci-run-local                                       | run ci pipeline locally                                      |                                                    |                                                              |                      |
 | pre-commit                                         | run localy precommit                                         |                                                    |                                                              |                      |
 make[1]: Leaving directory '/home/anthony/Documents/perso/projects/docker-overview-webui'
+||||||| parent of 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
+$ make help
+make[1]: Entering directory '/mnt/d/drive/dev/repos/-perso-/docker-overview-webui'
+Hello to the `docker-overview-webui` Makefile
+ 	make [target] [args]
+
+
+| Rule                                               | Help                                                         | Usage                                              | dependencies                                                 | Service              |
++====                                                +====                                                          +====                                                +====                                                          +====                  +
+| help                                               | display help                                                 |                                                    |                                                              |                      |
+| docker-build                                       | build image                                                  |                                                    |                                                              |                      |
+| docker-connect-dev                                 | connect-to-dev-server                                        |                                                    |                                                              |                      |
+| docker-stop                                        | stop services                                                |                                                    |                                                              |                      |
+| docker-up                                          | up service                                                   |                                                    |                                                              |                      |
+| docker-up-detach                                   | up service and detach                                        |                                                    |                                                              |                      |
+| node-upgradable-package                            | check outdated packages                                      |                                                    |                                                              |                      |
+| node-dev-upgradable-package                        | check outdated packages on dev                               |                                                    |                                                              |                      |
+| app-build                                          | build application                                            |                                                    |  app-install-deps                                            |                      |
+| app-install-deps                                   | install proect dependencies locally                          |                                                    |                                                              |                      |
+| app-dev                                            | launch as dev                                                |                                                    |  app-install-deps                                            |                      |
+| ci-run-local                                       | run ci pipeline locally                                      |                                                    |                                                              |                      |
+| pre-commit                                         | run localy precommit                                         |                                                    |                                                              |                      |
+make[1]: Leaving directory '/mnt/d/drive/dev/repos/-perso-/docker-overview-webui'
+=======
+docker-overview-webui/
+├── api/                        # Backend FastAPI (Python 3.12)
+│   ├── app/
+│   │   ├── config.py           # Configuration via pydantic-settings
+│   │   ├── constants.py        # Constantes (StrEnum, Final)
+│   │   ├── main.py             # App FastAPI + CORS + routeurs
+│   │   ├── security.py         # Service JWT
+│   │   ├── routers/            # Contrôleurs HTTP (minces)
+│   │   │   ├── auth.py         # POST /api/auth/login, GET /api/auth/check
+│   │   │   ├── projects.py     # GET /api/projects[/{id}]
+│   │   │   ├── topology.py     # GET /api/projects/{id}/topology
+│   │   │   ├── lifecycle.py    # POST /api/projects/{id}/services/{svc}/{action}
+│   │   │   ├── metrics.py      # GET /api/projects/{id}/metrics
+│   │   │   ├── alerts.py       # GET /api/alerts[/project/{id}]
+│   │   │   └── logs.py         # WebSocket /api/projects/{id}/services/{svc}/logs
+│   │   ├── services/           # Logique métier
+│   │   │   ├── auth_service.py
+│   │   │   ├── docker_client.py
+│   │   │   ├── project_manager.py
+│   │   │   ├── lifecycle_service.py
+│   │   │   ├── metrics_service.py
+│   │   │   ├── alerts_service.py
+│   │   │   └── topology_service.py
+│   │   └── tests/              # pytest — services + routers
+│   ├── pyproject.toml          # Dépendances + ruff + mypy + pytest + coverage
+│   └── Dockerfile              # Stages: base / dev / test / production
+├── code/                       # Frontend React 18 + Vite + TypeScript
+│   └── src/
+├── docker-compose.yml          # Stack de développement
+├── Makefile                    # Cibles make
+└── .env.example                # Variables d'environnement de référence
+>>>>>>> 62afd77 (test(api): add unit tests, fix guidelines violations, update docs\n\n- Single outer test class with nested sub-classes (no multiple module-level classes)\n- No type annotations in test helpers or factory functions\n- No imports inside fixture/method bodies\n- No noqa comments\n- mocker.patch for all mocking, Given-When-Then docstrings\n- conftest: move security import to module level\n- docs: rewrite README, update changelog, fix stale make targets")
 ```
 
-<!-- END makefile-doc -->
+---
+
+## Prérequis
+
+- Docker ≥ 24
+- Docker Compose ≥ 2.20
+- Make (GNU)
+- Un répertoire local contenant des sous-dossiers de projets Compose
+
+---
+
+## Démarrage rapide
+
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/chrysa/container-webview.git
+cd container-webview
+
+# 2. Copier et adapter la configuration
+cp .env.example .env
+# Éditer .env : SECRET_KEY, ADMIN_USERNAME, ADMIN_PASSWORD, PROJECTS_PATH
+
+# 3. Créer un répertoire de projets (ou pointer vers le vôtre)
+mkdir -p data/projects
+
+# 4. Lancer le stack de développement
+docker compose up --build
+
+# 5. Accéder à l'interface
+#   Frontend : http://localhost:3000
+#   API docs : http://localhost:8000/docs
+```
+
+Identifiants par défaut si non configurés : `admin` / `admin`.
+
+---
+
+## Configuration
+
+Toutes les variables sont documentées dans [.env.example](.env.example).
+
+| Variable | Défaut | Description |
+|---|---|---|
+| `SECRET_KEY` | `change-me-in-production` | Clé de signature JWT — **à changer en production** |
+| `ADMIN_USERNAME` | `admin` | Identifiant admin local |
+| `ADMIN_PASSWORD` | `admin` | Mot de passe admin local — **à changer en production** |
+| `PROJECTS_PATH` | `/projects` | Chemin dans le conteneur vers les projets Compose |
+| `LDAP_SERVER` | _(vide)_ | URL LDAP (`ldap://host:389`) — vide = désactivé |
+| `LDAP_BASE_DN` | _(vide)_ | Base DN LDAP |
+| `FRONTEND_PORT` | `3000` | Port exposé pour le frontend |
+| `VITE_API_URL` | `http://localhost:8000` | URL de l'API vue depuis le navigateur |
+
+Le volume `${PROJECTS_PATH:-./data/projects}:/projects:ro` dans `docker-compose.yml` monte votre répertoire local de projets Compose.
+
+---
+
+## Endpoints API
+
+Documentation interactive disponible sur `http://localhost:8000/docs` (Swagger UI).
+
+| Méthode | Chemin | Description |
+|---|---|---|
+| `POST` | `/api/auth/login` | Authentification — retourne un JWT Bearer |
+| `GET` | `/api/auth/check` | Valide le token courant |
+| `GET` | `/api/projects` | Liste tous les projets Compose détectés |
+| `GET` | `/api/projects/{id}` | Détail d'un projet |
+| `GET` | `/api/projects/{id}/topology` | Graphe de topologie du projet |
+| `GET` | `/api/projects/{id}/metrics` | Métriques CPU/RAM/réseau de tous les conteneurs |
+| `POST` | `/api/projects/{id}/services/{svc}/start` | Démarrer un service |
+| `POST` | `/api/projects/{id}/services/{svc}/stop` | Arrêter un service |
+| `POST` | `/api/projects/{id}/services/{svc}/restart` | Redémarrer un service |
+| `POST` | `/api/projects/{id}/services/{svc}/pause` | Mettre en pause |
+| `POST` | `/api/projects/{id}/services/{svc}/unpause` | Reprendre depuis la pause |
+| `GET` | `/api/alerts` | Toutes les alertes actives |
+| `GET` | `/api/alerts/project/{id}` | Alertes filtrées par projet |
+| `WS` | `/api/projects/{id}/services/{svc}/logs` | Logs en streaming (WebSocket) |
+
+---
+
+## Commandes Make
+
+```
+make docker-build           # Rebuild les images sans cache
+make docker-up              # Lance le stack (foreground)
+make docker-up-detach       # Lance le stack en arrière-plan
+make docker-stop            # Arrête les services
+
+make api-tests              # Lance les tests backend
+make api-tests-cov          # Tests + rapport de couverture terminal
+make api-tests-html         # Tests + rapport HTML (htmlcov/)
+make api-lint               # Ruff linter
+make api-format             # Ruff formatter
+make api-typecheck          # mypy
+
+make pre-commit             # Lance tous les hooks pre-commit
+make ci-run-local           # Lance le pipeline CI localement
+```
+
+---
+
+## Tests
+
+Les tests backend utilisent **pytest** avec couverture ≥ 80 %.
+
+```bash
+# Lancer tous les tests (Docker)
+make api-tests
+
+# Avec rapport de couverture
+make api-tests-cov
+
+# Avec rapport HTML
+make api-tests-html
+```
+
+Structure des tests :
+
+```
+api/app/tests/
+├── conftest.py                  # Fixtures partagées (fake, api_client, auth_headers…)
+├── test_main.py                 # Endpoint /api (ping)
+├── services/
+│   ├── test_docker_client.py
+│   ├── test_lifecycle_service.py
+│   ├── test_alerts_service.py
+│   ├── test_metrics_service.py
+│   ├── test_project_manager.py
+│   ├── test_auth_service.py
+│   └── test_topology_service.py
+└── routers/
+    ├── test_auth.py
+    ├── test_projects.py
+    ├── test_lifecycle.py
+    ├── test_metrics.py
+    ├── test_alerts.py
+    └── test_topology.py
+```
+
+---
+
+## Roadmap
+
+- [ ] Gestion dynamique des projets depuis le graphe
+- [ ] Création/modification de services via l'interface
+- [ ] Export du docker-compose (global, par service, dev/prod)
+- [ ] Accès aux logs depuis l'interface (WebSocket)
+- [ ] Notifications navigateur sur changement d'état des conteneurs
+- [ ] Authentification multi-utilisateurs
+- [ ] Extension Docker Desktop

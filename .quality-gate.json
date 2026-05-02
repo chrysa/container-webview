@@ -1,0 +1,17 @@
+{
+  "description": "Quality gate configuration for container-webview (Docker multi-service)",
+  "commands": {
+    "tests": "make api-tests",
+    "coverage": "make api-tests-cov",
+    "lint": "make api-lint",
+    "types": "make api-typecheck",
+    "build": "docker compose build"
+  },
+  "thresholds": {
+    "tests": {"type": "count", "operator": "≥"},
+    "coverage": {"type": "percentage", "operator": "≥"},
+    "lint": {"type": "count", "operator": "=", "value": 0},
+    "types": {"type": "count", "operator": "≤"},
+    "build": {"type": "exit_code", "operator": "=", "value": 0}
+  }
+}
