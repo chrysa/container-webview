@@ -43,7 +43,7 @@ repos:
 
     # ─── Debug Detection ──────────────────────────────────────────────────────
 -   repo: https://github.com/chrysa/pre-commit-tools
-    rev: ee9629f42e27aa3c6f73e9ca1da59e40f26e4421
+    rev: 73cdf6f22f42c3b87a15e5abc5f6c83db0cdfa56
     hooks:
     -   id: console-debug-detection
         name: Detect console.debug
@@ -71,7 +71,7 @@ repos:
 
     # ─── Python (API — FastAPI) ────────────────────────────────────────────────
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.2
+    rev: v0.15.12
     hooks:
     -   id: ruff-format
         name: Format Python (ruff)
@@ -118,7 +118,7 @@ repos:
         -   eslint@^9.15.0
         -   '@eslint/js@^9.15.0'
         -   globals@^15.0.0
-        -   '@typescript-eslint/eslint-plugin@^8.0.0'
+        -   '@typescript-eslint/eslint-plugin@^8.59.0'
         -   '@typescript-eslint/parser@^8.0.0'
         -   typescript-eslint@^8.0.0
         -   eslint-plugin-react@^7.37.0
@@ -127,7 +127,7 @@ repos:
 
     # ─── YAML ─────────────────────────────────────────────────────────────────
 -   repo: https://github.com/adrienverge/yamllint.git
-    rev: e3b72f585b1bf8c779b7bae2f773b11a5fb80eb1
+    rev: 30a25fe087e31d0345be0ffed4360e4651a44b6e
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
