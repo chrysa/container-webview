@@ -7,13 +7,13 @@ minimum_pre_commit_version: 4.1.0
 repos:
     # ─── General file checks (run first to fix encoding/whitespace) ───────────
 -   repo: https://github.com/sirosen/texthooks
-    rev: d6c72a6690a6169863904e316536b52a80c18813
+    rev: 0.7.1
     hooks:
     -   id: fix-smartquotes
     -   id: fix-spaces
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: f4e025486b81198907fa79d1c14af09c0e67859d
+    rev: v6.0.0
     hooks:
     -   id: check-merge-conflict
         name: Check for merge conflicts
@@ -43,7 +43,7 @@ repos:
 
     # ─── Debug Detection ──────────────────────────────────────────────────────
 -   repo: https://github.com/chrysa/pre-commit-tools
-    rev: v0.1.1-57
+    rev: v0.1.1-58
     hooks:
     -   id: console-debug-detection
         name: Detect console.debug
@@ -58,7 +58,7 @@ repos:
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
-    rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
+    rev: v2.14.0
     hooks:
     -   id: hadolint
         name: Lint Dockerfile frontend
@@ -82,7 +82,7 @@ repos:
         files: ^api/.*\.py$
 
 -   repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
     -   id: python-no-eval
     -   id: python-no-log-warn
@@ -91,7 +91,7 @@ repos:
 
     # ─── TypeScript / JavaScript (Frontend — React 19 + Vite) ─────────────────
 -   repo: https://github.com/pre-commit/mirrors-prettier
-    rev: f62a70a3a7114896b062de517d72829ea1c884b6
+    rev: v4.0.0-alpha.8
     hooks:
     -   id: prettier
         name: Format code with Prettier
@@ -108,7 +108,7 @@ repos:
         -   prettier-plugin-organize-imports@^3.2.0
 
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+    rev: v10.3.0
     hooks:
     -   id: eslint
         name: ESLint (TypeScript/React)
@@ -127,7 +127,7 @@ repos:
 
     # ─── YAML ─────────────────────────────────────────────────────────────────
 -   repo: https://github.com/adrienverge/yamllint.git
-    rev: 30a25fe087e31d0345be0ffed4360e4651a44b6e
+    rev: v1.38.0
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
@@ -142,7 +142,7 @@ repos:
 
     # ─── Markdown ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: 76208f1f418e7100334dfbf355b98f3e1f7c4fb0
+    rev: v0.48.0
     hooks:
     -   id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
@@ -150,13 +150,13 @@ repos:
 
     # ─── Shell ────────────────────────────────────────────────────────────────
 -   repo: https://github.com/lovesegfault/beautysh.git
-    rev: 0d03515ff30a542dc0a99410cfaf1a7bd2ed8251
+    rev: v6.4.3
     hooks:
     -   id: beautysh
         args: [--indent-size, '4']
 
 -   repo: https://github.com/openstack/bashate.git
-    rev: ec2f2400915200d633299612a02d7d285e4be24c
+    rev: 2.1.1
     hooks:
     -   id: bashate
         args:
@@ -164,14 +164,14 @@ repos:
 
     # ─── GitHub Actions ───────────────────────────────────────────────────────
 -   repo: https://github.com/rhysd/actionlint
-    rev: 0bdc95715fa58f64e3fd6e63b0f89be8733cbbab
+    rev: v1.7.12
     hooks:
     -   id: actionlint
         name: Lint GitHub Actions workflows
 
     # ─── Security ─────────────────────────────────────────────────────────────
 -   repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.1
+    rev: v8.30.0
     hooks:
     -   id: gitleaks
         name: Detect secrets
