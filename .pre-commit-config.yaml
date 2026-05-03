@@ -43,7 +43,7 @@ repos:
 
     # ─── Debug Detection ──────────────────────────────────────────────────────
 -   repo: https://github.com/chrysa/pre-commit-tools
-    rev: 73cdf6f22f42c3b87a15e5abc5f6c83db0cdfa56
+    rev: v0.1.1-57
     hooks:
     -   id: console-debug-detection
         name: Detect console.debug
@@ -175,3 +175,23 @@ repos:
     hooks:
     -   id: gitleaks
         name: Detect secrets
+
+    # ─── Python type check ────────────────────────────────────────────────────
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.20.2
+    hooks:
+    -   id: mypy
+        files: ^api/
+        additional_dependencies:
+            - "pydantic>=2.7"
+            - "pydantic-settings>=2.3"
+            - "fastapi>=0.115"
+            - "sqlalchemy[asyncio]>=2.0"
+
+    # ─── Commit message ───────────────────────────────────────────────────────
+-   repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+    -   id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
