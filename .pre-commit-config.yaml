@@ -184,7 +184,7 @@ repos:
         files: ^api/
         additional_dependencies:
             - "pydantic>=2.7"
-            - "pydantic-settings>=2.3"
+            - "pydantic-settings>=2.14.0"
             - "fastapi>=0.115"
             - "sqlalchemy[asyncio]>=2.0"
 
