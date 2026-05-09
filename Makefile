@@ -43,3 +43,35 @@ help: ## Afficher l'aide
 
 help-%: ## Aide détaillée pour une commande
 	@grep -A 3 -B 1 "^$*:" $(shell find makefiles -name "*.makefile" -o -name "*.Makefile" -type f) || echo "Commande '$*' introuvable"
+
+# ─── Standards compliance stubs ───────────────────────────────────────────────
+
+install: ## Install all dependencies (API + Node)
+	$(MAKE) api-install node-install
+
+dev: ## Start development environment
+	$(MAKE) dev-up
+
+test: ## Run all tests
+	$(MAKE) api-tests node-test
+
+test-cov: ## Run tests with coverage
+	$(MAKE) api-tests-cov node-test-cov
+
+lint: ## Run all linters
+	$(MAKE) api-lint node-lint
+
+format: ## Format all code
+	$(MAKE) api-format
+
+typecheck: ## Run type checks
+	$(MAKE) api-typecheck
+
+build: ## Build Docker images
+	$(MAKE) docker-build
+
+clean: ## Clean build artifacts
+	$(MAKE) node-clean docker-clean
+
+pre-commit: ## Run pre-commit hooks on all files
+	pre-commit run --all-files
