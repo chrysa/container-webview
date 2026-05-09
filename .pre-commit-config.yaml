@@ -13,7 +13,7 @@ repos:
     -   id: fix-spaces
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: f4e025486b81198907fa79d1c14af09c0e67859d
+    rev: v5.0.0
     hooks:
     -   id: check-merge-conflict
         name: Check for merge conflicts
