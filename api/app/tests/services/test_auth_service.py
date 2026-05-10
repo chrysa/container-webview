@@ -15,8 +15,8 @@ class TestAuthService:
             Then: Should return True
             """
             mocker.patch(
-                "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                "app.services.auth_service.settings",
+                new=mocker.MagicMock(admin_username="admin", admin_password="secret"),
             )
             service = AuthService()
             result = service._authenticate_local("admin", "secret")
@@ -30,8 +30,8 @@ class TestAuthService:
             Then: Should return False
             """
             mocker.patch(
-                "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                "app.services.auth_service.settings",
+                new=mocker.MagicMock(admin_username="admin", admin_password="secret"),
             )
             service = AuthService()
             result = service._authenticate_local("admin", "wrongpassword")
@@ -45,8 +45,8 @@ class TestAuthService:
             Then: Should return False
             """
             mocker.patch(
-                "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                "app.services.auth_service.settings",
+                new=mocker.MagicMock(admin_username="admin", admin_password="secret"),
             )
             service = AuthService()
             result = service._authenticate_local("hacker", "secret")
@@ -62,10 +62,7 @@ class TestAuthService:
             When: Calling _authenticate_ldap(...)
             Then: Should return False without attempting to connect
             """
-            mocker.patch(
-                "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(ldap_server=""),
-            )
+            mocker.patch("app.services.auth_service.settings", new=mocker.MagicMock(ldap_server=""))
             service = AuthService()
             result = service._authenticate_ldap("user", "pass")
             assert result is False, f"Expected False but got {result=}"
@@ -81,7 +78,7 @@ class TestAuthService:
                 ldap_server="ldap://ldap.example.com",
                 ldap_base_dn="dc=example,dc=com",
             )
-            mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
+            mocker.patch("app.services.auth_service.settings", new=mock_settings)
             mock_conn = mocker.MagicMock()
             mock_conn.simple_bind_s.return_value = (97, [])
             mocker.patch("ldap.initialize", return_value=mock_conn)
@@ -103,7 +100,7 @@ class TestAuthService:
                 ldap_server="ldap://ldap.example.com",
                 ldap_base_dn="dc=example,dc=com",
             )
-            mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
+            mocker.patch("app.services.auth_service.settings", new=mock_settings)
             mock_conn = mocker.MagicMock()
             mock_conn.simple_bind_s.side_effect = _ldap.LDAPError({"desc": "Invalid credentials"})
             mocker.patch("ldap.initialize", return_value=mock_conn)
@@ -123,8 +120,8 @@ class TestAuthService:
             Then: Should return True via local authentication
             """
             mocker.patch(
-                "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(
+                "app.services.auth_service.settings",
+                new=mocker.MagicMock(
                     ldap_server="",
                     admin_username="admin",
                     admin_password="secret",
@@ -142,8 +139,8 @@ class TestAuthService:
             Then: Should return False
             """
             mocker.patch(
-                "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(
+                "app.services.auth_service.settings",
+                new=mocker.MagicMock(
                     ldap_server="",
                     admin_username="admin",
                     admin_password="secret",
