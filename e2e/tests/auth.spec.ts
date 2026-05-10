@@ -7,7 +7,7 @@ test.describe('Authentication', () => {
   test('login page is accessible', async ({ loginPage, page }) => {
     await loginPage.goto();
     await expect(page).toHaveURL(/login/);
-    await expect(page.getByRole('button', { name: /login|connexion/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /login|connexion|connecter/i })).toBeVisible();
   });
 
   test('successful login redirects to projects', async ({ loginPage, page }) => {
@@ -29,7 +29,7 @@ test.describe('Authentication', () => {
   });
 
   test('logout clears session and redirects to login', async ({ authenticatedPage }) => {
-    const logoutButton = authenticatedPage.getByRole('button', { name: /logout|déconnexion/i });
+    const logoutButton = authenticatedPage.getByRole('button', { name: /logout|déconnexion|déconnecter/i });
     await expect(logoutButton).toBeVisible();
     await logoutButton.click();
     await expect(authenticatedPage).toHaveURL(/login/);
