@@ -114,8 +114,7 @@ jobs:
         needs: [build-push-api, build-push-frontend]
         environment:
             name: production
-      # URL à adapter selon votre hostname Traefik (variable d'env DEPLOY_URL ou valeur fixe)
-            url: ${{ vars.DEPLOY_URL || 'https://docker-overview.example.com' }}
+            url: https://docker-overview.example.com
         permissions:
             contents: read
         steps:
@@ -131,8 +130,10 @@ jobs:
                 chmod 600 ~/.kube/config
 
         -   name: Select kubectl context
-            if: ${{ vars.KUBE_CONTEXT != '' }}
-            run: kubectl config use-context "${{ vars.KUBE_CONTEXT }}"
+            env:
+                KUBE_CONTEXT: ${{ secrets.KUBE_CONTEXT }}
+            if: env.KUBE_CONTEXT != ''
+            run: kubectl config use-context "$KUBE_CONTEXT"
 
         -   name: Verify cluster connectivity
             run: kubectl cluster-info

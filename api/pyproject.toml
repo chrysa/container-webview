@@ -107,10 +107,14 @@ fixable = ["ALL"]
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
+    "S108",    # /tmp usage acceptable in tests
     "ANN",     # no type annotations in tests
     "ARG001", "ARG002",
     "PLR0913", "PLR2004",
+    "PT006",   # parametrize type
     "PT011",
+    "PLC0415", # imports inside functions acceptable in tests
+    "SLF001",  # tests may access private members
 ]
 "app/main.py" = ["ANN"]
 "app/config.py" = ["S105", "S106"]   # pydantic-settings defaults, overridden by env

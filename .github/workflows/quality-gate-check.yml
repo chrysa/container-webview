@@ -48,12 +48,14 @@ jobs:
         id: quality-gate
         run: |
           make quality-gate-verify || exit_code=$?
-          exit ${exit_code:-0}
+          exit "${exit_code:-0}"
 
       - name: Report quality gate status
         if: always()
+        env:
+          OUTCOME: ${{ steps.quality-gate.outcome }}
         run: |
-          if [ ${{ steps.quality-gate.outcome }} == 'success' ]; then
+          if [ "$OUTCOME" = 'success' ]; then
             echo "✅ All quality gates passed"
             exit 0
           else
