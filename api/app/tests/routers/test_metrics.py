@@ -1,62 +1,38 @@
-from app.services.metrics_service import ServiceMetrics
-
-
-def _make_metrics(service_name="web"):
-    return ServiceMetrics(
-        service=service_name,
-        cpu_percent=12.5,
-        memory_mb=64.0,
-        memory_limit_mb=512.0,
-        rx_bytes=1024,
-        tx_bytes=2048,
-    )
-
-
 class TestGetMetrics:
     """Tests for GET /api/projects/{project_id}/metrics."""
 
     async def test_returns_metrics_for_existing_project(self, api_client, auth_headers, mocker):
-        """Return 200 with a list of ServiceMetrics for all services.
-
-        Given: The project exists and metrics_service returns 2 metrics
-        When: GET /api/projects/my-project/metrics with valid auth
-        Then: Should return 200 with 2 items
-        """
-        mocker.patch("app.routers.metrics.project_manager.load", return_value=mocker.MagicMock())
+        mocker.patch("app.routers.metrics.load_project", return_value=mocker.MagicMock())
+        mock_c1 = mocker.MagicMock()
+        mock_c1.labels = {"com.docker.compose.service": "api"}
+        mock_c1.name = "api"
+        mock_c1.short_id = "abc123"
+        mock_c1.status = "running"
+        mock_c1.stats.return_value = {
+            "cpu_stats": {"cpu_usage": {"total_usage": 1000}, "system_cpu_usage": 10000, "online_cpus": 1},
+            "precpu_stats": {"cpu_usage": {"total_usage": 900}, "system_cpu_usage": 9000},
+            "memory_stats": {"usage": 64 * 1024 * 1024, "limit": 512 * 1024 * 1024},
+            "networks": {},
+            "blkio_stats": {"io_service_bytes_recursive": []},
+        }
         mocker.patch(
-            "app.routers.metrics.metrics_service.get_project_metrics",
-            return_value=[_make_metrics("api"), _make_metrics("db")],
+            "app.routers.metrics.get_all_containers_for_project",
+            return_value=[mock_c1],
         )
         async with api_client() as client:
             response = await client.get("/api/projects/my-project/metrics", headers=auth_headers())
-
-        assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
+        assert response.status_code == 200
         body = response.json()
-        assert len(body) == 2, f"Expected 2 metrics but got {len(body)=}"
-        services = {m["service"] for m in body}
-        assert services == {"api", "db"}, f"Expected service names but got {services=}"
+        assert len(body) == 1
+        assert body[0]["service"] == "api"
 
     async def test_returns_404_when_project_not_found(self, api_client, auth_headers, mocker):
-        """Return 404 when the project does not exist.
-
-        Given: project_manager.load returns None
-        When: GET /api/projects/unknown/metrics with valid auth
-        Then: Should return 404
-        """
-        mocker.patch("app.routers.metrics.project_manager.load", return_value=None)
+        mocker.patch("app.routers.metrics.load_project", return_value=None)
         async with api_client() as client:
             response = await client.get("/api/projects/unknown/metrics", headers=auth_headers())
-
-        assert response.status_code == 404, f"Expected 404 but got {response.status_code=}"
+        assert response.status_code == 404
 
     async def test_returns_401_without_token(self, api_client):
-        """Return 401 when no token is provided.
-
-        Given: No Authorization header
-        When: GET /api/projects/my-project/metrics
-        Then: Should return 401
-        """
         async with api_client() as client:
             response = await client.get("/api/projects/my-project/metrics")
-
-        assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
+        assert response.status_code == 401
