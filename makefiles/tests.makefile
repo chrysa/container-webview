@@ -4,7 +4,7 @@ api-tests: ## run backend unit tests
 	@docker compose --profile test run --rm $(API_SERVICE)
 
 api-tests-cov: ## run backend tests with terminal coverage report
-	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=term-missing
+	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=term-missing --cov-fail-under=85
 
 api-tests-html: ## run backend tests with HTML coverage report
 	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=html --cov-report=term-missing

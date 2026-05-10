@@ -6,20 +6,36 @@
 name: CI
 
 on:
-    push:
-        branches: [ "**" ]
     pull_request:
-        branches: [ "**" ]
+        branches:
+            - main
+            - develop
+    push:
+        branches:
+            - main
+            - develop
+            - "feat/**"
+            - "fix/**"
+            - "chore/**"
+            - "ci/**"
+    workflow_dispatch:
 
 concurrency:
-    group: ci-${{ github.ref }}
+    group: ${{ github.workflow }}-${{ github.ref }}
     cancel-in-progress: true
+
+permissions:
+    checks: write
+    contents: read
+    pull-requests: write
+    statuses: write
 
 jobs:
     # ───────────────────────────────────────────────────────────────────────────
     lint-frontend:
         name: Lint — TypeScript / ESLint
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         steps:
             - uses: actions/checkout@v6
 
@@ -42,6 +58,7 @@ jobs:
     lint-api:
         name: Lint — Python / Ruff
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         steps:
             - uses: actions/checkout@v6
 
@@ -53,7 +70,7 @@ jobs:
                   cache-dependency-path: api/requirements.txt
 
             - name: Install ruff
-              run: pip install ruff==0.11.2
+              run: pip install ruff
 
             - name: Run ruff check
               run: ruff check api/
@@ -65,6 +82,7 @@ jobs:
     build-frontend:
         name: Build — Frontend (Vite)
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         needs: [ lint-frontend ]
         steps:
             - uses: actions/checkout@v6
@@ -97,6 +115,7 @@ jobs:
     build-docker-api:
         name: Build — Docker API
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: [ lint-api ]
         steps:
             - uses: actions/checkout@v6
@@ -118,6 +137,7 @@ jobs:
     build-docker-frontend:
         name: Build — Docker Frontend
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: [ lint-frontend ]
         steps:
             - uses: actions/checkout@v6
@@ -140,6 +160,7 @@ jobs:
     test-api:
         name: Tests — Python (pytest + coverage)
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: [ lint-api ]
         steps:
             - uses: actions/checkout@v6
@@ -173,6 +194,7 @@ jobs:
     test-frontend:
         name: Tests — Frontend (Vitest + coverage)
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         needs: [ lint-frontend ]
         steps:
             - uses: actions/checkout@v6
@@ -204,6 +226,7 @@ jobs:
     test-e2e:
         name: Tests — E2E (Playwright)
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: [ build-docker-api, build-docker-frontend ]
         steps:
             - uses: actions/checkout@v6
