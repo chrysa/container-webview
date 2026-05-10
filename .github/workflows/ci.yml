@@ -263,6 +263,14 @@ jobs:
                       sleep 2
                   done
 
+            - name: Wait for frontend to be ready
+              run: |
+                  echo "Waiting for frontend at http://localhost:3000..."
+                  for _i in $(seq 1 60); do
+                      curl -sf http://localhost:3000 >/dev/null 2>&1 && echo "Frontend is ready" && break
+                      sleep 2
+                  done
+
             - name: Run Playwright E2E tests
               run: npx playwright test --config=playwright.config.ts
               env:

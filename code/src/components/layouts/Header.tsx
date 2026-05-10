@@ -76,7 +76,7 @@ export default function Header() {
         >
           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
-        <button className={styles.iconBtn} onClick={logout} title="Se déconnecter">
+        <button className={styles.iconBtn} onClick={logout} aria-label="Se déconnecter" title="Se déconnecter">
           <LogOut size={18} />
         </button>
       </div>

@@ -2,18 +2,19 @@
 name: SonarCloud Analysis
 
 on:
-    push:
+    workflow_run:
+        workflows: ["CI"]
+        types: [completed]
         branches: [main, master, develop]
-    pull_request:
-        types: [opened, synchronize, reopened]
 
 permissions:
     contents: read
+    actions: read
     pull-requests: read
 
 jobs:
     sonar:
-        if: ${{ github.event_name != 'pull_request' || github.actor != 'dependabot[bot]' }}
+        if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
         name: SonarCloud scan
         runs-on: ubuntu-latest
         timeout-minutes: 15
@@ -21,6 +22,26 @@ jobs:
             - uses: actions/checkout@v6
               with:
                   fetch-depth: 0
+                  ref: ${{ github.event.workflow_run.head_sha }}
+
+            - name: Download backend coverage artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: api-coverage
+                  run-id: ${{ github.event.workflow_run.id }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  path: api/
+              continue-on-error: true
+
+            - name: Download frontend coverage artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: frontend-coverage
+                  run-id: ${{ github.event.workflow_run.id }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  path: code/coverage/
+              continue-on-error: true
+
             - name: SonarCloud scan
               uses: SonarSource/sonarqube-scan-action@v8.0.0
               with:
@@ -28,8 +49,12 @@ jobs:
                       -Dsonar.projectKey=chrysa_container-webview
                       -Dsonar.organization=chrysa
                       -Dsonar.projectName=container-webview
-                      -Dsonar.sources=.
-                      -Dsonar.exclusions=**/.git/**,**/reports/**,**/.vscode/**,**/node_modules/**
+                      -Dsonar.sources=api/app,code/src
+                      -Dsonar.tests=api/app/tests
+                      -Dsonar.exclusions=**/migrations/**,**/__pycache__/**,**/node_modules/**,**/.git/**,**/dist/**,**/.vscode/**
+                      -Dsonar.python.version=3.12,3.13,3.14
+                      -Dsonar.python.coverage.reportPaths=api/coverage.xml
+                      -Dsonar.javascript.lcov.reportPaths=code/coverage/lcov.info
                       -Dsonar.sourceEncoding=UTF-8
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
