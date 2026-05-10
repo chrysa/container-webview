@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from pydantic import BaseModel
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from app.config import settings
 
@@ -45,7 +45,7 @@ def _normalize_ports(ports_raw: object) -> list[str]:
     if not ports_raw:
         return []
     result = []
-    for p in ports_raw:  # type: ignore[union-attr]
+    for p in ports_raw:  # type: ignore[union-attr,attr-defined]
         if isinstance(p, dict):
             result.append(f"{p.get('target', '')}")
         else:
@@ -77,7 +77,7 @@ def _normalize_volumes(vols_raw: object) -> list[str]:
     if not vols_raw:
         return []
     result = []
-    for v in vols_raw:  # type: ignore[union-attr]
+    for v in vols_raw:  # type: ignore[union-attr,attr-defined]
         if isinstance(v, dict):
             result.append(v.get("source", ""))
         else:
