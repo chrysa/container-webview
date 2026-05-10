@@ -82,7 +82,7 @@ class TestTopologyService:
             Then: Should return None
             """
             mocker.patch(
-                "app.services.topology_service.project_manager.load",
+                "app.services.topology_service.load_project",
                 return_value=None,
             )
             service = TopologyService()
@@ -104,11 +104,11 @@ class TestTopologyService:
                 networks=["app-net"],
             )
             mocker.patch(
-                "app.services.topology_service.project_manager.load",
+                "app.services.topology_service.load_project",
                 return_value=project,
             )
             mocker.patch(
-                "app.services.topology_service.docker_client.get_container_status",
+                "app.services.topology_service.TopologyService._get_container_status",
                 return_value=ContainerState.RUNNING,
             )
 
@@ -136,11 +136,11 @@ class TestTopologyService:
                 networks=[],
             )
             mocker.patch(
-                "app.services.topology_service.project_manager.load",
+                "app.services.topology_service.load_project",
                 return_value=project,
             )
             mocker.patch(
-                "app.services.topology_service.docker_client.get_container_status",
+                "app.services.topology_service.TopologyService._get_container_status",
                 return_value=ContainerState.RUNNING,
             )
 
@@ -168,11 +168,11 @@ class TestTopologyService:
                 networks=[],
             )
             mocker.patch(
-                "app.services.topology_service.project_manager.load",
+                "app.services.topology_service.load_project",
                 return_value=project,
             )
             mocker.patch(
-                "app.services.topology_service.docker_client.get_container_status",
+                "app.services.topology_service.TopologyService._get_container_status",
                 return_value=ContainerState.EXITED,
             )
 
@@ -203,7 +203,7 @@ class TestTopologyService:
                 ],
             )
             mocker.patch(
-                "app.services.topology_service.docker_client.get_container_status",
+                "app.services.topology_service.TopologyService._get_container_status",
                 return_value=ContainerState.UNKNOWN,
             )
             nodes, edges = TopologyService._service_nodes_and_edges(project, "test-project", {})

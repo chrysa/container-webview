@@ -2,7 +2,7 @@ import logging
 
 import ldap  # type: ignore[import]
 
-from app.config import get_settings
+from app.config import settings
 
 
 _logger = logging.getLogger(__name__)
@@ -18,7 +18,6 @@ class AuthService:
 
     def _authenticate_ldap(self, username: str, password: str) -> bool:
         """Return True if the user can bind to the configured LDAP server."""
-        settings = get_settings()
         if not settings.ldap_server:
             return False
         try:
@@ -34,7 +33,6 @@ class AuthService:
 
     def _authenticate_local(self, username: str, password: str) -> bool:
         """Return True if username/password match the configured admin credentials."""
-        settings = get_settings()
         return username == settings.admin_username and password == settings.admin_password
 
 

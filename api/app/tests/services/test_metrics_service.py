@@ -14,7 +14,7 @@ class TestMetricsService:
             [
                 (0, 0.0),
                 (1024 * 1024, 1.0),
-                (512 * 1024, 0.49),
+                (512 * 1024, 0.5),
                 (10 * 1024 * 1024, 10.0),
             ],
         )
@@ -156,7 +156,7 @@ class TestMetricsService:
             c2.stats.return_value = c1.stats.return_value
 
             mocker.patch(
-                "app.services.metrics_service.docker_client.get_all_containers_for_project",
+                "app.services.metrics_service.get_all_containers_for_project",
                 return_value=[c1, c2],
             )
 
@@ -181,7 +181,7 @@ class TestMetricsService:
             container.stats.side_effect = docker.errors.APIError("stats failed")
 
             mocker.patch(
-                "app.services.metrics_service.docker_client.get_all_containers_for_project",
+                "app.services.metrics_service.get_all_containers_for_project",
                 return_value=[container],
             )
 

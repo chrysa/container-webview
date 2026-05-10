@@ -2,8 +2,8 @@ from app.constants import ERR_CONTAINER_NOT_FOUND
 from app.constants import ERR_PROJECT_NOT_FOUND
 from app.constants import ERR_SERVICE_NOT_FOUND
 from app.constants import ERR_UNKNOWN_ACTION
-from app.services.docker_client import docker_client
-from app.services.project_manager import project_manager
+from app.services.docker_client import get_container_for_service
+from app.services.project_manager import load_project
 
 
 class LifecycleService:
@@ -30,14 +30,14 @@ class LifecycleService:
         if action not in self._VALID_ACTIONS:
             raise ValueError(ERR_UNKNOWN_ACTION.format(action))
 
-        project = project_manager.load(project_id)
+        project = load_project(project_id)
         if project is None:
             raise ValueError(ERR_PROJECT_NOT_FOUND)
 
         if service_name not in {svc.name for svc in project.services}:
             raise ValueError(ERR_SERVICE_NOT_FOUND.format(service_name))
 
-        container = docker_client.get_container_for_service(project_id, service_name)
+        container = get_container_for_service(project_id, service_name)
         if container is None:
             raise ValueError(ERR_CONTAINER_NOT_FOUND.format(service_name))
 
