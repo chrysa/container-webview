@@ -13,7 +13,7 @@ export class LoginPage {
   async login(username: string, password: string) {
     await this.page.getByLabel(/username|utilisateur/i).fill(username);
     await this.page.getByLabel(/password|mot de passe/i).fill(password);
-    await this.page.getByRole('button', { name: /login|connexion/i }).click();
+    await this.page.getByRole('button', { name: /login|connexion|connecter/i }).click();
   }
 
   async loginAsAdmin() {

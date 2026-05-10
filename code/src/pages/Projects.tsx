@@ -20,11 +20,14 @@ export default function Projects() {
 
   if (projects.length === 0) {
     return (
-      <div className={styles.empty}>
-        <p>Aucun projet détecté.</p>
-        <p className={styles.hint}>
-          Montez un répertoire contenant vos fichiers <code>docker-compose.yml</code> dans <code>/projects</code>.
-        </p>
+      <div className={styles.wrapper}>
+        <h1 className={styles.heading}>Projets</h1>
+        <div data-testid="empty-state" className={styles.empty}>
+          <p>Aucun projet détecté.</p>
+          <p className={styles.hint}>
+            Montez un répertoire contenant vos fichiers <code>docker-compose.yml</code> dans <code>/projects</code>.
+          </p>
+        </div>
       </div>
     );
   }
@@ -34,7 +37,7 @@ export default function Projects() {
       <h1 className={styles.heading}>Projets</h1>
       <div className={styles.grid}>
         {projects.map((p) => (
-          <div key={p.id} className={styles.card}>
+          <div key={p.id} data-testid="project-card" className={styles.card}>
             <div className={styles.cardHeader}>
               <span className={styles.cardIcon}>
                 <Package size={20} />
