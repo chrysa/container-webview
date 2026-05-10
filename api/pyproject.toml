@@ -119,6 +119,7 @@ fixable = ["ALL"]
 "app/main.py" = ["ANN"]
 "app/config.py" = ["S105", "S106"]   # pydantic-settings defaults, overridden by env
 "app/constants.py" = ["S105"]         # error-message strings, not passwords
+"app/services/docker_client.py" = ["I001"]  # isort edge case with docker submodule imports
 
 [tool.ruff.lint.isort]
 force-single-line = true

@@ -1,6 +1,6 @@
-import logging
 from datetime import UTC
 from datetime import datetime
+import logging
 
 from docker.errors import DockerException
 from pydantic import BaseModel
