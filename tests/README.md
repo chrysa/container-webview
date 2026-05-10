@@ -1,13 +1,12 @@
 # Unit and integration tests for container-webview
 
-#
+## Structure
 
-# Structure
+- `tests/api/` — API unit tests (mirrors api/)
+- `tests/integration/` — cross-service integration tests
 
-# tests/api/        — API unit tests (mirrors api/)
+## Run
 
-# tests/integration/ — cross-service integration tests
-
-#
-
-# Run via: make test
+```bash
+make test
+```

@@ -43,7 +43,9 @@ function Breadcrumb() {
         <span key={c.label} className={styles.crumbItem}>
           {i > 0 && <ChevronRight size={12} className={styles.crumbSep} />}
           {c.to && i < crumbs.length - 1 ? (
-            <Link to={c.to} className={styles.crumbLink}>{c.label}</Link>
+            <Link to={c.to} className={styles.crumbLink}>
+              {c.label}
+            </Link>
           ) : (
             <span className={styles.crumbCurrent}>{c.label}</span>
           )}
@@ -60,7 +62,9 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <span className={styles.brand}><Container size={20} /> Docker Overview</span>
+        <span className={styles.brand}>
+          <Container size={20} /> Docker Overview
+        </span>
         <Breadcrumb />
       </div>
       <div className={styles.right}>

@@ -83,7 +83,7 @@ jobs:
         name: Build — Frontend (Vite)
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        needs: [ lint-frontend ]
+        needs: [lint-frontend]
         steps:
             - uses: actions/checkout@v6
 
@@ -116,7 +116,7 @@ jobs:
         name: Build — Docker API
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        needs: [ lint-api ]
+        needs: [lint-api]
         steps:
             - uses: actions/checkout@v6
 
@@ -138,7 +138,7 @@ jobs:
         name: Build — Docker Frontend
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        needs: [ lint-frontend ]
+        needs: [lint-frontend]
         steps:
             - uses: actions/checkout@v6
 
@@ -161,7 +161,7 @@ jobs:
         name: Tests — Python (pytest + coverage)
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        needs: [ lint-api ]
+        needs: [lint-api]
         steps:
             - uses: actions/checkout@v6
 
@@ -195,7 +195,7 @@ jobs:
         name: Tests — Frontend (Vitest + coverage)
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        needs: [ lint-frontend ]
+        needs: [lint-frontend]
         steps:
             - uses: actions/checkout@v6
 
@@ -227,7 +227,7 @@ jobs:
         name: Tests — E2E (Playwright)
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        needs: [ build-docker-api, build-docker-frontend ]
+        needs: [build-docker-api, build-docker-frontend]
         steps:
             - uses: actions/checkout@v6
 
@@ -241,6 +241,9 @@ jobs:
             - name: Install dependencies
               working-directory: code
               run: npm install --legacy-peer-deps
+
+            - name: Install Playwright test runner
+              run: npm install --no-save @playwright/test
 
             - name: Install Playwright browsers
               run: npx playwright install --with-deps chromium

@@ -36,7 +36,7 @@ class TestLifecycleService:
             When: Calling perform() with a valid action
             Then: Should raise ValueError with ERR_PROJECT_NOT_FOUND
             """
-            mocker.patch("app.services.lifecycle_service.project_manager.load", return_value=None)
+            mocker.patch("app.services.lifecycle_service.load_project", return_value=None)
 
             service = LifecycleService()
 
@@ -58,7 +58,7 @@ class TestLifecycleService:
             mock_service.name = "db"
             mock_project = mocker.MagicMock()
             mock_project.services = [mock_service]
-            mocker.patch("app.services.lifecycle_service.project_manager.load", return_value=mock_project)
+            mocker.patch("app.services.lifecycle_service.load_project", return_value=mock_project)
 
             service = LifecycleService()
 
@@ -80,8 +80,8 @@ class TestLifecycleService:
             mock_svc.name = "web"
             mock_project = mocker.MagicMock()
             mock_project.services = [mock_svc]
-            mocker.patch("app.services.lifecycle_service.project_manager.load", return_value=mock_project)
-            mocker.patch("app.services.lifecycle_service.docker_client.get_container_for_service", return_value=None)
+            mocker.patch("app.services.lifecycle_service.load_project", return_value=mock_project)
+            mocker.patch("app.services.lifecycle_service.get_container_for_service", return_value=None)
 
             service = LifecycleService()
 
@@ -110,9 +110,9 @@ class TestLifecycleService:
             mock_container = mocker.MagicMock()
             mock_container.status = "running"
 
-            mocker.patch("app.services.lifecycle_service.project_manager.load", return_value=mock_project)
+            mocker.patch("app.services.lifecycle_service.load_project", return_value=mock_project)
             mocker.patch(
-                "app.services.lifecycle_service.docker_client.get_container_for_service",
+                "app.services.lifecycle_service.get_container_for_service",
                 return_value=mock_container,
             )
 

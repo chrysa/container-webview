@@ -25,3 +25,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+def get_settings() -> Settings:
+    """Dependency-injectable settings accessor."""
+    return settings
