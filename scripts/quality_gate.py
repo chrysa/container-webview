@@ -11,7 +11,7 @@ from typing import Dict, Any, Tuple
 class QualityGate:
     CONFIG_FILE = ".quality-gate.json"
     BASELINE_FILE = ".quality-gate-baseline.json"
-    
+
     def __init__(self):
         self.config_path = Path(self.CONFIG_FILE)
         self.baseline_path = Path(self.BASELINE_FILE)
@@ -20,7 +20,7 @@ class QualityGate:
             sys.exit(1)
         with open(self.config_path) as f:
             self.config = json.load(f)
-    
+
     def _run(self, cmd: str) -> Tuple[int, str]:
         try:
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=300)
@@ -29,7 +29,7 @@ class QualityGate:
             return 124, "Command timed out after 300s"
         except Exception as e:
             return 127, f"Error: {e}"
-    
+
     def _parse_coverage(self, output: str) -> float:
         for line in output.split('\n'):
             if 'coverage' in line.lower():
@@ -40,7 +40,7 @@ class QualityGate:
                         except ValueError:
                             continue
         return -1.0
-    
+
     def _parse_passed_tests(self, output: str) -> int:
         for line in output.split('\n'):
             if 'passed' in line:
@@ -52,7 +52,7 @@ class QualityGate:
                         except (ValueError, IndexError):
                             continue
         return 0
-    
+
     def _parse_warning_count(self, output: str) -> int:
         for line in output.split('\n'):
             if 'warning' in line.lower():
@@ -62,7 +62,7 @@ class QualityGate:
                 except (ValueError, IndexError):
                     continue
         return 0
-    
+
     def _parse_error_count(self, output: str) -> int:
         for line in output.split('\n'):
             if 'error' in line.lower():
@@ -72,12 +72,12 @@ class QualityGate:
                 except (ValueError, IndexError):
                     continue
         return 0
-    
+
     def _run_gate(self, gate_name: str, cmd: str) -> Dict[str, Any]:
         print(f"  🔍 {gate_name}...", end=" ", flush=True)
         exit_code, output = self._run(cmd)
         result = {"command": cmd, "exit_code": exit_code, "output": output, "timestamp": datetime.now().isoformat()}
-        
+
         if gate_name == "Tests":
             result["metric"] = self._parse_passed_tests(output)
             result["metric_name"] = "passed_tests"
@@ -93,10 +93,10 @@ class QualityGate:
         elif gate_name == "Build":
             result["metric"] = 0 if exit_code == 0 else 1
             result["metric_name"] = "build_status"
-        
+
         print(f"OK ({result.get('metric', 'N/A')})")
         return result
-    
+
     def baseline(self):
         print("\n📋 Recording Quality Gate Baseline\n")
         baseline_data = {"recorded_at": datetime.now().isoformat(), "gates": {}}
@@ -114,7 +114,7 @@ class QualityGate:
             json.dump(baseline_data, f, indent=2)
         print(f"\n✅ Baseline saved\n")
         return True
-    
+
     def verify(self) -> bool:
         print("\n🔍 Verifying Quality Gates\n")
         if not self.baseline_path.exists():
