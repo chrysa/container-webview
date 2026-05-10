@@ -54,7 +54,7 @@ export default function LoginForm() {
           />
         </div>
 
-        {error && <div className={styles.error}>Identifiants incorrects. Veuillez réessayer.</div>}
+        {error && <div role="alert" className={styles.error}>Identifiants incorrects. Veuillez réessayer.</div>}
 
         <button type="submit" className={styles.btn} disabled={isPending}>
           {isPending ? 'Connexion…' : 'Se connecter'}
