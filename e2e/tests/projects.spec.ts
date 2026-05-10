@@ -12,12 +12,9 @@ test.describe('Projects page', () => {
 
   test('shows empty state when no projects configured', async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/projects');
-    // Either project cards or an empty state message should be visible
-    const cards = authenticatedPage.locator('[data-testid="project-card"]');
-    const emptyState = authenticatedPage.locator('[data-testid="empty-state"]');
-    const hasCards = await cards.count() > 0;
-    const hasEmpty = await emptyState.count() > 0;
-    expect(hasCards || hasEmpty, 'Expected either project cards or empty state to be visible').toBe(true);
+    // Wait for either project cards or empty state to appear
+    const combined = authenticatedPage.locator('[data-testid="project-card"], [data-testid="empty-state"]');
+    await expect(combined.first()).toBeVisible();
   });
 
   test('navigates to project detail page on click', async ({ authenticatedPage }) => {
