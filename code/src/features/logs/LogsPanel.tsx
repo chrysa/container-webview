@@ -76,7 +76,6 @@ function LogViewer({ projectId, serviceName }: Readonly<{ projectId: string; ser
       </div>
       <div ref={containerRef} className={styles.terminal} onScroll={handleScroll}>
         {lines.map((line, i) => (
-          // eslint-disable-next-line react/no-array-index-key -- log lines have no unique ID
           <div key={i} className={styles.line}>
             {line}
           </div>
