@@ -73,4 +73,3 @@ class TestAuthRouter:
                 response = await client.get("/api/auth/check")
 
             assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
-
