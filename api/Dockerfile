@@ -15,7 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ── deps: install dev/test extras on top of base ─────────────────────────────
 FROM base AS deps
 
-RUN pip install --no-cache-dir -e ".[dev]"
+RUN pip install --no-cache-dir "setuptools>=70" wheel && \
+    pip install --no-cache-dir -e ".[dev]"
 
 # ── test: run the test suite ─────────────────────────────────────────────────
 FROM deps AS test
