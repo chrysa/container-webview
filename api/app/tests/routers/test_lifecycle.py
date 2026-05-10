@@ -53,4 +53,3 @@ class TestLifecycleActions:
         async with api_client() as client:
             response = await client.post("/api/projects/proj/services/web/start")
         assert response.status_code == 401
-
