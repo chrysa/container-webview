@@ -7,7 +7,7 @@ minimum_pre_commit_version: 4.1.0
 repos:
     # ─── General file checks (run first to fix encoding/whitespace) ───────────
 -   repo: https://github.com/sirosen/texthooks
-    rev: d6c72a6690a6169863904e316536b52a80c18813
+    rev: 0.7.1
     hooks:
     -   id: fix-smartquotes
     -   id: fix-spaces
@@ -58,7 +58,7 @@ repos:
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
-    rev: 446db46ab58b26eb8e40d5626c1229e8cf75b3b5
+    rev: v2.14.0
     hooks:
     -   id: hadolint
         name: Lint Dockerfile frontend
@@ -91,7 +91,7 @@ repos:
 
     # ─── TypeScript / JavaScript (Frontend — React 19 + Vite) ─────────────────
 -   repo: https://github.com/pre-commit/mirrors-prettier
-    rev: f62a70a3a7114896b062de517d72829ea1c884b6
+    rev: v4.0.0-alpha.8
     hooks:
     -   id: prettier
         name: Format code with Prettier
@@ -127,7 +127,7 @@ repos:
 
     # ─── YAML ─────────────────────────────────────────────────────────────────
 -   repo: https://github.com/adrienverge/yamllint.git
-    rev: 30a25fe087e31d0345be0ffed4360e4651a44b6e
+    rev: v1.9.0
     hooks:
     -   id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
