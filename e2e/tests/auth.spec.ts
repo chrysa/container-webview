@@ -29,7 +29,7 @@ test.describe('Authentication', () => {
   });
 
   test('logout clears session and redirects to login', async ({ authenticatedPage }) => {
-    const logoutButton = authenticatedPage.getByRole('button', { name: /logout|déconnexion/i });
+    const logoutButton = authenticatedPage.getByRole('button', { name: /logout|déconnexion|déconnecter/i });
     await expect(logoutButton).toBeVisible();
     await logoutButton.click();
     await expect(authenticatedPage).toHaveURL(/login/);
