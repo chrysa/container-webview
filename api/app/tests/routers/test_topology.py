@@ -1,4 +1,3 @@
-from app.routers.topology import TopologyGraph
 from app.services.project_manager import ProjectModel
 from app.services.project_manager import ServiceModel
 
