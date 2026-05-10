@@ -6,7 +6,7 @@ import pytest
 from app.config import Settings
 from app.config import get_settings
 from app.main import app
-from app.security import security
+from app.security import create_access_token
 
 
 @pytest.fixture(name="faker_instance")
@@ -46,12 +46,10 @@ def fixt_override_settings(test_settings):
     def _load(**kwargs):
         settings = test_settings(**kwargs)
         app.dependency_overrides[get_settings] = lambda: settings
-        get_settings.cache_clear()
         return settings
 
     yield _load
     app.dependency_overrides.pop(get_settings, None)
-    get_settings.cache_clear()
 
 
 @pytest.fixture(name="api_client")
@@ -70,8 +68,7 @@ def fixt_valid_token():
     """Return a valid JWT token for test authentication."""
 
     def _load(**kwargs):
-        get_settings.cache_clear()
-        return security.create_access_token(kwargs.get("username", "testuser"))
+        return create_access_token({"sub": kwargs.get("username", "testuser")})
 
     return _load
 

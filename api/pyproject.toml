@@ -163,3 +163,7 @@ cache_dir = ".mypy_cache/"
 [[tool.mypy.overrides]]
 module = ["app.tests.*"]
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = ["yaml"]
+ignore_missing_imports = true
