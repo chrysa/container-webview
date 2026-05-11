@@ -10,7 +10,7 @@
 #   docs / chore / style / test → no bump
 # ─────────────────────────────────────────────────────────────────────────────
 
-mode: Mainline
+mode: ContinuousDelivery
 tag-prefix: '[vV]'
 initial-version: 0.1.0
 
@@ -22,7 +22,7 @@ no-bump-message: '^(docs?|style|test|chore)(\(.+\))?:'
 branches:
     main:
         regex: ^main$
-        mode: Mainline
+        mode: ContinuousDelivery
         increment: Inherit
         is-main-branch: true
         prevent-increment-of-merged-branch-version: false
