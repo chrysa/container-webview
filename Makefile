@@ -41,7 +41,7 @@ help: ## Afficher l'aide
 	@echo "  SERVICE=$(SERVICE)"
 	@echo "==================================================================="
 
-help-%: ## Aide détaillée pour une commande
+help-%: ## Show detailed help for a command
 	@grep -A 3 -B 1 "^$*:" $(shell find makefiles -name "*.makefile" -o -name "*.Makefile" -type f) || echo "Commande '$*' introuvable"
 
 # ─── Standards compliance stubs ───────────────────────────────────────────────
@@ -69,6 +69,15 @@ typecheck: ## Run type checks
 
 build: ## Build Docker images
 	$(MAKE) docker-build
+
+docker-up: ## Start all services (detached)
+	$(MAKE) -f makefiles/docker.makefile docker-up
+
+docker-down: ## Stop and remove containers
+	$(MAKE) -f makefiles/docker.makefile docker-down
+
+docker-test: ## Run tests inside Docker
+	$(MAKE) api-tests
 
 clean: ## Clean build artifacts
 	$(MAKE) node-clean docker-clean
