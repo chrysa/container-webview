@@ -1,5 +1,7 @@
 # container-webview — Claude context
 
+> **Claude Code**: also read `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md` for code specifications.
+
 ## What does this project do?
 
 Web GUI for managing Docker Compose projects and Kubernetes workloads. Two components:
