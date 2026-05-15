@@ -1,11 +1,11 @@
-api-shell: ## Shell dans le container API dev
+api-shell: ## Open shell in API dev container
 	@docker compose --profile dev exec api-dev sh
 
-api-test: ## Lancer les tests API
+api-test: ## Run API tests
 	@docker compose --profile dev run --rm api-dev python -m pytest -v
 
-api-lint: ## Linter le code Python (ruff ou flake8)
+api-lint: ## Lint Python code (ruff or flake8)
 	@docker compose --profile dev run --rm api-dev python -m flake8 app/ || true
 
-api-install: ## Installer les dépendances Python
+api-install: ## Install Python dependencies
 	@docker compose --profile dev run --rm api-dev pip install -r requirements.txt
