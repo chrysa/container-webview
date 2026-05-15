@@ -1,8 +1,12 @@
 import pytest
 
+from app.services.project_manager import _normalize_depends
 from app.services.project_manager import _normalize_environment
+from app.services.project_manager import _normalize_networks
 from app.services.project_manager import _normalize_ports
+from app.services.project_manager import _normalize_volumes
 from app.services.project_manager import _safe_project_path
+from app.services.project_manager import list_projects
 from app.services.project_manager import load_project
 
 
@@ -169,3 +173,145 @@ networks:
         assert result.services[0].image == "nginx:alpine", (
             f"Expected 'nginx:alpine' but got {result.services[0].image=}"
         )
+
+    def test_loads_project_from_compose_yaml(self, tmp_path, mocker):
+        """Return a ProjectModel when compose file is named compose.yaml."""
+        project_dir = tmp_path / "alt-project"
+        project_dir.mkdir()
+        (project_dir / "compose.yaml").write_text("services:\n  db:\n    image: postgres\n")
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = load_project("alt-project")
+        assert result is not None
+        assert result.compose_file == "compose.yaml"
+
+    def test_loads_project_with_depends_on_list(self, tmp_path, mocker):
+        """Parse depends_on in list format."""
+        project_dir = tmp_path / "myproject"
+        project_dir.mkdir()
+        compose_content = "services:\n  web:\n    image: nginx\n    depends_on:\n      - db\n"
+        (project_dir / "docker-compose.yml").write_text(compose_content)
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = load_project("myproject")
+        assert result is not None
+        assert result.services[0].depends_on == ["db"]
+
+    def test_loads_project_with_depends_on_dict(self, tmp_path, mocker):
+        """Parse depends_on in dict format (condition-based)."""
+        project_dir = tmp_path / "myproject"
+        project_dir.mkdir()
+        compose_content = (
+            "services:\n  web:\n    image: nginx\n    depends_on:\n      db:\n        condition: service_healthy\n"
+        )
+        (project_dir / "docker-compose.yml").write_text(compose_content)
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = load_project("myproject")
+        assert result is not None
+        assert result.services[0].depends_on == ["db"]
+
+    def test_loads_project_with_dict_volumes(self, tmp_path, mocker):
+        """Parse volumes in dict format with 'source' key."""
+        project_dir = tmp_path / "myproject"
+        project_dir.mkdir()
+        compose_content = (
+            "services:\n  web:\n    image: nginx\n    volumes:\n      - source: mydata\n        target: /data\n"
+        )
+        (project_dir / "docker-compose.yml").write_text(compose_content)
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = load_project("myproject")
+        assert result is not None
+        assert result.services[0].volumes == ["mydata"]
+
+    def test_loads_project_with_string_volumes(self, tmp_path, mocker):
+        """Parse volumes in 'host:container' string format."""
+        project_dir = tmp_path / "myproject"
+        project_dir.mkdir()
+        compose_content = "services:\n  web:\n    image: nginx\n    volumes:\n      - ./data:/data\n"
+        (project_dir / "docker-compose.yml").write_text(compose_content)
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = load_project("myproject")
+        assert result is not None
+        assert result.services[0].volumes == ["./data"]
+
+    def test_loads_project_with_list_networks(self, tmp_path, mocker):
+        """Parse service networks in list format."""
+        project_dir = tmp_path / "myproject"
+        project_dir.mkdir()
+        compose_content = "services:\n  web:\n    image: nginx\n    networks:\n      - frontend\n"
+        (project_dir / "docker-compose.yml").write_text(compose_content)
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = load_project("myproject")
+        assert result is not None
+        assert result.services[0].networks == ["frontend"]
+
+
+class TestNormalizeDepends:
+    """Tests for _normalize_depends()."""
+
+    def test_returns_empty_for_none(self):
+        assert _normalize_depends(None) == []
+
+    def test_returns_list_as_is(self):
+        assert _normalize_depends(["db", "cache"]) == ["db", "cache"]
+
+    def test_returns_keys_for_dict(self):
+        assert _normalize_depends({"db": {"condition": "service_healthy"}}) == ["db"]
+
+    def test_returns_empty_for_unknown_type(self):
+        assert _normalize_depends(42) == []
+
+
+class TestNormalizeNetworks:
+    """Tests for _normalize_networks()."""
+
+    def test_returns_empty_for_none(self):
+        assert _normalize_networks(None) == []
+
+    def test_returns_list_as_is(self):
+        assert _normalize_networks(["frontend", "backend"]) == ["frontend", "backend"]
+
+    def test_returns_keys_for_dict(self):
+        assert _normalize_networks({"frontend": None}) == ["frontend"]
+
+
+class TestNormalizeVolumes:
+    """Tests for _normalize_volumes()."""
+
+    def test_returns_empty_for_none(self):
+        assert _normalize_volumes(None) == []
+
+    def test_parses_string_volumes(self):
+        assert _normalize_volumes(["./data:/data", "myvolume"]) == ["./data", "myvolume"]
+
+    def test_parses_dict_volumes(self):
+        assert _normalize_volumes([{"source": "mydata", "target": "/data"}]) == ["mydata"]
+
+    def test_filters_empty_sources(self):
+        result = _normalize_volumes([{"target": "/data"}])
+        assert result == []
+
+
+class TestListProjects:
+    """Tests for list_projects()."""
+
+    def test_returns_empty_when_base_missing(self, mocker):
+        """Return empty list when projects_path does not exist."""
+        mocker.patch("app.services.project_manager.settings", projects_path="/nonexistent/path")
+        result = list_projects()
+        assert result == []
+
+    def test_returns_valid_projects(self, tmp_path, mocker):
+        """Return list of valid projects found in projects_path."""
+        project_dir = tmp_path / "proj1"
+        project_dir.mkdir()
+        (project_dir / "docker-compose.yml").write_text("services:\n  web:\n    image: nginx\n")
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = list_projects()
+        assert len(result) == 1
+        assert result[0].id == "proj1"
+
+    def test_skips_dirs_without_compose(self, tmp_path, mocker):
+        """Skip directories that have no compose file."""
+        (tmp_path / "no-compose").mkdir()
+        mocker.patch("app.services.project_manager.settings", projects_path=str(tmp_path))
+        result = list_projects()
+        assert result == []

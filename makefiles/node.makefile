@@ -1,21 +1,21 @@
-node-install: ## Installer les dépendances npm
+node-install: ## Install npm dependencies
 	@docker compose --profile dev run --rm frontend-dev npm install
 
-node-build: ## Compiler le frontend (production)
+node-build: ## Build frontend for production
 	@docker compose --profile dev run --rm frontend-dev npm run build
 
-node-lint: ## Linter le code frontend
+node-lint: ## Lint frontend code
 	@docker compose --profile dev run --rm frontend-dev npm run lint
 
-node-test: ## Lancer les tests unitaires Vitest (containerisé)
+node-test: ## Run Vitest unit tests (containerised)
 	@docker compose --profile test run --rm frontend-test npm run test
 
-node-test-cov: ## Lancer les tests Vitest avec couverture (containerisé)
+node-test-cov: ## Run Vitest tests with coverage (containerised)
 	@docker compose --profile test run --rm frontend-test npm run test:coverage
 
-node-outdated: ## Vérifier les dépendances npm obsolètes
+node-outdated: ## Check for outdated npm dependencies
 	@docker compose --profile dev run --rm frontend-dev npm outdated
 
-node-clean: ## Supprimer node_modules et dist
+node-clean: ## Remove node_modules and dist
 	@rm -rf code/node_modules code/dist
 	@docker volume rm docker-overview-node-modules 2>/dev/null || true
