@@ -19,7 +19,6 @@ on:
       - "fix/**"
       - "chore/**"
       - "ci/**"
-  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -45,8 +44,8 @@ jobs:
           cache: pip
 
       - uses: pre-commit/action@v3.0.1
-      env:
-        SKIP: no-commit-to-branch
+        env:
+          SKIP: no-commit-to-branch
 
   # ───────────────────────────────────────────────────────────────────────────
   lint-frontend:
