@@ -328,3 +328,41 @@ jobs:
       - name: Stop stack
         if: always()
         run: docker compose down
+
+  # ───────────────────────────────────────────────────────────────────────────
+  sonar:
+    if: github.actor != 'dependabot[bot]'
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [test-api, test-frontend]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download API coverage
+        uses: actions/download-artifact@v8
+        with:
+          name: api-coverage
+          path: api/
+        continue-on-error: true
+
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-coverage
+          path: code/coverage/
+        continue-on-error: true
+
+      - name: List available reports
+        run: |
+          ls -lh api/coverage.xml 2>/dev/null || echo "api/coverage.xml missing"
+          ls -lh code/coverage/lcov.info 2>/dev/null || echo "code/coverage/lcov.info missing"
+
+      - name: SonarCloud scan
+        # sonar-project.properties configures sources, coverage paths, etc.
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
