@@ -46,7 +46,7 @@ async def stream_logs(
         for chunk in log_stream:
             line = chunk.decode("utf-8", errors="replace").rstrip("\n")
             await websocket.send_text(line)
-            await asyncio.sleep(0)  # yield control
+            await asyncio.sleep(0)  # yield control  # NOSONAR
     except WebSocketDisconnect:
         pass
     except Exception as exc:  # noqa: BLE001 — unknown errors during log streaming

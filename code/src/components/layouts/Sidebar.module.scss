@@ -45,7 +45,7 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: white;
+    color: var(--white);
   }
 }
 
@@ -67,12 +67,12 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.07);
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-nav-hover);
   }
 
   &.active {
     background: var(--primary);
-    color: white;
+    color: var(--white);
   }
 }
 

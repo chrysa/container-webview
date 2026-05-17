@@ -23,6 +23,10 @@
 
   --surface-hover: rgba(0, 0, 0, 0.05);
 
+  --white: #ffffff;
+  --text-nav-hover: rgba(255, 255, 255, 0.9);
+  --color-danger: #ef4444;
+
   --skeleton-base: #e2e8f0;
   --skeleton-highlight: #f1f5f9;
 
@@ -55,6 +59,10 @@ html.dark {
   --status-restarting: #a78bfa;
 
   --surface-hover: rgba(255, 255, 255, 0.05);
+
+  --white: #ffffff;
+  --text-nav-hover: rgba(255, 255, 255, 0.9);
+  --color-danger: #f87171;
 
   --skeleton-base: #1e293b;
   --skeleton-highlight: #334155;
