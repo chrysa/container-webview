@@ -13,7 +13,7 @@ from app.security import get_current_user
 router = APIRouter()
 
 try:
-    import ldap as _ldap  # type: ignore[import-untyped]
+    import ldap as _ldap
 
     _HAS_LDAP = True
 except ImportError:
