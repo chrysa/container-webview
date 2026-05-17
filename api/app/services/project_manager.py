@@ -92,7 +92,7 @@ def _normalize_environment(env_raw: dict | list | None) -> dict:
         return {k: str(v) for k, v in env_raw.items() if v is not None}
     if isinstance(env_raw, list):
         result = {}
-        for item in env_raw:  # type: ignore[union-attr]
+        for item in env_raw:
             if "=" in item:
                 k, v = item.split("=", 1)
                 result[k] = v
