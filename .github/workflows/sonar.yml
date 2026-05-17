@@ -2,60 +2,40 @@
 name: SonarCloud Analysis
 
 on:
-    workflow_run:
-        workflows: ["CI"]
-        types: [completed]
-        branches: [main, master, develop]
+    push:
+        branches:
+            - main
+            - master
+            - develop
+    pull_request:
+        types:
+            - opened
+            - synchronize
+            - reopened
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 permissions:
     contents: read
-    actions: read
     pull-requests: read
 
 jobs:
     sonar:
-        if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
+        if: github.actor != 'dependabot[bot]'
         name: SonarCloud scan
         runs-on: ubuntu-latest
         timeout-minutes: 15
         steps:
-            - uses: actions/checkout@v6
+            - name: Checkout
+              uses: actions/checkout@v6
               with:
                   fetch-depth: 0
-                  ref: ${{ github.event.workflow_run.head_sha }}
-
-            - name: Download backend coverage artifact
-              uses: actions/download-artifact@v8
-              with:
-                  name: api-coverage
-                  run-id: ${{ github.event.workflow_run.id }}
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  path: api/
-              continue-on-error: true
-
-            - name: Download frontend coverage artifact
-              uses: actions/download-artifact@v8
-              with:
-                  name: frontend-coverage
-                  run-id: ${{ github.event.workflow_run.id }}
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  path: code/coverage/
-              continue-on-error: true
-
             - name: SonarCloud scan
-              uses: SonarSource/sonarqube-scan-action@v4.2.1
+              uses: chrysa/github-actions/sonar-scan@v1
               with:
-                  args: >
-                      -Dsonar.projectKey=chrysa_container-webview
-                      -Dsonar.organization=chrysa
-                      -Dsonar.projectName=container-webview
-                      -Dsonar.sources=api/app,code/src
-                      -Dsonar.tests=api/app/tests
-                      -Dsonar.exclusions=**/migrations/**,**/__pycache__/**,**/node_modules/**,**/.git/**,**/dist/**,**/.vscode/**
-                      -Dsonar.python.version=3.12,3.13,3.14
-                      -Dsonar.python.coverage.reportPaths=api/coverage.xml
-                      -Dsonar.javascript.lcov.reportPaths=code/coverage/lcov.info
-                      -Dsonar.sourceEncoding=UTF-8
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  sonar-token: ${{ secrets.SONAR_TOKEN }}
+                  project-key: chrysa_container-webview
+                  sources: api/app,ui/src
+                  tests: tests
