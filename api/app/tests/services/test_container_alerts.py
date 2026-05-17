@@ -1,5 +1,3 @@
-from datetime import UTC
-from datetime import datetime
 from unittest.mock import MagicMock
 
 from docker.errors import DockerException
@@ -70,7 +68,7 @@ class TestContainerAlerts:
 
         assert len(result) == 1
         assert result[0].level == "critical"
-        assert "abc123-exited" == result[0].id
+        assert result[0].id == "abc123-exited"
 
     def test_exited_with_zero_code_creates_info_alert(self, mocker):
         """Exited container with exit code 0 should generate an info alert."""

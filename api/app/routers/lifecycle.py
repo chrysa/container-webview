@@ -73,7 +73,9 @@ def stop_service(project_id: str, service_name: str, _: dict = Depends(get_curre
     return _perform_action(project_id, service_name, "stop")
 
 
-@router.post("/{project_id}/services/{service_name}/restart", response_model=ActionResponse, responses=_ACTION_RESPONSES)
+@router.post(
+    "/{project_id}/services/{service_name}/restart", response_model=ActionResponse, responses=_ACTION_RESPONSES
+)
 def restart_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "restart")
 
@@ -83,6 +85,8 @@ def pause_service(project_id: str, service_name: str, _: dict = Depends(get_curr
     return _perform_action(project_id, service_name, "pause")
 
 
-@router.post("/{project_id}/services/{service_name}/unpause", response_model=ActionResponse, responses=_ACTION_RESPONSES)
+@router.post(
+    "/{project_id}/services/{service_name}/unpause", response_model=ActionResponse, responses=_ACTION_RESPONSES
+)
 def unpause_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "unpause")
