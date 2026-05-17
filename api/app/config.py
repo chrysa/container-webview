@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     admin_username: str = ""  # nosec B105 — set via ADMIN_USERNAME env var
     admin_password: str = ""  # nosec B105 — set via ADMIN_PASSWORD env var
 
+    # CORS — allowed origins (comma-separated via env var CORS_ORIGINS)
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+
     # Chemin monté où sont stockés les docker-compose des projets
     projects_path: str = "/projects"
 
