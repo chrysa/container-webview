@@ -19,8 +19,7 @@
     "target": "ES2022",
     "types": ["vite/client"],
     "useDefineForClassFields": true,
-    "verbatimModuleSyntax": true,
-    "ignoreDeprecations": "6.0"
+    "verbatimModuleSyntax": true
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts", "src/**/*.spec.tsx"]
