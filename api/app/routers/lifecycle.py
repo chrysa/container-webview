@@ -11,6 +11,12 @@ from app.services.project_manager import load_project
 
 router = APIRouter()
 
+_ACTION_RESPONSES: dict[int | str, dict] = {
+    400: {"description": "Unknown or unsupported action"},
+    404: {"description": "Project, service or container not found"},
+    500: {"description": "Docker API error"},
+}
+
 _CONTAINER_ACTIONS: dict[str, str] = {
     "start": "start",
     "stop": "stop",
@@ -57,26 +63,26 @@ def _perform_action(project_id: str, service_name: str, action: str) -> ActionRe
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-@router.post("/{project_id}/services/{service_name}/start", response_model=ActionResponse)
+@router.post("/{project_id}/services/{service_name}/start", response_model=ActionResponse, responses=_ACTION_RESPONSES)
 def start_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "start")
 
 
-@router.post("/{project_id}/services/{service_name}/stop", response_model=ActionResponse)
+@router.post("/{project_id}/services/{service_name}/stop", response_model=ActionResponse, responses=_ACTION_RESPONSES)
 def stop_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "stop")
 
 
-@router.post("/{project_id}/services/{service_name}/restart", response_model=ActionResponse)
+@router.post("/{project_id}/services/{service_name}/restart", response_model=ActionResponse, responses=_ACTION_RESPONSES)
 def restart_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "restart")
 
 
-@router.post("/{project_id}/services/{service_name}/pause", response_model=ActionResponse)
+@router.post("/{project_id}/services/{service_name}/pause", response_model=ActionResponse, responses=_ACTION_RESPONSES)
 def pause_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "pause")
 
 
-@router.post("/{project_id}/services/{service_name}/unpause", response_model=ActionResponse)
+@router.post("/{project_id}/services/{service_name}/unpause", response_model=ActionResponse, responses=_ACTION_RESPONSES)
 def unpause_service(project_id: str, service_name: str, _: dict = Depends(get_current_user)) -> ActionResponse:
     return _perform_action(project_id, service_name, "unpause")
