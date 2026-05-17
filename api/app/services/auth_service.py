@@ -1,6 +1,6 @@
 import logging
 
-import ldap  # type: ignore[import]
+import ldap  # type: ignore[import-untyped]
 
 from app.config import settings
 

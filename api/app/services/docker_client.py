@@ -1,6 +1,6 @@
-import docker  # type: ignore[attr-defined]
+import docker
 from docker import DockerClient  # type: ignore[attr-defined]
-from docker.models.containers import Container  # type: ignore[attr-defined]
+from docker.models.containers import Container
 
 
 _client: DockerClient | None = None
