@@ -93,8 +93,9 @@ jobs:
         with:
           python-version: "3.14"
           latest-python: "3.14"
-          config: api/pyproject.toml
-          sources: api
+          config: pyproject.toml
+          sources: app
+          working-directory: api
 
   # ───────────────────────────────────────────────────────────────────────────
   mypy-api:
