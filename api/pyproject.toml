@@ -108,7 +108,8 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"app/tests/**" = [
+# Patterns cover both running from api/ and from repo root (ruff resolves relative to CWD)
+"api/app/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
@@ -121,10 +122,19 @@ fixable = ["ALL"]
     "PLC0415", # imports inside functions acceptable in tests
     "SLF001",  # tests may access private members
 ]
+"app/tests/**" = [
+    "S101", "S106", "S105", "S108", "ANN",
+    "ARG001", "ARG002", "PLR0913", "PLR2004",
+    "PT006", "PT011", "PLC0415", "SLF001",
+]
 "app/main.py" = ["ANN"]
-"app/config.py" = ["S105", "S106"]   # pydantic-settings defaults, overridden by env
-"app/constants.py" = ["S105"]         # error-message strings, not passwords
-"app/services/docker_client.py" = ["I001"]  # isort edge case with docker submodule imports
+"api/app/main.py" = ["ANN"]
+"app/config.py" = ["S105", "S106"]
+"api/app/config.py" = ["S105", "S106"]
+"app/constants.py" = ["S105"]
+"api/app/constants.py" = ["S105"]
+"app/services/docker_client.py" = ["I001"]
+"api/app/services/docker_client.py" = ["I001"]
 
 [tool.ruff.lint.isort]
 force-single-line = true
