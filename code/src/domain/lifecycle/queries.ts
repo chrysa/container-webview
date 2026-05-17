@@ -15,8 +15,8 @@ export function useServiceAction(projectId: string) {
       return res.data;
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['topology', projectId] });
-      void qc.invalidateQueries({ queryKey: ['metrics', projectId] });
+      qc.invalidateQueries({ queryKey: ['topology', projectId] }).catch(() => {});
+      qc.invalidateQueries({ queryKey: ['metrics', projectId] }).catch(() => {});
     },
   });
 }
