@@ -5,7 +5,7 @@ on:
     push:
         branches: [main, master]
         paths-ignore:
-            - '**.md'
+            - "**.md"
             - .github/**
     workflow_dispatch:
 
@@ -13,4 +13,4 @@ jobs:
     call:
         uses: chrysa/github-actions/.github/workflows/release.yml@main
         secrets:
-          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+            RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
