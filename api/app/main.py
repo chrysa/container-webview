@@ -33,5 +33,5 @@ app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
 
 
 @app.get("/api")
-def ping():
+def ping() -> dict[str, str]:
     return {"status": "ok"}
