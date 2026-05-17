@@ -9,7 +9,8 @@ interface Props {
 
 function LogViewer({ projectId, serviceName }: Readonly<{ projectId: string; serviceName: string }>) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [lines, setLines] = useState<string[]>([]);
+  const nextId = useRef(0);
+  const [lines, setLines] = useState<{ id: number; text: string }[]>([]);
   const [connected, setConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -27,7 +28,7 @@ function LogViewer({ projectId, serviceName }: Readonly<{ projectId: string; ser
     ws.onerror = () => setConnected(false);
     ws.onmessage = (ev) => {
       setLines((prev) => {
-        const next = [...prev, ev.data as string];
+        const next = [...prev, { id: nextId.current++, text: ev.data as string }];
         return next.length > 2000 ? next.slice(-2000) : next;
       });
     };
@@ -75,9 +76,9 @@ function LogViewer({ projectId, serviceName }: Readonly<{ projectId: string; ser
         </button>
       </div>
       <div ref={containerRef} className={styles.terminal} onScroll={handleScroll}>
-        {lines.map((line, i) => (
-          <div key={i} className={styles.line}>
-            {line}
+        {lines.map(({ id, text }) => (
+          <div key={id} className={styles.line}>
+            {text}
           </div>
         ))}
       </div>
