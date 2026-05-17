@@ -14,7 +14,7 @@ export class Auth {
      * Triggers the list of callbacks provided in the constructor.
      */
     onAuthUpdateCallback() {
-        for (var callback of this.onAuthUpdateCallbacks)
+        for (const callback of this.onAuthUpdateCallbacks)
             callback()
     }
 

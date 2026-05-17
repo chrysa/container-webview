@@ -64,7 +64,10 @@ def _get_container_status(project_id: str, service_name: str) -> str:
     return "unknown"
 
 
-@router.get("/{project_id}/topology", response_model=TopologyGraph)
+_TOPOLOGY_RESPONSES: dict[int | str, dict] = {404: {"description": "Project not found"}}
+
+
+@router.get("/{project_id}/topology", response_model=TopologyGraph, responses=_TOPOLOGY_RESPONSES)
 def get_topology(project_id: str, _: dict = Depends(get_current_user)) -> TopologyGraph:
     project = load_project(project_id)
     if not project:

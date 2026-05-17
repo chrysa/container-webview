@@ -42,7 +42,10 @@ def _bytes_to_mb(b: int) -> float:
     return round(b / (1024 * 1024), 2)
 
 
-@router.get("/{project_id}/metrics", response_model=list[ServiceMetrics])
+_METRICS_RESPONSES: dict[int | str, dict] = {404: {"description": "Project not found"}}
+
+
+@router.get("/{project_id}/metrics", response_model=list[ServiceMetrics], responses=_METRICS_RESPONSES)
 def get_metrics(project_id: str, _: dict = Depends(get_current_user)) -> list[ServiceMetrics]:
     project = load_project(project_id)
     if not project:

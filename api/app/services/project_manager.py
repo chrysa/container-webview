@@ -41,11 +41,11 @@ def _parse_compose(compose_path: Path) -> dict:
         return yaml.safe_load(f) or {}
 
 
-def _normalize_ports(ports_raw: object) -> list[str]:
+def _normalize_ports(ports_raw: list | None) -> list[str]:
     if not ports_raw:
         return []
     result = []
-    for p in ports_raw:  # type: ignore[union-attr,attr-defined]
+    for p in ports_raw:
         if isinstance(p, dict):
             result.append(f"{p.get('target', '')}")
         else:
@@ -53,7 +53,7 @@ def _normalize_ports(ports_raw: object) -> list[str]:
     return result
 
 
-def _normalize_depends(depends_raw: object) -> list[str]:
+def _normalize_depends(depends_raw: list | dict | None) -> list[str]:
     if not depends_raw:
         return []
     if isinstance(depends_raw, list):
@@ -63,7 +63,7 @@ def _normalize_depends(depends_raw: object) -> list[str]:
     return []
 
 
-def _normalize_networks(nets_raw: object) -> list[str]:
+def _normalize_networks(nets_raw: list | dict | None) -> list[str]:
     if not nets_raw:
         return []
     if isinstance(nets_raw, list):
@@ -73,11 +73,11 @@ def _normalize_networks(nets_raw: object) -> list[str]:
     return []
 
 
-def _normalize_volumes(vols_raw: object) -> list[str]:
+def _normalize_volumes(vols_raw: list | None) -> list[str]:
     if not vols_raw:
         return []
     result = []
-    for v in vols_raw:  # type: ignore[union-attr,attr-defined]
+    for v in vols_raw:
         if isinstance(v, dict):
             result.append(v.get("source", ""))
         else:
@@ -85,11 +85,11 @@ def _normalize_volumes(vols_raw: object) -> list[str]:
     return [v for v in result if v]
 
 
-def _normalize_environment(env_raw: object) -> dict:
+def _normalize_environment(env_raw: dict | list | None) -> dict:
     if not env_raw:
         return {}
     if isinstance(env_raw, dict):
-        return {k: str(v) for k, v in env_raw.items() if v is not None}  # type: ignore[union-attr]
+        return {k: str(v) for k, v in env_raw.items() if v is not None}
     if isinstance(env_raw, list):
         result = {}
         for item in env_raw:  # type: ignore[union-attr]
