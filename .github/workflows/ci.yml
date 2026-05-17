@@ -116,12 +116,19 @@ jobs:
         working-directory: api
         run: pip install -e '.[dev]'
 
-      - uses: chrysa/github-actions/mypy-check@v1
+      - name: Mypy — type check
+        working-directory: api
+        run: |
+          mypy --config-file=pyproject.toml app
+
+      - name: Upload mypy report
+        if: always()
+        uses: actions/upload-artifact@v7
         with:
-          python-version: "3.14"
-          latest-python: "3.14"
-          config-file: api/pyproject.toml
-          sources: app
+          name: mypy-report
+          path: api/reports/mypy.txt
+          if-no-files-found: warn
+          compression-level: 6
 
   # ───────────────────────────────────────────────────────────────────────────
   build-frontend:
