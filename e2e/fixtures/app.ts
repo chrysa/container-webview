@@ -1,19 +1,21 @@
-import { test as base, Page } from '@playwright/test';
+import { test as base, Page } from "@playwright/test";
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'admin';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin";
 
 export class LoginPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto('/login');
+    await this.page.goto("/login");
   }
 
   async login(username: string, password: string) {
     await this.page.getByLabel(/username|utilisateur/i).fill(username);
     await this.page.getByLabel(/password|mot de passe/i).fill(password);
-    await this.page.getByRole('button', { name: /login|connexion|connecter/i }).click();
+    await this.page
+      .getByRole("button", { name: /login|connexion|connecter/i })
+      .click();
   }
 
   async loginAsAdmin() {
@@ -25,7 +27,7 @@ export class ProjectsPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto('/projects');
+    await this.page.goto("/projects");
   }
 
   async getProjectCards() {
@@ -51,9 +53,9 @@ export const test = base.extend<AppFixtures>({
     await login.goto();
     await login.loginAsAdmin();
     await page.waitForURL(/projects|dashboard/);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState("networkidle");
     await use(page);
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";
