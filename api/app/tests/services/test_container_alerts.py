@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock
 
-from app.routers.alerts import _container_alerts
 from docker.errors import DockerException
+
+from app.routers.alerts import _container_alerts
 
 
 def _make_container(
