@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import GlobalLoader from '@/components/loaders/GlobalLoader';
 import styles from './Layout.module.scss';
 
 export default function Layout() {
@@ -10,7 +12,9 @@ export default function Layout() {
       <div className={styles.body}>
         <Sidebar />
         <main className={styles.content}>
-          <Outlet />
+          <Suspense fallback={<GlobalLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

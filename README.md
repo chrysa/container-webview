@@ -3,6 +3,8 @@
 
 Interface web pour gérer et visualiser vos projets Docker Compose — topologie interactive, métriques en temps réel, alertes et gestion du cycle de vie des services.
 
+![Preview](docs/screenshots/preview.png)
+
 ---
 
 ## Table des matières
