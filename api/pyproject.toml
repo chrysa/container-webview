@@ -44,10 +44,7 @@ testpaths = ["app/tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = [
-    "--tb=short",
-    "-q",
-]
+addopts = ["--tb=short", "-q"]
 
 # ── Coverage ───────────────────────────────────────────────────────────────
 
@@ -88,20 +85,55 @@ extend-exclude = [
 
 [tool.ruff.lint]
 select = [
-    "E", "W", "F", "I", "N", "UP", "B", "C4", "C90",
-    "A", "ANN", "ARG", "ASYNC", "BLE", "DTZ", "EM",
-    "FBT", "G", "ICN", "ISC", "LOG", "PERF", "PIE",
-    "PL", "PT", "PTH", "Q", "RET", "RSE", "RUF",
-    "S", "SIM", "SLF", "T20", "TC", "TID",
+    "E",
+    "W",
+    "F",
+    "I",
+    "N",
+    "UP",
+    "B",
+    "C4",
+    "C90",
+    "A",
+    "ANN",
+    "ARG",
+    "ASYNC",
+    "BLE",
+    "DTZ",
+    "EM",
+    "FBT",
+    "G",
+    "ICN",
+    "ISC",
+    "LOG",
+    "PERF",
+    "PIE",
+    "PL",
+    "PT",
+    "PTH",
+    "Q",
+    "RET",
+    "RSE",
+    "RUF",
+    "S",
+    "SIM",
+    "SLF",
+    "T20",
+    "TC",
+    "TID",
 ]
 ignore = [
     "E501",    # line length (handled by formatter)
     "COM812",  # trailing comma (conflicts with formatter)
     "ANN401",  # Any disallowed (too strict)
-    "RET501", "RET502", "RET503",  # return None
+    "RET501",
+    "RET502",
+    "RET503",  # return None
     "S311",    # random is fine for non-crypto use
     "RUF100",  # unused noqa
-    "TD002", "TD003", "FIX002",  # TODO pragmatics
+    "TD002",
+    "TD003",
+    "FIX002",  # TODO pragmatics
     "B008",    # FastAPI Depends() in argument defaults is intentional
     "PLW0603", # global statement is acceptable for lazy Docker client singleton
 ]
@@ -115,17 +147,29 @@ fixable = ["ALL"]
     "S105",    # hardcoded password in strings
     "S108",    # /tmp usage acceptable in tests
     "ANN",     # no type annotations in tests
-    "ARG001", "ARG002",
-    "PLR0913", "PLR2004",
+    "ARG001",
+    "ARG002",
+    "PLR0913",
+    "PLR2004",
     "PT006",   # parametrize type
     "PT011",
     "PLC0415", # imports inside functions acceptable in tests
     "SLF001",  # tests may access private members
 ]
 "app/tests/**" = [
-    "S101", "S106", "S105", "S108", "ANN",
-    "ARG001", "ARG002", "PLR0913", "PLR2004",
-    "PT006", "PT011", "PLC0415", "SLF001",
+    "S101",
+    "S106",
+    "S105",
+    "S108",
+    "ANN",
+    "ARG001",
+    "ARG002",
+    "PLR0913",
+    "PLR2004",
+    "PT006",
+    "PT011",
+    "PLC0415",
+    "SLF001",
 ]
 "app/main.py" = ["ANN"]
 "api/app/main.py" = ["ANN"]
