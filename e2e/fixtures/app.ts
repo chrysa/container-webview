@@ -53,9 +53,7 @@ export const test = base.extend<AppFixtures>({
     await login.goto();
     await login.loginAsAdmin();
     await page.waitForURL(/projects|dashboard/, { timeout: 10000 });
-    await page.waitForLoadState("networkidle", { timeout: 15000 });
-    // Wait for the app shell to be fully rendered (header visible)
-    await page.waitForSelector("header, nav, [role='navigation']", { timeout: 10000 }).catch(() => {});
+    await page.waitForLoadState("domcontentloaded");
     await use(page);
   },
 });

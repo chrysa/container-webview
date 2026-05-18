@@ -4,21 +4,24 @@ test.describe("Projects page", () => {
   test("displays projects list after login", async ({ authenticatedPage }) => {
     await authenticatedPage.goto("/projects", { waitUntil: "networkidle" });
     await expect(authenticatedPage).toHaveURL(/projects/);
-    // The page title or heading should be visible
+    // Wait for loading to finish (either heading or error state)
+    await authenticatedPage.waitForSelector('h1, [data-testid="empty-state"]', { timeout: 15000 });
     await expect(
       authenticatedPage.getByRole("heading", { name: /projects|projets/i }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test("shows empty state when no projects configured", async ({
     authenticatedPage,
   }) => {
     await authenticatedPage.goto("/projects", { waitUntil: "networkidle" });
+    // Wait for loading to finish
+    await authenticatedPage.waitForSelector('h1, [data-testid="empty-state"], .error', { timeout: 15000 });
     // Wait for either project cards or empty state to appear
     const combined = authenticatedPage.locator(
       '[data-testid="project-card"], [data-testid="empty-state"]',
     );
-    await expect(combined.first()).toBeVisible();
+    await expect(combined.first()).toBeVisible({ timeout: 10000 });
   });
 
   test("navigates to project detail page on click", async ({

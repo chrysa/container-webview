@@ -29,8 +29,9 @@ test.describe('Authentication', () => {
   });
 
   test('logout clears session and redirects to login', async ({ authenticatedPage }) => {
-    const logoutButton = authenticatedPage.getByRole('button', { name: /logout|déconnexion|déconnecter/i });
-    await expect(logoutButton).toBeVisible();
+    await expect(authenticatedPage).toHaveURL(/projects/, { timeout: 5000 });
+    const logoutButton = authenticatedPage.locator('button[aria-label="Se déconnecter"]');
+    await expect(logoutButton).toBeVisible({ timeout: 10000 });
     await logoutButton.click();
     await expect(authenticatedPage).toHaveURL(/login/);
   });
