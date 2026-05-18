@@ -49,11 +49,15 @@ export const test = base.extend<AppFixtures>({
     await use(new ProjectsPage(page));
   },
   authenticatedPage: async ({ page }, use) => {
+    // Perform real login to get a valid token from the API
     const login = new LoginPage(page);
     await login.goto();
     await login.loginAsAdmin();
+    // Wait for SPA navigation to authenticated area
     await page.waitForURL(/projects|dashboard/, { timeout: 10000 });
-    await page.waitForLoadState("domcontentloaded");
+    // Layout (header/sidebar) renders synchronously once RequireAuth passes.
+    // The Suspense in Layout only wraps the inner page content, not the shell.
+    await page.waitForSelector("header", { state: "visible", timeout: 15000 });
     await use(page);
   },
 });
