@@ -300,10 +300,15 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Build frontend with correct API URL
+        run: docker compose build --no-cache frontend
+        env:
+          VITE_API_URL: "http://localhost:8000"
+
       - name: Start stack (API + frontend)
         run: docker compose up -d api frontend
         env:
-          VITE_API_URL: ""
+          VITE_API_URL: "http://localhost:8000"
           SECRET_KEY: e2e-secret-key-for-ci
           ADMIN_USERNAME: admin
           ADMIN_PASSWORD: admin
