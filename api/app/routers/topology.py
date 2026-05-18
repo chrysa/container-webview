@@ -1,6 +1,5 @@
 import contextlib
 
-from docker.errors import DockerException
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -9,6 +8,7 @@ from pydantic import BaseModel
 from app.security import get_current_user
 from app.services.docker_client import get_docker_client
 from app.services.project_manager import load_project
+from docker.errors import DockerException
 
 
 router = APIRouter()
