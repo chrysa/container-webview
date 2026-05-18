@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures/app';
 
 test.describe('Projects page', () => {
   test('displays projects list after login', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/projects');
+    await authenticatedPage.goto('/projects', { waitUntil: 'networkidle' });
     await expect(authenticatedPage).toHaveURL(/projects/);
     // The page title or heading should be visible
     await expect(
@@ -11,14 +11,14 @@ test.describe('Projects page', () => {
   });
 
   test('shows empty state when no projects configured', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/projects');
+    await authenticatedPage.goto('/projects', { waitUntil: 'networkidle' });
     // Wait for either project cards or empty state to appear
     const combined = authenticatedPage.locator('[data-testid="project-card"], [data-testid="empty-state"]');
     await expect(combined.first()).toBeVisible();
   });
 
   test('navigates to project detail page on click', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/projects');
+    await authenticatedPage.goto('/projects', { waitUntil: 'networkidle' });
     const cards = authenticatedPage.locator('[data-testid="project-card"]');
     const count = await cards.count();
 
@@ -34,9 +34,9 @@ test.describe('Projects page', () => {
 
 test.describe('404 page', () => {
   test('shows not-found page for unknown routes', async ({ authenticatedPage }) => {
-    await authenticatedPage.goto('/this-route-does-not-exist');
+    await authenticatedPage.goto('/this-route-does-not-exist', { waitUntil: 'networkidle' });
     await expect(
-      authenticatedPage.getByText(/not found|404|introuvable/i),
+      authenticatedPage.getByText(/not found|404|introuvable/i).first(),
     ).toBeVisible();
   });
 });

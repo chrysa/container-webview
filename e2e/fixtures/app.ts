@@ -51,6 +51,7 @@ export const test = base.extend<AppFixtures>({
     await login.goto();
     await login.loginAsAdmin();
     await page.waitForURL(/projects|dashboard/);
+    await page.waitForLoadState('networkidle');
     await use(page);
   },
 });
