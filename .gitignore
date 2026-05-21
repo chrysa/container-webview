@@ -23,3 +23,9 @@ code/package-lock.json
 .DS_Store
 Thumbs.db
 .gitnexus
+
+# CodeGraph (local index — never commit)
+.codegraph/
+
+# Local dev override
+docker-compose.override.yml
