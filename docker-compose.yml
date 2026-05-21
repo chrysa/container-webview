@@ -12,7 +12,6 @@ x-common: &common
           read_only: true
 
 services:
-
     # ─── Backend FastAPI ─────────────────────────────────────
     api:
         <<: *common
@@ -45,7 +44,7 @@ services:
         expose:
             - "8000"
         ports:
-            - 8000:8000
+            - 9003:8000
         healthcheck:
             test: [CMD, curl, -f, "http://localhost:8000/api"]
             interval: 30s
@@ -61,12 +60,12 @@ services:
             target: production
             args:
                 # URL absolue de l'API vue depuis le navigateur
-                VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+                VITE_API_URL: ${VITE_API_URL:-http://localhost:9003}
         container_name: docker-overview-frontend
         hostname: frontend
         image: docker-overview-frontend:latest
         ports:
-            - ${FRONTEND_PORT:-3000}:3000
+            - 9103:3000
         depends_on:
             api:
                 condition: service_healthy
