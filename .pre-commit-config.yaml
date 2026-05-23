@@ -55,6 +55,8 @@ repos:
     -   id: yaml-sorter
         name: Sort YAML files
         exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
+    -   id: regression-gate
+        stages: [pre-push]
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
