@@ -78,18 +78,19 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1
+      - uses: chrysa/github-actions/python-setup@v1.0.8
         with:
           python-version: "3.14"
 
       - name: Install system dependencies (python-ldap)
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev
 
-      - name: Install project dependencies
-        working-directory: api
-        run: pip install -e '.[dev]'
+      - uses: chrysa/github-actions/install-project@v1
+        with:
+          extras: dev
+          working-directory: api
 
-      - uses: chrysa/github-actions/ruff-check@v1
+      - uses: chrysa/github-actions/ruff-check@v1.0.8
         with:
           python-version: "3.14"
           latest-python: "3.14"
@@ -104,16 +105,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: chrysa/github-actions/python-setup@v1
+      - uses: chrysa/github-actions/python-setup@v1.0.8
         with:
           python-version: "3.14"
 
       - name: Install system dependencies (python-ldap)
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev
 
-      - name: Install project dependencies
-        working-directory: api
-        run: pip install -e '.[dev]'
+      - uses: chrysa/github-actions/install-project@v1
+        with:
+          extras: dev
+          working-directory: api
 
       - uses: chrysa/github-actions/mypy-check@v1
         with:
@@ -168,7 +170,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build API image (no push)
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7.1.0
         with:
           context: ./api
           push: false
@@ -190,7 +192,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build Frontend image (no push)
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7.1.0
         with:
           context: .
           push: false
@@ -373,7 +375,7 @@ jobs:
 
       - name: SonarCloud scan
         # sonar-project.properties configures sources, coverage paths, etc.
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
