@@ -85,9 +85,10 @@ jobs:
       - name: Install system dependencies (python-ldap)
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev
 
-      - name: Install project dependencies
-        working-directory: api
-        run: pip install -e '.[dev]'
+      - uses: chrysa/github-actions/install-project@v1
+        with:
+          extras: dev
+          working-directory: api
 
       - uses: chrysa/github-actions/ruff-check@v1.0.8
         with:
@@ -111,9 +112,10 @@ jobs:
       - name: Install system dependencies (python-ldap)
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev
 
-      - name: Install project dependencies
-        working-directory: api
-        run: pip install -e '.[dev]'
+      - uses: chrysa/github-actions/install-project@v1
+        with:
+          extras: dev
+          working-directory: api
 
       - name: Mypy — type check
         working-directory: api
