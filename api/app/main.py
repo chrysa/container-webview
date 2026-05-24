@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.observability import init_sentry
 from app.routers import alerts
 from app.routers import auth
 from app.routers import lifecycle
@@ -13,6 +14,7 @@ from app.routers import topology
 
 _API_PROJECTS_PREFIX = "/api/projects"
 
+init_sentry()
 app = FastAPI(title="Docker Overview API", version="1.0.0")
 
 app.add_middleware(
