@@ -15,8 +15,12 @@
 
 .content {
   flex: 1;
-  padding: 24px;
+  padding: 16px;
   overflow-y: auto;
   min-width: 0;
   background: var(--bg);
+
+  @media (min-width: 640px) {
+    padding: 24px;
+  }
 }
