@@ -57,6 +57,11 @@ repos:
         exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
     -   id: regression-gate
         stages: [pre-push]
+    -   id: no-hardcoded-localhost
+        exclude: 'tests?/|\.test\.|\.spec\.'
+    -   id: adr-gate
+    -   id: dockerfile-no-latest
+    -   id: react-no-async-in-useeffect
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
 -   repo: https://github.com/AleksaC/hadolint-py
