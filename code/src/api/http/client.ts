@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { setupInterceptors } from './interceptors';
 
-// En dev, Vite proxifie /api → api:8000 (voir vite.config.ts).
-// En prod avec serve (sans proxy), VITE_API_URL est bakée au build.
-const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api';
+// VITE_API_URL must be set in .env.local for local dev (e.g. http://localhost:8000).
+// In production, it is set at build time.
+const BASE = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000') + '/api';
 
 export const http = axios.create({
   baseURL: BASE,
