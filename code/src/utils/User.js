@@ -1,5 +1,7 @@
 import { Cookies } from 'react-cookie'
 
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
 /**
  * User-related operations
  */
@@ -12,7 +14,7 @@ export class User {
         const cookies = new Cookies()
         const user_cookie = cookies.get("authentication")
         if (user_cookie && "token" in user_cookie) {
-            return fetch("/api/user/profile", {
+            return fetch(`${API_URL}/api/user/profile`, {
                 method: "POST",
                 headers: { 'X-Api-Auth-Token': user_cookie["token"] }
             })
@@ -31,7 +33,7 @@ export class User {
         const cookies = new Cookies()
         const user_cookie = cookies.get("authentication")
         if (user_cookie && "token" in user_cookie) {
-            return fetch("/api/user/profile", {
+            return fetch(`${API_URL}/api/user/profile`, {
                 method: "PUT",
                 headers: {
                     'X-Api-Auth-Token': user_cookie["token"],
