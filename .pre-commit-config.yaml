@@ -122,7 +122,7 @@ repos:
         files: ^code/.*\.(ts|tsx)$
         args: [--fix, --max-warnings=0, --config, code/eslint.config.js]
         additional_dependencies:
-        -   eslint@^9.15.0
+        -   eslint@^10.4.0
         -   '@eslint/js@^9.15.0'
         -   globals@^15.0.0
         -   '@typescript-eslint/eslint-plugin@^8.59.0'
