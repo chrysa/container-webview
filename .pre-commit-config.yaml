@@ -115,7 +115,7 @@ repos:
         -   prettier-plugin-organize-imports@^3.2.0
 
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.1
+    rev: v10.4.0
     hooks:
     -   id: eslint
         name: ESLint (TypeScript/React)
