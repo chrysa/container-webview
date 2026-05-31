@@ -127,7 +127,7 @@ export const useProjects = () =>
 | `alerts`    | `Alert`                                         | `useAlerts`                                   |
 | `lifecycle` | —                                               | `useServiceAction` (start/stop/restart/pause) |
 
----
+______________________________________________________________________
 
 ## Loading States (NON-NEGOTIABLE)
 
