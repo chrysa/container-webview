@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * Detects whether the backend API is reachable.
@@ -13,14 +13,14 @@ export function useBackendStatus(): boolean {
     const handleOnline = () => setIsBackendDown(false);
     const handleOffline = () => setIsBackendDown(true);
 
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event.type !== "updated") return;
+      if (event.type !== 'updated') return;
 
       const { state } = event.query;
-      if (state.status !== "error") return;
+      if (state.status !== 'error') return;
 
       const error = state.error as {
         code?: string;
@@ -30,12 +30,12 @@ export function useBackendStatus(): boolean {
 
       const isNetworkError =
         !navigator.onLine ||
-        error?.code === "ECONNREFUSED" ||
-        error?.code === "ENOTFOUND" ||
-        error?.name === "NetworkError" ||
-        error?.message?.toLowerCase().includes("network") ||
-        error?.message?.toLowerCase().includes("failed to fetch") ||
-        error?.message?.toLowerCase().includes("timeout");
+        error?.code === 'ECONNREFUSED' ||
+        error?.code === 'ENOTFOUND' ||
+        error?.name === 'NetworkError' ||
+        error?.message?.toLowerCase().includes('network') ||
+        error?.message?.toLowerCase().includes('failed to fetch') ||
+        error?.message?.toLowerCase().includes('timeout');
 
       if (isNetworkError) {
         setIsBackendDown(true);
@@ -43,8 +43,8 @@ export function useBackendStatus(): boolean {
     });
 
     return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
       unsubscribe();
     };
   }, [queryClient]);
