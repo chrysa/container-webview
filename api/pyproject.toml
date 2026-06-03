@@ -12,7 +12,7 @@ version = "1.0.0"
 description = "FastAPI backend for Docker Overview WebUI"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi==0.111.0",
+    "fastapi==0.136.3",
     "uvicorn[standard]==0.29.0",
     "docker==7.0.0",
     "pyyaml==6.0.3",
