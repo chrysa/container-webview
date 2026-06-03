@@ -30,3 +30,10 @@ graphify-out/
 
 # Local dev override
 docker-compose.override.yml
+
+# graphify (local knowledge graph — never commit)
+/graphify
+/sys
+.graphify_version
+graphify
+sys
