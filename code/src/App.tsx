@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, type RouteObject } from 'react-router-dom';
 import GlobalLoader from '@/components/loaders/GlobalLoader';
 import Layout from '@/components/layouts/Layout';
 import { ToastProvider } from '@/components/feedback/Toast';
@@ -19,34 +19,38 @@ function RequireAuth({ children }: Readonly<{ children: React.ReactNode }>) {
   return <>{children}</>;
 }
 
+// A data router is required because the layout consumes `useMatches()`
+// (breadcrumbs). `createBrowserRouter` provides the matches context that the
+// legacy `<BrowserRouter>` did not.
+const routes: RouteObject[] = [
+  { path: '/login', element: <Login /> },
+  {
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
+    children: [
+      { index: true, element: <Navigate to="/projects" replace /> },
+      { path: '/projects', element: <Projects /> },
+      { path: '/projects/:projectId/topology', element: <Topology /> },
+      { path: '/projects/:projectId/services', element: <Services /> },
+      { path: '/projects/:projectId/logs', element: <Logs /> },
+      { path: '/projects/:projectId/metrics', element: <Metrics /> },
+      { path: '/alerts', element: <Alerts /> },
+    ],
+  },
+  { path: '*', element: <NotFound /> },
+];
+
+const router = createBrowserRouter(routes);
+
 export default function App() {
   return (
     <ToastProvider>
-      <BrowserRouter>
-        <Suspense fallback={<GlobalLoader />}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-
-            <Route
-              element={
-                <RequireAuth>
-                  <Layout />
-                </RequireAuth>
-              }
-            >
-              <Route index element={<Navigate to="/projects" replace />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/:projectId/topology" element={<Topology />} />
-              <Route path="/projects/:projectId/services" element={<Services />} />
-              <Route path="/projects/:projectId/logs" element={<Logs />} />
-              <Route path="/projects/:projectId/metrics" element={<Metrics />} />
-              <Route path="/alerts" element={<Alerts />} />
-            </Route>
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+      <Suspense fallback={<GlobalLoader />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </ToastProvider>
   );
 }
