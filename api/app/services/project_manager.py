@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from pydantic import BaseModel
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from app.config import settings
 

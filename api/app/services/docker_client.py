@@ -1,15 +1,16 @@
-import docker
-from docker import DockerClient  # type: ignore[attr-defined]
+from typing import Any
+
+from docker.client import from_env
 from docker.models.containers import Container
 
 
-_client: DockerClient | None = None
+_client: Any = None
 
 
-def get_docker_client() -> DockerClient:
+def get_docker_client() -> Any:
     global _client
     if _client is None:
-        _client = docker.from_env()  # type: ignore[attr-defined]
+        _client = from_env()
     return _client
 
 

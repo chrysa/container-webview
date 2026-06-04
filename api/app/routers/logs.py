@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 
+import docker.errors
 from fastapi import APIRouter
 from fastapi import HTTPException
 from fastapi import Query
@@ -49,9 +50,9 @@ async def stream_logs(
             await asyncio.sleep(0)  # yield control  # NOSONAR
     except WebSocketDisconnect:
         pass
-    except Exception as exc:  # noqa: BLE001 — unknown errors during log streaming
-        with contextlib.suppress(Exception):  # noqa: BLE001
+    except (docker.errors.DockerException, RuntimeError, OSError) as exc:
+        with contextlib.suppress(RuntimeError, WebSocketDisconnect):
             await websocket.send_text(f"[ERROR] {exc!s}")
     finally:
-        with contextlib.suppress(Exception):  # noqa: BLE001
+        with contextlib.suppress(RuntimeError, WebSocketDisconnect):
             await websocket.close()

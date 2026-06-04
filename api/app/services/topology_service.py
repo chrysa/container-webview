@@ -1,5 +1,6 @@
 import contextlib
 
+import docker.errors
 from pydantic import BaseModel
 
 from app.constants import ContainerState
@@ -72,7 +73,7 @@ class TopologyService:
     @staticmethod
     def _get_container_status(project_id: str, service_name: str) -> str:
         """Query Docker for the current container status of a service."""
-        with contextlib.suppress(Exception):  # noqa: BLE001 — Docker may be unavailable
+        with contextlib.suppress(docker.errors.DockerException, OSError):
             client = get_docker_client()
             for container in client.containers.list(all=True):
                 labels = container.labels

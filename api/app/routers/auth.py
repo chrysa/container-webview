@@ -10,6 +10,8 @@ from app.security import create_access_token
 from app.security import get_current_user
 
 
+_BEARER_TYPE: str = "bearer"
+
 router = APIRouter()
 
 try:
@@ -41,7 +43,7 @@ def _authenticate_ldap(username: str, password: str) -> bool:
             password,
         )
         return True
-    except Exception:  # noqa: BLE001 — ldap can throw many undocumented subtypes
+    except _ldap.LDAPError:
         return False
 
 
@@ -56,7 +58,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
             detail="Identifiants incorrects",
         )
     token = create_access_token({"sub": form_data.username})
-    return Token(access_token=token, token_type="bearer", username=form_data.username)  # noqa: S106  # nosec B106
+    return Token(access_token=token, token_type=_BEARER_TYPE, username=form_data.username)
 
 
 @router.get("/check")
