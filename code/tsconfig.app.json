@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "baseUrl": ".",
     "jsx": "react-jsx",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
@@ -12,7 +11,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "skipLibCheck": true,
     "strict": true,
