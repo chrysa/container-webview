@@ -19,7 +19,7 @@ api-format: ## run ruff formatter on backend code
 	@docker compose run --rm --no-deps api-test python -m ruff format app/
 
 api-typecheck: ## run mypy type checking on backend code
-	@docker compose run --rm api python -m mypy app/
+	@docker compose run --rm --no-deps api-test python -m mypy app/
 
 e2e: ## run E2E Playwright tests (requires prod stack running)
 	@docker compose --profile e2e run --rm e2e
