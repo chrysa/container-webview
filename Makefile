@@ -1,4 +1,5 @@
 #!make
+# makefile-tier: fullstack
 ifneq (,)
 	$(error This Makefile requires GNU Make)
 endif
@@ -84,3 +85,6 @@ clean: ## Clean build artifacts
 
 pre-commit: ## Run pre-commit hooks on all files
 	pre-commit run --all-files
+
+# ─── CI gate ────────────────────────────────────
+ci: lint typecheck test ## Run the full local gate (lint + typecheck + test)
