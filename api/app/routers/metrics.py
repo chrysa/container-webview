@@ -4,6 +4,8 @@ from fastapi import Depends
 from fastapi import HTTPException
 from pydantic import BaseModel
 
+from app import demo
+from app.config import settings
 from app.security import get_current_user
 from app.services.docker_client import get_all_containers_for_project
 from app.services.project_manager import load_project
@@ -47,6 +49,11 @@ _METRICS_RESPONSES: dict[int | str, dict] = {404: {"description": "Project not f
 
 @router.get("/{project_id}/metrics", response_model=list[ServiceMetrics], responses=_METRICS_RESPONSES)
 def get_metrics(project_id: str, _: dict = Depends(get_current_user)) -> list[ServiceMetrics]:
+    if settings.demo_mode:
+        if not demo.load_project(project_id):
+            raise HTTPException(status_code=404, detail="Projet introuvable")
+        return [ServiceMetrics(**metrics) for metrics in demo.project_metrics(project_id)]
+
     project = load_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Projet introuvable")

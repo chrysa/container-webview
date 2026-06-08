@@ -12,11 +12,12 @@ class TestPing:
 
         Given: The FastAPI application is running
         When: GET /api
-        Then: Should return 200 with {"status": "ok"}
+        Then: Should return 200 with status "ok" and the demo_mode flag
         """
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             response = await client.get("/api")
 
         assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
         data = response.json()
-        assert data == {"status": "ok"}, f"Expected ok payload but got {data=}"
+        assert data["status"] == "ok", f"Expected ok payload but got {data=}"
+        assert data["demo_mode"] is False, f"Demo mode must default to off but got {data=}"

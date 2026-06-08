@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     # Chemin monté où sont stockés les docker-compose des projets
     projects_path: str = "/projects"
 
+    # Demo mode — serve fixture data instead of reading the real Docker socket
+    # and projects directory, and accept the built-in `demo`/`demo` credentials.
+    # OFF by default; never enable in production. An amber "DEMO" banner is shown
+    # in the UI while enabled so the app is fully explorable without real access.
+    demo_mode: bool = False
+
     class Config:
         env_file = ".env"
 

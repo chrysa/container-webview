@@ -4,6 +4,8 @@ from fastapi import Depends
 from fastapi import HTTPException
 from pydantic import BaseModel
 
+from app import demo
+from app.config import settings
 from app.security import get_current_user
 from app.services.docker_client import get_container_for_service
 from app.services.project_manager import load_project
@@ -26,6 +28,17 @@ _CONTAINER_ACTIONS: dict[str, str] = {
     "kill": "kill",
 }
 
+# Container status reflected back after a successful action, used in demo mode
+# where no real Docker call is made.
+_DEMO_ACTION_RESULT: dict[str, str] = {
+    "start": "running",
+    "restart": "running",
+    "unpause": "running",
+    "stop": "exited",
+    "kill": "exited",
+    "pause": "paused",
+}
+
 
 class ActionResponse(BaseModel):
     service: str
@@ -34,7 +47,26 @@ class ActionResponse(BaseModel):
     message: str = ""
 
 
+def _perform_demo_action(project_id: str, service_name: str, action: str) -> ActionResponse:
+    demo_project = demo.load_project(project_id)
+    if not demo_project:
+        raise HTTPException(status_code=404, detail="Projet introuvable")
+    if not any(s["name"] == service_name for s in demo_project["services"]):
+        raise HTTPException(status_code=404, detail=f"Service '{service_name}' introuvable")
+    if action not in _CONTAINER_ACTIONS:
+        raise HTTPException(status_code=400, detail=f"Action inconnue : {action}")
+    return ActionResponse(
+        service=service_name,
+        action=action,
+        status=_DEMO_ACTION_RESULT.get(action, "running"),
+        message="Demo mode — no real container was changed.",
+    )
+
+
 def _perform_action(project_id: str, service_name: str, action: str) -> ActionResponse:
+    if settings.demo_mode:
+        return _perform_demo_action(project_id, service_name, action)
+
     project = load_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Projet introuvable")

@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider, Navigate, type RouteObject } from 
 import GlobalLoader from '@/components/loaders/GlobalLoader';
 import Layout from '@/components/layouts/Layout';
 import { ToastProvider } from '@/components/feedback/Toast';
+import { DemoBanner } from '@/components/ui/DemoBanner';
 import { isAuthenticated } from '@/utils/auth';
 
 const Login = lazy(() => import('@/pages/Login'));
@@ -48,6 +49,7 @@ const router = createBrowserRouter(routes);
 export default function App() {
   return (
     <ToastProvider>
+      <DemoBanner />
       <Suspense fallback={<GlobalLoader />}>
         <RouterProvider router={router} />
       </Suspense>
