@@ -12,7 +12,7 @@ repos:
       - id: fix-spaces
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-merge-conflict
         name: Check for merge conflicts
@@ -81,7 +81,7 @@ repos:
 
     # ─── Python (API — FastAPI) ────────────────────────────────────────────────
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.12
+    rev: v0.15.16
     hooks:
       - id: ruff-format
         name: Format Python (ruff)
@@ -92,7 +92,7 @@ repos:
         files: ^api/.*\.py$
 
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
       - id: python-no-eval
       - id: python-no-log-warn
@@ -118,7 +118,7 @@ repos:
           - prettier-plugin-organize-imports@^3.2.0
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.4.0
+    rev: v10.4.1
     hooks:
       - id: eslint
         name: ESLint (TypeScript/React)
@@ -137,7 +137,7 @@ repos:
 
     # ─── YAML ─────────────────────────────────────────────────────────────────
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.9.0
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
@@ -174,21 +174,21 @@ repos:
 
     # ─── GitHub Actions ───────────────────────────────────────────────────────
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.9
+    rev: v1.7.12
     hooks:
       - id: actionlint
         name: Lint GitHub Actions workflows
 
     # ─── Security ─────────────────────────────────────────────────────────────
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.1
+    rev: v8.30.0
     hooks:
       - id: gitleaks
         name: Detect secrets
 
     # ─── Python type check ────────────────────────────────────────────────────
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.2
+    rev: v2.1.0
     hooks:
       - id: mypy
         files: ^api/
