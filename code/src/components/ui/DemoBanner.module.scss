@@ -1,0 +1,25 @@
+.banner {
+  // Amber on dark text — contrast ratio ~9:1, well above WCAG 2.1 AA.
+  background-color: #f59e0b;
+  color: #1f1300;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  .icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .message {
+    font-weight: 500;
+  }
+}

@@ -5,6 +5,7 @@ from fastapi import status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
+from app import demo
 from app.config import settings
 from app.security import create_access_token
 from app.security import get_current_user
@@ -24,6 +25,11 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     username: str
+
+
+def _authenticate_demo(username: str, password: str) -> bool:
+    """Accept the built-in demo credentials only while demo mode is enabled."""
+    return settings.demo_mode and username == demo.DEMO_USERNAME and password == demo.DEMO_PASSWORD
 
 
 def _authenticate_local(username: str, password: str) -> bool:
@@ -47,8 +53,10 @@ def _authenticate_ldap(username: str, password: str) -> bool:
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    authenticated = _authenticate_ldap(form_data.username, form_data.password) or _authenticate_local(
-        form_data.username, form_data.password
+    authenticated = (
+        _authenticate_demo(form_data.username, form_data.password)
+        or _authenticate_ldap(form_data.username, form_data.password)
+        or _authenticate_local(form_data.username, form_data.password)
     )
     if not authenticated:
         raise HTTPException(
