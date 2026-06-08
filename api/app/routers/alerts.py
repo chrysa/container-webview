@@ -7,6 +7,8 @@ from fastapi import APIRouter
 from fastapi import Depends
 from pydantic import BaseModel
 
+from app import demo
+from app.config import settings
 from app.security import get_current_user
 from app.services.docker_client import get_docker_client
 
@@ -90,4 +92,6 @@ def _container_alerts() -> list[Alert]:
 
 @router.get("", response_model=list[Alert])
 def get_alerts(_: dict = Depends(get_current_user)) -> list[Alert]:
+    if settings.demo_mode:
+        return [Alert(**alert) for alert in demo.alerts()]
     return _container_alerts()
