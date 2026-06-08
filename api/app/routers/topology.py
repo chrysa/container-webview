@@ -6,8 +6,11 @@ from fastapi import Depends
 from fastapi import HTTPException
 from pydantic import BaseModel
 
+from app import demo
+from app.config import settings
 from app.security import get_current_user
 from app.services.docker_client import get_docker_client
+from app.services.project_manager import ProjectModel
 from app.services.project_manager import load_project
 
 
@@ -52,6 +55,8 @@ class TopologyGraph(BaseModel):
 
 
 def _get_container_status(project_id: str, service_name: str) -> str:
+    if settings.demo_mode:
+        return demo.service_status(project_id, service_name)
     with contextlib.suppress(DockerException):
         client = get_docker_client()
         for container in client.containers.list(all=True):
@@ -69,7 +74,11 @@ _TOPOLOGY_RESPONSES: dict[int | str, dict] = {404: {"description": "Project not 
 
 @router.get("/{project_id}/topology", response_model=TopologyGraph, responses=_TOPOLOGY_RESPONSES)
 def get_topology(project_id: str, _: dict = Depends(get_current_user)) -> TopologyGraph:
-    project = load_project(project_id)
+    if settings.demo_mode:
+        demo_project = demo.load_project(project_id)
+        project = ProjectModel(**demo_project) if demo_project else None
+    else:
+        project = load_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Projet introuvable")
 

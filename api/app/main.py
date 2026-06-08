@@ -5,6 +5,7 @@ from app.config import settings
 from app.observability import init_sentry
 from app.routers import alerts
 from app.routers import auth
+from app.routers import config
 from app.routers import lifecycle
 from app.routers import logs
 from app.routers import metrics
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(config.router, prefix="/api/config", tags=["config"])
 app.include_router(projects.router, prefix=_API_PROJECTS_PREFIX, tags=["projects"])
 app.include_router(topology.router, prefix=_API_PROJECTS_PREFIX, tags=["topology"])
 app.include_router(lifecycle.router, prefix=_API_PROJECTS_PREFIX, tags=["lifecycle"])
@@ -35,5 +37,5 @@ app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
 
 
 @app.get("/api")
-def ping() -> dict[str, str]:
-    return {"status": "ok"}
+def ping() -> dict[str, object]:
+    return {"status": "ok", "demo_mode": settings.demo_mode}
