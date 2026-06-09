@@ -1,225 +1,171 @@
-
 # Docker Overview WebUI
 
-Interface web pour gérer et visualiser vos projets Docker Compose — topologie interactive, métriques en temps réel, alertes et gestion du cycle de vie des services.
+A web dashboard to monitor and operate your Docker Compose projects from one place — interactive topology, live metrics, anomaly alerts, streaming logs, and one-click service lifecycle control.
 
 ![Preview](docs/screenshots/preview.png)
 
----
+## Who it's for
 
-## Table des matières
+Developers and operators running several Docker Compose stacks on a single host who want a visual cockpit instead of juggling `docker compose ps/logs/restart` across directories. It reads the host Docker socket (read-only) and auto-discovers every Compose project under a directory you mount.
 
-- [Docker Overview WebUI](#docker-overview-webui)
-    - [Table des matières](#table-des-matières)
-    - [Fonctionnalités](#fonctionnalités)
-    - [Architecture](#architecture)
-    - [Prérequis](#prérequis)
-    - [Démarrage rapide](#démarrage-rapide)
-    - [Configuration](#configuration)
-    - [Endpoints API](#endpoints-api)
-    - [Commandes Make](#commandes-make)
-    - [Tests](#tests)
-    - [Roadmap](#roadmap)
+## Features
 
+- **Project overview** — auto-discovers and lists every Compose project found in the mounted projects directory.
+- **Interactive topology** — graph of a project's services and networks, rendered with React Flow.
+- **Live metrics** — per-container CPU, memory, and network usage, charted in real time.
+- **Anomaly alerts** — automatically surfaces containers that are exited, restarting, or unhealthy.
+- **Service lifecycle** — start / stop / restart / pause / unpause any service straight from the UI.
+- **Streaming logs** — tail a service's logs live in an in-browser terminal (xterm.js over WebSocket).
+- **Authentication** — JWT Bearer with a built-in local admin and optional LDAP.
 
----
+## Screenshots
 
-## Fonctionnalités
+![Preview](docs/screenshots/preview.png)
 
+## Tech stack
 
-- **Vue d'ensemble** — liste tous les projets Compose détectés dans le répertoire configuré
-- **Topologie** — graphe interactif des services et réseaux d'un projet
-- **Métriques** — CPU, mémoire et réseau en temps réel par conteneur
-- **Alertes** — détection automatique des conteneurs en anomalie (exited, restarting, unhealthy)
-- **Cycle de vie** — start / stop / restart / pause / unpause depuis l'interface
-- **Authentification** — JWT Bearer, fallback local + LDAP optionnel
+- **Backend** — FastAPI (Python 3.12), pydantic-settings, talks to Docker via the host socket.
+- **Frontend** — React 19 + TypeScript, Vite 8, TanStack Query, React Router 7, React Flow, Recharts, xterm.js.
+- **Packaging** — Docker Compose (production, dev, test, and e2e profiles).
 
+## Prerequisites
 
----
+- Docker >= 24 and Docker Compose >= 2.20
+- GNU Make
+- A local directory containing your Compose project sub-folders
 
-
-## Architecture
-
-```
-docker-overview-webui/
-├── api/                        # Backend FastAPI (Python 3.12)
-│   ├── app/
-│   │   ├── config.py           # Configuration via pydantic-settings
-│   │   ├── constants.py        # Constantes (StrEnum, Final)
-│   │   ├── main.py             # App FastAPI + CORS + routeurs
-│   │   ├── security.py         # Service JWT
-│   │   ├── routers/            # Contrôleurs HTTP (minces)
-│   │   │   ├── auth.py         # POST /api/auth/login, GET /api/auth/check
-│   │   │   ├── projects.py     # GET /api/projects[/{id}]
-│   │   │   ├── topology.py     # GET /api/projects/{id}/topology
-│   │   │   ├── lifecycle.py    # POST /api/projects/{id}/services/{svc}/{action}
-│   │   │   ├── metrics.py      # GET /api/projects/{id}/metrics
-│   │   │   ├── alerts.py       # GET /api/alerts[/project/{id}]
-│   │   │   └── logs.py         # WebSocket /api/projects/{id}/services/{svc}/logs
-│   │   ├── services/           # Logique métier
-│   │   │   ├── auth_service.py
-│   │   │   ├── docker_client.py
-│   │   │   ├── project_manager.py
-│   │   │   ├── lifecycle_service.py
-│   │   │   ├── metrics_service.py
-│   │   │   ├── alerts_service.py
-│   │   │   └── topology_service.py
-│   │   └── tests/              # pytest — services + routers
-│   ├── pyproject.toml          # Dépendances + ruff + mypy + pytest + coverage
-│   └── Dockerfile              # Stages: base / dev / test / production
-├── code/                       # Frontend React 18 + Vite + TypeScript
-│   └── src/
-├── docker-compose.yml          # Stack de développement
-├── Makefile                    # Cibles make
-└── .env.example                # Variables d'environnement de référence
-```
-
----
-
-## Prérequis
-
-- Docker ≥ 24
-- Docker Compose ≥ 2.20
-- Make (GNU)
-- Un répertoire local contenant des sous-dossiers de projets Compose
-
----
-
-## Démarrage rapide
+## Quick start
 
 ```bash
-# 1. Cloner le dépôt
-git clone https://github.com/chrysa/container-webview.git
+# 1. Clone
+git clone git@github.com:chrysa/container-webview.git
 cd container-webview
 
-# 2. Copier et adapter la configuration
+# 2. Configure
 cp .env.example .env
-# Éditer .env : SECRET_KEY, ADMIN_USERNAME, ADMIN_PASSWORD, PROJECTS_PATH
+# Edit .env: SECRET_KEY, ADMIN_USERNAME, ADMIN_PASSWORD, PROJECTS_PATH
 
-# 3. Créer un répertoire de projets (ou pointer vers le vôtre)
-mkdir -p data/projects
+# 3. Point PROJECTS_PATH at the directory holding your Compose projects
+#    (defaults to /opt/projects)
 
-# 4. Lancer le stack de développement
-docker compose up --build
-
-# 5. Accéder à l'interface
-#   Frontend : http://localhost:3000
-#   API docs : http://localhost:8000/docs
+# 4. Start the production stack
+make prod-up          # or: docker compose up --detach --wait
 ```
 
-Identifiants par défaut si non configurés : `admin` / `admin`.
+Then open:
 
----
+- **UI**: http://localhost:9103
+- **API docs (Swagger)**: http://localhost:9003/docs
+
+Default credentials if none are configured: `admin` / `admin` (change them).
+
+### Development mode (hot reload)
+
+```bash
+make dev-up           # Vite frontend on :5173, API on :8000 (--reload)
+```
 
 ## Configuration
 
-Toutes les variables sont documentées dans [.env.example](.env.example).
+All variables are documented in [.env.example](.env.example).
 
-| Variable | Défaut | Description |
+| Variable | Default | Description |
 |---|---|---|
-| `SECRET_KEY` | `change-me-in-production` | Clé de signature JWT — **à changer en production** |
-| `ADMIN_USERNAME` | `admin` | Identifiant admin local |
-| `ADMIN_PASSWORD` | `admin` | Mot de passe admin local — **à changer en production** |
-| `PROJECTS_PATH` | `/projects` | Chemin dans le conteneur vers les projets Compose |
-| `LDAP_SERVER` | _(vide)_ | URL LDAP (`ldap://host:389`) — vide = désactivé |
-| `LDAP_BASE_DN` | _(vide)_ | Base DN LDAP |
-| `FRONTEND_PORT` | `3000` | Port exposé pour le frontend |
-| `VITE_API_URL` | `http://localhost:8000` | URL de l'API vue depuis le navigateur |
+| `SECRET_KEY` | `change-me-in-production` | JWT signing key — **change in production** |
+| `ADMIN_USERNAME` | `admin` | Local admin username |
+| `ADMIN_PASSWORD` | `admin` | Local admin password — **change in production** |
+| `PROJECTS_PATH` | `/opt/projects` | Host directory containing your Compose projects (mounted read-only at `/projects`) |
+| `LDAP_SERVER` | _(empty)_ | LDAP URL (`ldap://host:389`) — empty disables LDAP |
+| `LDAP_BASE_DN` | _(empty)_ | LDAP base DN |
+| `VITE_API_URL` | `http://localhost:9003` | API URL as seen by the browser, baked at build time. Leave empty if a reverse proxy serves `/api`. |
+| `SENTRY_DSN` | _(empty)_ | Optional Sentry DSN for backend error reporting |
 
-Le volume `${PROJECTS_PATH:-./data/projects}:/projects:ro` dans `docker-compose.yml` monte votre répertoire local de projets Compose.
+The Compose stack mounts `${PROJECTS_PATH}:/projects:ro` and `/var/run/docker.sock` (read-only) into the API container.
 
----
+### Ports
 
-## Endpoints API
-
-Documentation interactive disponible sur `http://localhost:8000/docs` (Swagger UI).
-
-| Méthode | Chemin | Description |
+| Service | Host port | Notes |
 |---|---|---|
-| `POST` | `/api/auth/login` | Authentification — retourne un JWT Bearer |
-| `GET` | `/api/auth/check` | Valide le token courant |
-| `GET` | `/api/projects` | Liste tous les projets Compose détectés |
-| `GET` | `/api/projects/{id}` | Détail d'un projet |
-| `GET` | `/api/projects/{id}/topology` | Graphe de topologie du projet |
-| `GET` | `/api/projects/{id}/metrics` | Métriques CPU/RAM/réseau de tous les conteneurs |
-| `POST` | `/api/projects/{id}/services/{svc}/start` | Démarrer un service |
-| `POST` | `/api/projects/{id}/services/{svc}/stop` | Arrêter un service |
-| `POST` | `/api/projects/{id}/services/{svc}/restart` | Redémarrer un service |
-| `POST` | `/api/projects/{id}/services/{svc}/pause` | Mettre en pause |
-| `POST` | `/api/projects/{id}/services/{svc}/unpause` | Reprendre depuis la pause |
-| `GET` | `/api/alerts` | Toutes les alertes actives |
-| `GET` | `/api/alerts/project/{id}` | Alertes filtrées par projet |
-| `WS` | `/api/projects/{id}/services/{svc}/logs` | Logs en streaming (WebSocket) |
+| Frontend (production) | `9103` | `make prod-up` |
+| API (production) | `9003` | Swagger at `9003/docs` |
+| Frontend (dev, Vite) | `5173` | `make dev-up` |
+| API (dev) | `8000` | `make dev-up` |
 
----
+## API endpoints
 
-## Commandes Make
+Interactive docs at `http://localhost:9003/docs` (Swagger UI).
 
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api` | Health/ping |
+| `POST` | `/api/auth/login` | Authenticate — returns a JWT Bearer token |
+| `GET` | `/api/auth/check` | Validate the current token |
+| `GET` | `/api/projects` | List all discovered Compose projects |
+| `GET` | `/api/projects/{id}` | Project detail |
+| `GET` | `/api/projects/{id}/topology` | Topology graph for a project |
+| `GET` | `/api/projects/{id}/metrics` | CPU / memory / network metrics for the project's containers |
+| `POST` | `/api/projects/{id}/services/{svc}/start` | Start a service |
+| `POST` | `/api/projects/{id}/services/{svc}/stop` | Stop a service |
+| `POST` | `/api/projects/{id}/services/{svc}/restart` | Restart a service |
+| `POST` | `/api/projects/{id}/services/{svc}/pause` | Pause a service |
+| `POST` | `/api/projects/{id}/services/{svc}/unpause` | Unpause a service |
+| `GET` | `/api/alerts` | All active alerts |
+| `WS` | `/api/projects/{id}/services/{svc}/logs` | Stream service logs (WebSocket) |
+
+## Make commands
+
+```bash
+make help              # List all available targets
+
+# Lifecycle
+make prod-up           # Start production stack (detached, waits for health)
+make prod-down         # Stop production stack
+make dev-up            # Dev mode: Vite (5173) + API (8000)
+make docker-build      # Build production images
+make docker-logs SERVICE=api   # Tail a service's logs
+
+# Quality (backend)
+make api-tests         # Run backend tests
+make api-tests-cov     # Tests + terminal coverage report
+make api-tests-html    # Tests + HTML coverage report (htmlcov/)
+make api-lint          # Ruff linter
+make api-format        # Ruff formatter
+make api-typecheck     # mypy
+
+# Quality (frontend)
+make node-test         # Vitest unit tests
+make node-lint         # ESLint
+make node-build        # Production build
+
+make pre-commit        # Run all pre-commit hooks
 ```
-make docker-build           # Rebuild les images sans cache
-make docker-up              # Lance le stack (foreground)
-make docker-up-detach       # Lance le stack en arrière-plan
-make docker-stop            # Arrête les services
-
-make api-tests              # Lance les tests backend
-make api-tests-cov          # Tests + rapport de couverture terminal
-make api-tests-html         # Tests + rapport HTML (htmlcov/)
-make api-lint               # Ruff linter
-make api-format             # Ruff formatter
-make api-typecheck          # mypy
-
-make pre-commit             # Lance tous les hooks pre-commit
-make ci-run-local           # Lance le pipeline CI localement
-```
-
----
 
 ## Tests
 
-Les tests backend utilisent **pytest** avec couverture ≥ 80 %.
+Backend tests use **pytest** (coverage target enforced via the quality gate). Frontend uses **Vitest**; end-to-end tests use **Playwright** (`docker compose --profile e2e up`).
 
 ```bash
-# Lancer tous les tests (Docker)
-make api-tests
-
-# Avec rapport de couverture
-make api-tests-cov
-
-# Avec rapport HTML
-make api-tests-html
+make api-tests         # backend
+make node-test         # frontend
 ```
 
-Structure des tests :
+## Documentation
 
-```
-api/app/tests/
-├── conftest.py                  # Fixtures partagées (fake, api_client, auth_headers…)
-├── test_main.py                 # Endpoint /api (ping)
-├── services/
-│   ├── test_docker_client.py
-│   ├── test_lifecycle_service.py
-│   ├── test_alerts_service.py
-│   ├── test_metrics_service.py
-│   ├── test_project_manager.py
-│   ├── test_auth_service.py
-│   └── test_topology_service.py
-└── routers/
-    ├── test_auth.py
-    ├── test_projects.py
-    ├── test_lifecycle.py
-    ├── test_metrics.py
-    ├── test_alerts.py
-    └── test_topology.py
-```
-
----
+- [.env.example](.env.example) — all configuration variables
+- [CHANGELOG.md](CHANGELOG.md) — release history (auto-generated via git cliff)
+- [DECISIONS.md](DECISIONS.md) — architecture decisions
+- API reference — Swagger UI at `http://localhost:9003/docs`
 
 ## Roadmap
 
-- [ ] Gestion dynamique des projets depuis le graphe
-- [ ] Création/modification de services via l'interface
-- [ ] Export du docker-compose (global, par service, dev/prod)
-- [ ] Accès aux logs depuis l'interface (WebSocket)
-- [ ] Notifications navigateur sur changement d'état des conteneurs
-- [ ] Authentification multi-utilisateurs
-- [ ] Extension Docker Desktop
+- [ ] Manage projects/services (create, edit) from the UI
+- [ ] Export docker-compose (global, per-service, dev/prod)
+- [ ] Browser notifications on container state changes
+- [ ] Multi-user authentication
+- [ ] Docker Desktop extension
+
+## License
+
+See repository for license details.
+</content>
+</invoke>
