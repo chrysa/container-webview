@@ -5,8 +5,9 @@
   gap: 6px;
   padding: 12px 14px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   min-width: 160px;
   font-size: 12px;
 }

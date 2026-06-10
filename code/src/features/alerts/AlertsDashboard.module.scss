@@ -23,15 +23,15 @@
   }
 
   &.critical {
-    color: #ef4444;
+    color: var(--status-exited);
     border-color: rgba(239, 68, 68, 0.3);
   }
   &.warning {
-    color: #f59e0b;
+    color: var(--status-paused);
     border-color: rgba(245, 158, 11, 0.3);
   }
   &.info {
-    color: #3b82f6;
+    color: var(--primary);
     border-color: rgba(59, 130, 246, 0.3);
   }
 }
@@ -50,7 +50,7 @@
   background: var(--bg-secondary);
 
   &.critical {
-    border-left: 3px solid #ef4444;
+    border-left: var(--border-width) solid var(--status-exited);
     background: rgba(239, 68, 68, 0.05);
   }
   &.warning {

@@ -1,7 +1,7 @@
 .banner {
   // Amber on dark text — contrast ratio ~9:1, well above WCAG 2.1 AA.
-  background-color: #f59e0b;
-  color: #1f1300;
+  background-color: var(--status-paused);
+  color: var(--accent-ink);
   padding: 8px 16px;
   text-align: center;
   font-size: 14px;
