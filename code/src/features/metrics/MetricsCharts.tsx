@@ -42,7 +42,7 @@ export default function MetricsCharts({ projectId }: Readonly<Props>) {
           <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
             <XAxis dataKey="service" tick={{ fontSize: 11 }} />
             <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-            <Tooltip formatter={(v: number) => [`${v.toFixed(2)}%`, 'CPU']} />
+            <Tooltip formatter={(value) => [`${Number(value).toFixed(2)}%`, 'CPU']} />
             <Bar dataKey="cpu_percent" radius={[4, 4, 0, 0]}>
               {data.map((entry) => (
                 <Cell key={entry.service} fill={getStatusColor(entry.status)} />
@@ -59,7 +59,7 @@ export default function MetricsCharts({ projectId }: Readonly<Props>) {
           <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
             <XAxis dataKey="service" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
-            <Tooltip formatter={(v: number) => [`${v.toFixed(0)} MB`, 'RAM']} />
+            <Tooltip formatter={(value) => [`${Number(value).toFixed(0)} MB`, 'RAM']} />
             <Legend />
             <Bar dataKey="mem_usage_mb" name="Utilisé" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             <Bar dataKey="mem_limit_mb" name="Limite" fill="#64748b" radius={[4, 4, 0, 0]} />
