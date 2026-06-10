@@ -5,12 +5,8 @@
 
 body {
   margin: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    sans-serif;
+  /* Neon Brutalist: mono-forward UI (fonts loaded via index.html). */
+  font-family: var(--font-mono);
   background: var(--bg);
   color: var(--text);
   transition:
@@ -18,16 +14,37 @@ body {
     color 0.2s ease;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
 * {
   box-sizing: border-box;
 }
 
+:focus-visible {
+  outline: var(--border-width) solid var(--primary);
+  outline-offset: 2px;
+}
+
 ::selection {
   background: var(--primary);
-  color: white;
+  color: var(--accent-ink);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

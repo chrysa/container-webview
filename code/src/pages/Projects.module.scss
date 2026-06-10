@@ -28,7 +28,7 @@
 
   &:hover {
     border-color: var(--primary);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+    box-shadow: var(--shadow-md);
   }
 }
 

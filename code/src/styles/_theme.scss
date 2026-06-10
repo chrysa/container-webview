@@ -1,69 +1,80 @@
+/* chrysa "Neon Brutalist" palette (container-webview accent = cyan).
+   Token names are preserved so every *.module.scss inherits the new look.
+   Light is the :root default (existing toggle); dark is canonical per spec —
+   both meet WCAG AA. Accent is used as a block with --accent-ink on top. */
+
 /* LIGHT THEME (default) */
 :root {
-  --bg: #f0f2f5;
+  --bg: #fafafa;
   --bg-secondary: #ffffff;
-  --header-bg: #1e293b;
-  --sidebar-bg: #0f172a;
+  --header-bg: #0e0e10;
+  --sidebar-bg: #0e0e10;
 
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --text-inverse: #f8fafc;
+  --text: #0e0e10;
+  --text-muted: #52525b;
+  --text-inverse: #fafafa;
 
-  --border: #e2e8f0;
-  --border-strong: #94a3b8;
+  --border: #0e0e10;
+  --border-strong: #0e0e10;
+  --grid: #d4d4d8;
 
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
+  --primary: #0891b2;
+  --primary-hover: #06748f;
+  --accent-ink: #ffffff;
 
-  --status-running: #22c55e;
-  --status-exited: #ef4444;
-  --status-paused: #f59e0b;
-  --status-unknown: #94a3b8;
-  --status-restarting: #8b5cf6;
+  --status-running: #15803d;
+  --status-exited: #dc2626;
+  --status-paused: #b45309;
+  --status-unknown: #52525b;
+  --status-restarting: #7c3aed;
 
-  --surface-hover: rgba(0, 0, 0, 0.05);
+  --surface-hover: rgba(0, 0, 0, 0.06);
 
   --white: #ffffff;
-  --text-nav-hover: rgba(255, 255, 255, 0.9);
-  --color-danger: #ef4444;
+  --text-nav-hover: rgba(255, 255, 255, 0.92);
+  --color-danger: #dc2626;
 
-  --skeleton-base: #e2e8f0;
-  --skeleton-highlight: #f1f5f9;
+  --shadow-color: #0e0e10;
+  --skeleton-base: #e4e4e7;
+  --skeleton-highlight: #f4f4f5;
 
   --z-sidebar: 50;
   --z-header: 100;
   --z-overlay: 200;
 }
 
-/* DARK THEME */
+/* DARK THEME (canonical) */
 html.dark {
-  --bg: #0f172a;
-  --bg-secondary: #1e293b;
-  --header-bg: #0f172a;
-  --sidebar-bg: #020617;
+  --bg: #0e0e10;
+  --bg-secondary: #18181b;
+  --header-bg: #0e0e10;
+  --sidebar-bg: #18181b;
 
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --text-inverse: #1e293b;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-inverse: #0e0e10;
 
-  --border: #334155;
-  --border-strong: #475569;
+  --border: #fafafa;
+  --border-strong: #fafafa;
+  --grid: #3f3f46;
 
-  --primary: #60a5fa;
-  --primary-hover: #3b82f6;
+  --primary: #00e5ff;
+  --primary-hover: #34edff;
+  --accent-ink: #0e0e10;
 
-  --status-running: #4ade80;
-  --status-exited: #f87171;
+  --status-running: #22c55e;
+  --status-exited: #ff4d4d;
   --status-paused: #fbbf24;
-  --status-unknown: #64748b;
+  --status-unknown: #a1a1aa;
   --status-restarting: #a78bfa;
 
-  --surface-hover: rgba(255, 255, 255, 0.05);
+  --surface-hover: rgba(255, 255, 255, 0.06);
 
   --white: #ffffff;
-  --text-nav-hover: rgba(255, 255, 255, 0.9);
-  --color-danger: #f87171;
+  --text-nav-hover: rgba(255, 255, 255, 0.92);
+  --color-danger: #ff4d4d;
 
-  --skeleton-base: #1e293b;
-  --skeleton-highlight: #334155;
+  --shadow-color: #000000;
+  --skeleton-base: #18181b;
+  --skeleton-highlight: #242428;
 }
