@@ -5,8 +5,8 @@
 
 body {
   margin: 0;
-  /* Neon Brutalist: mono-forward UI (fonts loaded via index.html). */
-  font-family: var(--font-mono);
+  /* Console: readable sans body; mono reserved for data (fonts via index.html). */
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
   transition:
