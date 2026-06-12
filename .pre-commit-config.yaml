@@ -197,7 +197,7 @@ repos:
           - "pydantic>=2.13.4"
           - "pydantic-settings>=2.14.1"
           - "fastapi>=0.136.3"
-          - "sqlalchemy[asyncio]>=2.0"
+          - "sqlalchemy[asyncio]>=2.0.50"
 
     # ─── Commit message ───────────────────────────────────────────────────────
   - repo: https://github.com/compilerla/conventional-pre-commit
