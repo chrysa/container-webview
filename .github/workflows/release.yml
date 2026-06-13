@@ -12,5 +12,8 @@ on:
 jobs:
     call:
         uses: chrysa/github-actions/.github/workflows/release.yml@main
-        secrets:
-            RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        # The reusable workflow does not declare RELEASE_TOKEN in its
+        # `workflow_call.secrets`, so passing it explicitly caused a
+        # startup_failure ("workflow file issue"). Inherit instead: the callee
+        # reads `secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN`.
+        secrets: inherit

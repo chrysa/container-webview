@@ -32,9 +32,10 @@ repos:
         name: Fix end of files
       - id: mixed-line-ending
         args: [--fix=lf]
-      - id: pretty-format-json
-        args: [--indent=4, --autofix]
-        exclude: ^code/
+      # NOTE: JSON formatting/sorting is owned by `json-sorter` (chrysa/pre-commit-tools,
+      # 2-space indent, unicode-preserving). The generic `pretty-format-json` hook is
+      # intentionally omitted: it used 4-space indent + ascii-escaping, which oscillated
+      # against json-sorter on every config JSON and kept the pre-commit job red.
       - id: trailing-whitespace
         name: Trim trailing whitespace
       - id: no-commit-to-branch
@@ -66,6 +67,9 @@ repos:
 
     # ─── Dockerfile ───────────────────────────────────────────────────────────
       - id: json-sorter
+        # `code/` JSON (tsconfig, etc.) is formatted by Prettier; keep json-sorter
+        # off it to avoid a sort-vs-format oscillation.
+        exclude: ^code/
       - id: env-file-check
       - id: env-example-sync
   - repo: https://github.com/AleksaC/hadolint-py
@@ -157,7 +161,9 @@ repos:
     hooks:
       - id: markdownlint
         args: [-c, config-tools/.markdownlint.yml, --fix]
-        exclude: ^CLAUDE\.md$
+        # CLAUDE.md and the vendored `.claude/` agent/config dumps are tooling
+        # artifacts, not authored project docs — exclude from markdown linting.
+        exclude: ^(CLAUDE\.md$|\.claude/)
 
     # ─── Shell ────────────────────────────────────────────────────────────────
   - repo: https://github.com/lovesegfault/beautysh.git

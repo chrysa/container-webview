@@ -1,7 +1,7 @@
 ---
 # ─────────────────────────────────────────────────────────────────────────────
-# Quality — pre-commit checks sur chaque push
-# Exécute les hooks pre-commit (lint, format, sécurité) en CI.
+# Quality — pre-commit checks on every push.
+# Runs the pre-commit hooks (lint, format, security) in CI.
 # ─────────────────────────────────────────────────────────────────────────────
 name: Quality
 
@@ -22,10 +22,11 @@ jobs:
         steps:
             - uses: actions/checkout@v6.0.3
 
-            - name: Setup Python 3.12
+            - name: Setup Python 3.14
               uses: actions/setup-python@v6.2.0
               with:
-                  python-version: "3.13"
+                  # chrysa/pre-commit-tools requires Python >= 3.14; match ci.yml.
+                  python-version: "3.14"
 
             - name: Setup Node 22
               uses: actions/setup-node@v6
