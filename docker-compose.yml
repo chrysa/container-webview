@@ -11,6 +11,7 @@ x-common: &common
           type: bind
           read_only: true
 
+name: container-webview
 services:
     # ─── Backend FastAPI ─────────────────────────────────────
     api:
@@ -18,7 +19,6 @@ services:
         build:
             context: ./api
             dockerfile: Dockerfile
-        container_name: docker-overview-api
         hostname: api
         image: docker-overview-api:latest
         environment:
@@ -61,7 +61,6 @@ services:
             args:
                 # URL absolue de l'API vue depuis le navigateur
                 VITE_API_URL: ${VITE_API_URL:-http://localhost:9003}
-        container_name: docker-overview-frontend
         hostname: frontend
         image: docker-overview-frontend:latest
         ports:
@@ -75,7 +74,6 @@ services:
         build:
             context: ./api
             dockerfile: Dockerfile
-        container_name: docker-overview-api-dev
         hostname: api
         command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
         environment:
@@ -110,7 +108,6 @@ services:
             context: .
             dockerfile: Dockerfile
             target: deps
-        container_name: docker-overview-frontend-dev
         hostname: frontend-dev
         command: npm run dev
         environment:
@@ -133,7 +130,6 @@ services:
             context: ./api
             dockerfile: Dockerfile
             target: test
-        container_name: docker-overview-api-test
         hostname: api-test
         environment:
             SECRET_KEY: test-secret-key-for-tests
@@ -153,7 +149,6 @@ services:
             context: .
             dockerfile: Dockerfile
             target: deps
-        container_name: docker-overview-frontend-test
         hostname: frontend-test
         command: npm run test
         environment:
@@ -174,7 +169,6 @@ services:
         build:
             context: .
             dockerfile: e2e/Dockerfile
-        container_name: docker-overview-e2e
         hostname: e2e
         environment:
             BASE_URL: http://frontend:3000
