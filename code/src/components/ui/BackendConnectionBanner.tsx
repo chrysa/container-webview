@@ -1,8 +1,7 @@
-import { useBackendStatus } from "../../hooks/useBackendStatus";
-import styles from "./BackendConnectionBanner.module.scss";
+import { useBackendStatus } from '../../hooks/useBackendStatus';
+import styles from './BackendConnectionBanner.module.scss';
 
-const DISCONNECTED_MSG =
-  "Unable to reach the server. Please check your connection.";
+const DISCONNECTED_MSG = 'Unable to reach the server. Please check your connection.';
 
 export function BackendConnectionBanner() {
   const isBackendDown = useBackendStatus();
@@ -10,12 +9,7 @@ export function BackendConnectionBanner() {
   if (!isBackendDown) return null;
 
   return (
-    <div
-      className={styles.banner}
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
+    <div className={styles.banner} role="alert" aria-live="assertive" aria-atomic="true">
       <span className={styles.icon} aria-hidden="true">
         ⚠️
       </span>

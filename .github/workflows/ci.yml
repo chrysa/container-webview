@@ -311,22 +311,22 @@ jobs:
       - name: Wait for API healthcheck
         run: |
           for _i in $(seq 1 30); do
-              curl -sf http://localhost:8000/api && break
+              curl -sf http://localhost:9003/api && break
               sleep 2
           done
 
       - name: Wait for frontend to be ready
         run: |
-          echo "Waiting for frontend at http://localhost:3000..."
+          echo "Waiting for frontend at http://localhost:9103..."
           for _i in $(seq 1 60); do
-              curl -sf http://localhost:3000 >/dev/null 2>&1 && echo "Frontend is ready" && break
+              curl -sf http://localhost:9103 >/dev/null 2>&1 && echo "Frontend is ready" && break
               sleep 2
           done
 
       - name: Run Playwright E2E tests
         run: npx playwright test --config=playwright.config.ts
         env:
-          BASE_URL: http://localhost:3000
+          BASE_URL: http://localhost:9103
           ADMIN_USERNAME: admin
           ADMIN_PASSWORD: admin
 
