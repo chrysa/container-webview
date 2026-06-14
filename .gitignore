@@ -37,3 +37,4 @@ docker-compose.override.yml
 .graphify_version
 graphify
 sys
+.playwright-mcp/
