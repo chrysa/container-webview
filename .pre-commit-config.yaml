@@ -1,214 +1,222 @@
 default_language_version:
-  python: python3
+  python: python3.14
 fail_fast: false
 minimum_pre_commit_version: 4.1.0
-
 repos:
-    # ─── General file checks (run first to fix encoding/whitespace) ───────────
-  - repo: https://github.com/sirosen/texthooks
-    rev: 0.7.1
-    hooks:
-      - id: fix-smartquotes
-      - id: fix-spaces
-
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: check-merge-conflict
-        name: Check for merge conflicts
-      - id: check-yaml
-        name: Validate YAML
-        args: [--allow-multiple-documents]
-        exclude: ^(\.github/ISSUE_TEMPLATE/)
-        files: \.(yaml|yml)$
-      - id: check-json
-        name: Validate JSON
-        exclude: ^code/tsconfig
-      - id: check-case-conflict
-      - id: check-added-large-files
-        name: Check for large files
-        args: [--maxkb=500]
-      - id: end-of-file-fixer
-        name: Fix end of files
-      - id: mixed-line-ending
-        args: [--fix=lf]
-      # NOTE: JSON formatting/sorting is owned by `json-sorter` (chrysa/pre-commit-tools,
-      # 2-space indent, unicode-preserving). The generic `pretty-format-json` hook is
-      # intentionally omitted: it used 4-space indent + ascii-escaping, which oscillated
-      # against json-sorter on every config JSON and kept the pre-commit job red.
-      - id: trailing-whitespace
-        name: Trim trailing whitespace
-      - id: no-commit-to-branch
-        args: [--branch, main]
-      - id: detect-private-key
-
-    # ─── Debug Detection ──────────────────────────────────────────────────────
-  - repo: https://github.com/chrysa/pre-commit-tools
-    rev: v0.1.1-94
-    hooks:
-      - id: makefile-check
-      - id: console-debug-detection
-        name: Detect console.debug
-      - id: console-log-detection
-        name: Detect console.log
-        exclude: ^code/src/serviceWorker\.js$
-      - id: console-table-detection
-        name: Detect console.table
-      - id: yaml-sorter
-        name: Sort YAML files
-        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
-      - id: regression-gate
-        stages: [pre-push]
-      - id: no-hardcoded-localhost
-        exclude: 'tests?/|\.test\.|\.spec\.'
-      - id: adr-gate
-      - id: dockerfile-no-latest
-      - id: react-no-async-in-useeffect
-
-    # ─── Dockerfile ───────────────────────────────────────────────────────────
-      - id: json-sorter
-        # `code/` JSON (tsconfig, etc.) is formatted by Prettier; keep json-sorter
-        # off it to avoid a sort-vs-format oscillation.
-        exclude: ^code/
-      - id: env-file-check
-      - id: env-example-sync
-  - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.14.0
-    hooks:
-      - id: hadolint
-        name: Lint Dockerfile frontend
-        args: [-c, config-tools/.hadolint.yaml]
-        files: ^Dockerfile$
-      - id: hadolint
-        name: Lint Dockerfile api
-        args: [-c, config-tools/.hadolint.yaml]
-        files: ^api/Dockerfile$
-
-    # ─── Python (API — FastAPI) ────────────────────────────────────────────────
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.18
-    hooks:
-      - id: ruff-format
-        name: Format Python (ruff)
-        files: ^api/.*\.py$
-      - id: ruff
-        name: Lint Python (ruff)
-        args: [--fix, --exit-non-zero-on-fix]
-        files: ^api/.*\.py$
-
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
-    hooks:
-      - id: python-no-eval
-      - id: python-no-log-warn
-      - id: python-use-type-annotations
-      - id: python-check-mock-methods
-
-    # ─── TypeScript / JavaScript (Frontend — React 19 + Vite) ─────────────────
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
-        name: Format code with Prettier
-        files: ^code/.*\.(css|scss|ts|tsx|json)$
-        exclude: ^code/package(-lock)?\.json$
-        args:
-          - --print-width=120
-          - --tab-width=2
-          - --use-tabs=false
-          - --single-quote
-          - --trailing-comma=es5
-        additional_dependencies:
-          - prettier@^3.0.0
-          - prettier-plugin-organize-imports@^3.2.0
-
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v10.4.0
-    hooks:
-      - id: eslint
-        name: ESLint (TypeScript/React)
-        files: ^code/.*\.(ts|tsx)$
-        args: [--fix, --max-warnings=0, --config, code/eslint.config.js]
-        additional_dependencies:
-          - eslint@^10.4.0
-          - '@eslint/js@^9.15.0'
-          - globals@^15.0.0
-          - '@typescript-eslint/eslint-plugin@^8.59.0'
-          - '@typescript-eslint/parser@^8.0.0'
-          - typescript-eslint@^8.61.0
-          - eslint-plugin-react@^7.37.5
-          - eslint-plugin-react-hooks@^7.1.1
-          - eslint-plugin-react-refresh@^0.5.2
-
-    # ─── YAML ─────────────────────────────────────────────────────────────────
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.38.0
-    hooks:
-      - id: yamllint
-        args: [--config-file, config-tools/.yamllint.yaml, --format, parsable, --strict]
-        exclude: ^(\.github/ISSUE_TEMPLATE/)
-
-  - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-    rev: 0.2.3
-    hooks:
-      - id: yamlfmt
-        args: [--mapping, '4', --sequence, '4', --offset, '0', --width, '200']
-        exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
-
-    # ─── Markdown ─────────────────────────────────────────────────────────────
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.48.0
-    hooks:
-      - id: markdownlint
-        args: [-c, config-tools/.markdownlint.yml, --fix]
-        # CLAUDE.md and the vendored `.claude/` agent/config dumps are tooling
-        # artifacts, not authored project docs — exclude from markdown linting.
-        exclude: ^(CLAUDE\.md$|\.claude/)
-
-    # ─── Shell ────────────────────────────────────────────────────────────────
-  - repo: https://github.com/lovesegfault/beautysh.git
-    rev: v6.4.3
-    hooks:
-      - id: beautysh
-        args: [--indent-size, '4']
-
-  - repo: https://github.com/openstack/bashate.git
-    rev: 2.1.1
-    hooks:
-      - id: bashate
-        args:
-          - --ignore=E006,E020
-
-    # ─── GitHub Actions ───────────────────────────────────────────────────────
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.9
-    hooks:
-      - id: actionlint
-        name: Lint GitHub Actions workflows
-
-    # ─── Security ─────────────────────────────────────────────────────────────
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.30.1
-    hooks:
-      - id: gitleaks
-        name: Detect secrets
-
-    # ─── Python type check ────────────────────────────────────────────────────
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.2
-    hooks:
-      - id: mypy
-        files: ^api/
-        additional_dependencies:
-          - "pydantic>=2.13.4"
-          - "pydantic-settings>=2.14.1"
-          - "fastapi>=0.136.3"
-          - "sqlalchemy[asyncio]>=2.0.50"
-
-    # ─── Commit message ───────────────────────────────────────────────────────
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.4.0
-    hooks:
-      - id: conventional-pre-commit
-        stages: [commit-msg]
-        args: [feat, fix, docs, style, refactor, test, chore, perf, revert, ci]
+- repo: https://github.com/sirosen/texthooks
+  rev: 0.7.1
+  hooks:
+  - id: fix-smartquotes
+  - id: fix-spaces
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: check-merge-conflict
+    name: Check for merge conflicts
+  - id: check-yaml
+    name: Validate YAML
+    args:
+    - --allow-multiple-documents
+    exclude: ^(\.github/ISSUE_TEMPLATE/)
+    files: \.(yaml|yml)$
+  - id: check-json
+    name: Validate JSON
+    exclude: ^code/tsconfig
+  - id: check-case-conflict
+  - id: check-added-large-files
+    name: Check for large files
+    args:
+    - --maxkb=500
+  - id: end-of-file-fixer
+    name: Fix end of files
+  - id: mixed-line-ending
+    args:
+    - --fix=lf
+  - id: trailing-whitespace
+    name: Trim trailing whitespace
+  - id: no-commit-to-branch
+    args:
+    - --branch
+    - main
+  - id: detect-private-key
+- repo: https://github.com/chrysa/pre-commit-tools
+  rev: v0.1.1-94
+  hooks:
+  - id: makefile-check
+  - id: console-debug-detection
+    name: Detect console.debug
+  - id: console-log-detection
+    name: Detect console.log
+    exclude: ^code/src/serviceWorker\.js$
+  - id: console-table-detection
+    name: Detect console.table
+  - id: yaml-sorter
+    name: Sort YAML files
+    exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
+  - id: regression-gate
+    stages:
+    - pre-push
+  - id: no-hardcoded-localhost
+    exclude: tests?/|\.test\.|\.spec\.
+  - id: adr-gate
+  - id: dockerfile-no-latest
+  - id: react-no-async-in-useeffect
+  - id: json-sorter
+    exclude: ^code/
+  - id: env-file-check
+  - id: env-example-sync
+- repo: https://github.com/AleksaC/hadolint-py
+  rev: v2.14.0
+  hooks:
+  - id: hadolint
+    name: Lint Dockerfile frontend
+    args:
+    - -c
+    - config-tools/.hadolint.yaml
+    files: ^Dockerfile$
+  - id: hadolint
+    name: Lint Dockerfile api
+    args:
+    - -c
+    - config-tools/.hadolint.yaml
+    files: ^api/Dockerfile$
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.18
+  hooks:
+  - id: ruff-format
+    name: Format Python (ruff)
+    files: ^api/.*\.py$
+  - id: ruff
+    name: Lint Python (ruff)
+    args:
+    - --fix
+    - --exit-non-zero-on-fix
+    files: ^api/.*\.py$
+- repo: https://github.com/pre-commit/pygrep-hooks
+  rev: v1.9.0
+  hooks:
+  - id: python-no-eval
+  - id: python-no-log-warn
+  - id: python-use-type-annotations
+  - id: python-check-mock-methods
+- repo: https://github.com/pre-commit/mirrors-prettier
+  rev: v4.0.0-alpha.8
+  hooks:
+  - id: prettier
+    name: Format code with Prettier
+    files: ^code/.*\.(css|scss|ts|tsx|json)$
+    exclude: ^code/package(-lock)?\.json$
+    args:
+    - --print-width=120
+    - --tab-width=2
+    - --use-tabs=false
+    - --single-quote
+    - --trailing-comma=es5
+    additional_dependencies:
+    - prettier@^3.0.0
+    - prettier-plugin-organize-imports@^3.2.0
+- repo: https://github.com/pre-commit/mirrors-eslint
+  rev: v10.4.0
+  hooks:
+  - id: eslint
+    name: ESLint (TypeScript/React)
+    files: ^code/.*\.(ts|tsx)$
+    args:
+    - --fix
+    - --max-warnings=0
+    - --config
+    - code/eslint.config.js
+    additional_dependencies:
+    - eslint@^10.4.0
+    - '@eslint/js@^9.15.0'
+    - globals@^15.0.0
+    - '@typescript-eslint/eslint-plugin@^8.59.0'
+    - '@typescript-eslint/parser@^8.0.0'
+    - typescript-eslint@^8.61.0
+    - eslint-plugin-react@^7.37.5
+    - eslint-plugin-react-hooks@^7.1.1
+    - eslint-plugin-react-refresh@^0.5.2
+- repo: https://github.com/adrienverge/yamllint.git
+  rev: v1.38.0
+  hooks:
+  - id: yamllint
+    args:
+    - --config-file
+    - config-tools/.yamllint.yaml
+    - --format
+    - parsable
+    - --strict
+    exclude: ^(\.github/ISSUE_TEMPLATE/)
+- repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  rev: 0.2.3
+  hooks:
+  - id: yamlfmt
+    args:
+    - --mapping
+    - '4'
+    - --sequence
+    - '4'
+    - --offset
+    - '0'
+    - --width
+    - '200'
+    exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.48.0
+  hooks:
+  - id: markdownlint
+    args:
+    - -c
+    - config-tools/.markdownlint.yml
+    - --fix
+    exclude: ^(CLAUDE\.md$|\.claude/)
+- repo: https://github.com/lovesegfault/beautysh.git
+  rev: v6.4.3
+  hooks:
+  - id: beautysh
+    args:
+    - --indent-size
+    - '4'
+- repo: https://github.com/openstack/bashate.git
+  rev: 2.1.1
+  hooks:
+  - id: bashate
+    args:
+    - --ignore=E006,E020
+- repo: https://github.com/rhysd/actionlint
+  rev: v1.7.9
+  hooks:
+  - id: actionlint
+    name: Lint GitHub Actions workflows
+- repo: https://github.com/gitleaks/gitleaks
+  rev: v8.30.1
+  hooks:
+  - id: gitleaks
+    name: Detect secrets
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.20.2
+  hooks:
+  - id: mypy
+    files: ^api/
+    additional_dependencies:
+    - pydantic>=2.13.4
+    - pydantic-settings>=2.14.1
+    - fastapi>=0.136.3
+    - sqlalchemy[asyncio]>=2.0.50
+- repo: https://github.com/compilerla/conventional-pre-commit
+  rev: v4.4.0
+  hooks:
+  - id: conventional-pre-commit
+    stages:
+    - commit-msg
+    args:
+    - feat
+    - fix
+    - docs
+    - style
+    - refactor
+    - test
+    - chore
+    - perf
+    - revert
+    - ci
