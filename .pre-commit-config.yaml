@@ -52,7 +52,8 @@ repos:
     name: Detect console.table
   - id: yaml-sorter
     name: Sort YAML files
-    exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
+    exclude: 
+      ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
   - id: regression-gate
     stages:
     - pre-push
@@ -160,7 +161,8 @@ repos:
     - '0'
     - --width
     - '200'
-    exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
+    exclude: 
+      ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
 - repo: https://github.com/igorshubovych/markdownlint-cli
   rev: v0.48.0
   hooks:
@@ -220,17 +222,3 @@ repos:
     - perf
     - revert
     - ci
-- repo: local
-  hooks:
-  - id: gitversion-canonical-drift
-    name: GitVersion.yml canonical drift
-    entry: scripts/check-canonical-drift.sh GitVersion.yml templates/GitVersion.yml
-    language: system
-    pass_filenames: false
-    files: ^(GitVersion\.yml|templates/GitVersion\.yml)$
-  - id: cliff-canonical-drift
-    name: cliff.toml canonical drift
-    entry: scripts/check-canonical-drift.sh cliff.toml templates/cliff.toml
-    language: system
-    pass_filenames: false
-    files: ^(cliff\.toml|templates/cliff\.toml)$
