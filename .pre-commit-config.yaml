@@ -40,7 +40,7 @@ repos:
     - main
   - id: detect-private-key
 - repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-95
+  rev: v0.1.1-94
   hooks:
   - id: makefile-check
   - id: console-debug-detection
@@ -52,8 +52,7 @@ repos:
     name: Detect console.table
   - id: yaml-sorter
     name: Sort YAML files
-    exclude: 
-      ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
+    exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
   - id: regression-gate
     stages:
     - pre-push
@@ -161,8 +160,7 @@ repos:
     - '0'
     - --width
     - '200'
-    exclude: 
-      ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
+    exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
 - repo: https://github.com/igorshubovych/markdownlint-cli
   rev: v0.48.0
   hooks:
