@@ -8,6 +8,7 @@ import { isAuthenticated } from '@/utils/auth';
 
 const Login = lazy(() => import('@/pages/Login'));
 const Projects = lazy(() => import('@/pages/Projects'));
+const ProjectWorkspacePage = lazy(() => import('@/pages/ProjectWorkspacePage'));
 const Topology = lazy(() => import('@/pages/Topology'));
 const Services = lazy(() => import('@/pages/Services'));
 const Logs = lazy(() => import('@/pages/Logs'));
@@ -34,6 +35,7 @@ const routes: RouteObject[] = [
     children: [
       { index: true, element: <Navigate to="/projects" replace /> },
       { path: '/projects', element: <Projects /> },
+      { path: '/projects/:id', element: <ProjectWorkspacePage /> },
       { path: '/projects/:projectId/topology', element: <Topology /> },
       { path: '/projects/:projectId/services', element: <Services /> },
       { path: '/projects/:projectId/logs', element: <Logs /> },
