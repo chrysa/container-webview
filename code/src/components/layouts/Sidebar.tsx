@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FolderOpen,
+  LayoutPanelLeft,
 } from 'lucide-react';
 import styles from './Sidebar.module.scss';
 
@@ -26,6 +27,7 @@ export default function Sidebar() {
 
   const projectLinks = activeProjectId
     ? [
+        { to: `/projects/${activeProjectId}`, icon: <LayoutPanelLeft size={20} />, label: 'Workspace' },
         { to: `/projects/${activeProjectId}/topology`, icon: <GitBranch size={20} />, label: 'Topologie' },
         { to: `/projects/${activeProjectId}/services`, icon: <Server size={20} />, label: 'Services' },
         { to: `/projects/${activeProjectId}/logs`, icon: <ScrollText size={20} />, label: 'Logs' },
