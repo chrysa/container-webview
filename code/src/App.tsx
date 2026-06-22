@@ -35,7 +35,7 @@ const routes: RouteObject[] = [
     children: [
       { index: true, element: <Navigate to="/projects" replace /> },
       { path: '/projects', element: <Projects /> },
-      { path: '/projects/:id', element: <ProjectWorkspacePage /> },
+      { path: '/projects/:projectId', element: <ProjectWorkspacePage /> },
       { path: '/projects/:projectId/topology', element: <Topology /> },
       { path: '/projects/:projectId/services', element: <Services /> },
       { path: '/projects/:projectId/logs', element: <Logs /> },

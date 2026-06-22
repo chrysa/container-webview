@@ -66,7 +66,7 @@
     background: var(--surface-hover);
   }
 
-  &[aria-selected='true'] {
+  &.serviceRowSelected {
     background: var(--surface-hover);
     border-left-color: var(--primary);
   }
@@ -210,6 +210,11 @@
     opacity: 0.4;
     cursor: not-allowed;
   }
+
+  &:focus-visible {
+    outline: var(--border-width) solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 
 /* SECONDARY actions — stop / pause */
@@ -236,7 +241,12 @@
   &.danger:hover:not(:disabled) {
     color: var(--status-exited);
     border-color: var(--status-exited);
-    background: rgba(220, 38, 38, 0.08);
+    background: color-mix(in srgb, var(--status-exited) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline: var(--border-width) solid var(--primary);
+    outline-offset: 2px;
   }
 }
 
@@ -256,6 +266,11 @@
   &:hover {
     border-color: var(--primary);
     color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: var(--border-width) solid var(--primary);
+    outline-offset: 2px;
   }
 }
 
@@ -356,6 +371,11 @@
     color: var(--primary);
   }
 
+  &:focus-visible {
+    outline: var(--border-width) solid var(--primary);
+    outline-offset: 2px;
+  }
+
   svg {
     flex-shrink: 0;
   }
@@ -377,6 +397,11 @@
   &:hover {
     color: var(--primary);
     border-color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: var(--border-width) solid var(--primary);
+    outline-offset: 2px;
   }
 }
 
@@ -411,17 +436,17 @@
 
   &.critical {
     border-left: 3px solid var(--status-exited);
-    background: rgba(220, 38, 38, 0.05);
+    background: color-mix(in srgb, var(--status-exited) 5%, transparent);
   }
 
   &.warning {
     border-left: 3px solid var(--status-paused);
-    background: rgba(180, 83, 9, 0.05);
+    background: color-mix(in srgb, var(--status-paused) 5%, transparent);
   }
 
   &.info {
     border-left: 3px solid var(--primary);
-    background: rgba(8, 145, 178, 0.05);
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
   }
 }
 

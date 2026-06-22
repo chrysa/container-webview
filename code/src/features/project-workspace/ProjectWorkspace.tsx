@@ -13,7 +13,7 @@
  * the project query alone suffices without the metrics dependency.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Play,
@@ -103,10 +103,35 @@ interface MasterListProps {
 }
 
 function MasterList({ projectId, services, metrics, alerts, selected, onSelect }: MasterListProps) {
+  const listRef = useRef<HTMLUListElement>(null);
+
   function handleKeyDown(e: React.KeyboardEvent, name: string) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onSelect(name);
+      return;
+    }
+
+    const items = listRef.current?.querySelectorAll<HTMLLIElement>('[data-service-row]');
+    if (!items || items.length === 0) return;
+
+    const itemArray = Array.from(items);
+    const currentIdx = itemArray.findIndex((el) => el.dataset['serviceRow'] === name);
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = itemArray[(currentIdx + 1) % itemArray.length];
+      next?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = itemArray[(currentIdx - 1 + itemArray.length) % itemArray.length];
+      prev?.focus();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      itemArray[0]?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      itemArray[itemArray.length - 1]?.focus();
     }
   }
 
@@ -125,17 +150,18 @@ function MasterList({ projectId, services, metrics, alerts, selected, onSelect }
           <p className={styles.stateHint}>{STRINGS.noServicesHint}</p>
         </div>
       ) : (
-        <ul className={styles.masterList} role="listbox" aria-label={`Services du projet ${projectId}`}>
-          {services.map((svc) => {
+        <ul ref={listRef} className={styles.masterList} role="list" aria-label={`Services du projet ${projectId}`}>
+          {services.map((svc, idx) => {
             const health = deriveServiceHealth(svc.name, metrics, alerts);
             const isSelected = selected === svc.name;
             return (
               <li
                 key={svc.name}
-                role="option"
-                aria-selected={isSelected}
-                tabIndex={0}
-                className={styles.serviceRow}
+                role="listitem"
+                data-service-row={svc.name}
+                aria-current={isSelected ? 'true' : undefined}
+                tabIndex={isSelected || (selected === null && idx === 0) ? 0 : -1}
+                className={`${styles.serviceRow}${isSelected ? ` ${styles.serviceRowSelected}` : ''}`}
                 onClick={() => onSelect(svc.name)}
                 onKeyDown={(e) => handleKeyDown(e, svc.name)}
               >
@@ -396,7 +422,7 @@ function ServiceDetail({ projectId, service: svc, health, metrics, alerts }: Ser
                   background: alerts.some((a) => a.level === 'critical')
                     ? 'var(--status-exited)'
                     : 'var(--status-paused)',
-                  color: 'white',
+                  color: 'var(--accent-ink)',
                   fontWeight: 700,
                 }}
               >
@@ -500,8 +526,9 @@ export default function ProjectWorkspace({ projectId }: Props) {
 
   const selectedSvc = project.services.find((s) => s.name === selectedService) ?? null;
   const selectedMetrics = metrics?.find((m) => m.service === selectedService);
-  const serviceAlerts = (alerts ?? []).filter((a) => a.project === project.name && a.service === selectedService);
-  const selectedHealth = selectedSvc ? deriveServiceHealth(selectedSvc.name, metrics, alerts) : 'unknown';
+  const projectAlerts = (alerts ?? []).filter((a) => a.project === project.name);
+  const serviceAlerts = projectAlerts.filter((a) => a.service === selectedService);
+  const selectedHealth = selectedSvc ? deriveServiceHealth(selectedSvc.name, metrics, projectAlerts) : 'unknown';
 
   return (
     <div className={styles.workspace}>
@@ -509,7 +536,7 @@ export default function ProjectWorkspace({ projectId }: Props) {
         projectId={projectId}
         services={project.services}
         metrics={metrics}
-        alerts={alerts}
+        alerts={projectAlerts}
         selected={selectedService}
         onSelect={handleSelect}
       />

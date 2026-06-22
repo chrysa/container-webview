@@ -30,12 +30,17 @@ function pushSample(key: string, value: number): number[] {
   const arr = history.get(key) ?? [];
   const next = [...arr, value].slice(-MAX_SAMPLES);
   // FIFO eviction: Map preserves insertion order, so the first key is the oldest.
+  // Evict BEFORE inserting a new key to keep the Map bounded at MAX_KEYS.
   if (!history.has(key) && history.size >= MAX_KEYS) {
     const oldest = history.keys().next().value;
     if (oldest !== undefined) history.delete(oldest);
   }
   history.set(key, next);
   return next;
+}
+
+function sanitizeId(s: string): string {
+  return s.replace(/[^a-z0-9_-]/gi, '_');
 }
 
 interface Props {
@@ -47,6 +52,7 @@ interface Props {
 export default function ServiceSparkline({ projectId, serviceName, metrics }: Props) {
   const cpuKey = `${projectId}:${serviceName}:cpu`;
   const memKey = `${projectId}:${serviceName}:mem`;
+  const safeId = sanitizeId(`${projectId}_${serviceName}`);
 
   // push latest sample whenever metrics update
   const prevMetrics = useRef<ServiceMetrics | undefined>(undefined);
@@ -70,7 +76,7 @@ export default function ServiceSparkline({ projectId, serviceName, metrics }: Pr
         <ResponsiveContainer width="100%" height={48}>
           <AreaChart data={cpuData} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id={`cpu-${serviceName}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={`cpu-${safeId}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
               </linearGradient>
@@ -84,7 +90,7 @@ export default function ServiceSparkline({ projectId, serviceName, metrics }: Pr
               type="monotone"
               dataKey="v"
               stroke="var(--primary)"
-              fill={`url(#cpu-${serviceName})`}
+              fill={`url(#cpu-${safeId})`}
               strokeWidth={1.5}
               dot={false}
               isAnimationActive={false}
@@ -99,7 +105,7 @@ export default function ServiceSparkline({ projectId, serviceName, metrics }: Pr
         <ResponsiveContainer width="100%" height={48}>
           <AreaChart data={memData} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id={`mem-${serviceName}`} x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={`mem-${safeId}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--status-running)" stopOpacity={0.3} />
                 <stop offset="95%" stopColor="var(--status-running)" stopOpacity={0} />
               </linearGradient>
@@ -113,7 +119,7 @@ export default function ServiceSparkline({ projectId, serviceName, metrics }: Pr
               type="monotone"
               dataKey="v"
               stroke="var(--status-running)"
-              fill={`url(#mem-${serviceName})`}
+              fill={`url(#mem-${safeId})`}
               strokeWidth={1.5}
               dot={false}
               isAnimationActive={false}
