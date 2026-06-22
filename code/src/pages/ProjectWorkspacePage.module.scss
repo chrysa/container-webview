@@ -1,0 +1,75 @@
+@use '../styles/mixins' as m;
+
+.page {
+  @include m.flex-column;
+  height: 100%;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ─── Breadcrumb ───────────────────────────────────────── */
+
+.breadcrumb {
+  @include m.flex-center-y;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.breadcrumbLink {
+  color: var(--text-muted);
+  @include m.smooth;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.sep {
+  color: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.breadcrumbCurrent {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ─── Deep-link bar ────────────────────────────────────── */
+
+.deepLinks {
+  @include m.flex-center-y;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.deepLink {
+  @include m.flex-center-y;
+  gap: 5px;
+  padding: 4px 10px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-muted);
+  @include m.smooth;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+/* ─── Workspace container ──────────────────────────────── */
+
+.workspaceWrap {
+  flex: 1;
+  min-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  /* pass height to child */
+  > * {
+    flex: 1;
+    min-height: 0;
+  }
+}
