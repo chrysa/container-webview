@@ -17,6 +17,20 @@ import type { Alert } from '@/domain/alerts/types';
 export type HealthStatus = 'running' | 'exited' | 'restarting' | 'paused' | 'unhealthy' | 'unknown';
 
 /**
+ * Map a raw (lower-cased) Docker status string to a HealthStatus, or undefined
+ * for any unexpected string (which is treated as "unknown" by the caller).
+ */
+function mapDockerStatus(status: string): HealthStatus | undefined {
+  const s = status.toLowerCase();
+  if (s === 'running') return 'running';
+  if (s === 'exited') return 'exited';
+  if (s === 'restarting') return 'restarting';
+  if (s === 'paused') return 'paused';
+  if (s.includes('unhealthy')) return 'unhealthy';
+  return undefined;
+}
+
+/**
  * Derive a single health status for a service name given the current snapshot
  * from the metrics query and the alerts query.
  *
@@ -35,12 +49,8 @@ export function deriveServiceHealth(
   // 1. metrics path (most accurate — live Docker status)
   const m = metrics?.find((e) => e.service === serviceName);
   if (m) {
-    const s = m.status.toLowerCase();
-    if (s === 'running') return 'running';
-    if (s === 'exited') return 'exited';
-    if (s === 'restarting') return 'restarting';
-    if (s === 'paused') return 'paused';
-    if (s.includes('unhealthy')) return 'unhealthy';
+    const mapped = mapDockerStatus(m.status);
+    if (mapped) return mapped;
     // pass through as unknown for any unexpected string
   }
 
