@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
     ci:
-        uses: chrysa/github-actions/.github/workflows/ci-fullstack.yml@v1.2.0
+        uses: chrysa/github-actions/.github/workflows/ci-fullstack.yml@v1.2.1
         with:
             project-key: chrysa_container-webview
             project-name: container-webview
