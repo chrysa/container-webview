@@ -8,5 +8,5 @@ python-multipart==0.0.32
 websockets==16.0
 httpx==0.28.1
 python-ldap==3.4.7
-pydantic-settings==2.14.1
+pydantic-settings==2.14.2
 sentry-sdk[fastapi]>=2.0.0
