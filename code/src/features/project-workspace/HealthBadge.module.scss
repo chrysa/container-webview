@@ -1,0 +1,107 @@
+@use '../../styles/mixins' as m;
+
+/* HealthBadge — status pill reused across master list, project cards,
+   ServicesTable rows. Always uses --status-* semantic tokens. */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* ── status variants ── */
+.running {
+  background: color-mix(in srgb, var(--status-running) 12%, transparent);
+  color: var(--status-running);
+  border: 1px solid currentColor;
+
+  .dot {
+    background: var(--status-running);
+  }
+}
+
+.exited {
+  background: color-mix(in srgb, var(--status-exited) 10%, transparent);
+  color: var(--status-exited);
+  border: 1px solid currentColor;
+
+  .dot {
+    background: var(--status-exited);
+  }
+}
+
+.restarting {
+  background: color-mix(in srgb, var(--status-restarting) 10%, transparent);
+  color: var(--status-restarting);
+  border: 1px solid currentColor;
+
+  .dot {
+    background: var(--status-restarting);
+    animation: pulse 1s ease infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+.paused {
+  background: color-mix(in srgb, var(--status-paused) 10%, transparent);
+  color: var(--status-paused);
+  border: 1px solid currentColor;
+
+  .dot {
+    background: var(--status-paused);
+  }
+}
+
+.unhealthy {
+  background: color-mix(in srgb, var(--status-exited) 15%, transparent);
+  color: var(--status-exited);
+  border: 1px solid var(--status-exited);
+
+  .dot {
+    background: var(--status-exited);
+    animation: pulse 0.7s ease infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+.unknown {
+  background: transparent;
+  color: var(--status-unknown);
+  border: 1px solid var(--border);
+
+  .dot {
+    background: var(--status-unknown);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
