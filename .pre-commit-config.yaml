@@ -40,7 +40,7 @@ repos:
     - main
   - id: detect-private-key
 - repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-95
+  rev: v0.1.1-96
   hooks:
   - id: makefile-check
   - id: console-debug-detection
@@ -50,6 +50,8 @@ repos:
     exclude: ^code/src/serviceWorker\.js$
   - id: console-table-detection
     name: Detect console.table
+  - id: css-outside-stylesheet-detection
+    name: Detect CSS outside CSS/SCSS files
   - id: yaml-sorter
     name: Sort YAML files
     exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|\.github/dependabot\.yml|docker-compose\.yml|k8s/|\.pre-commit-config\.yaml|GitVersion\.yml|\.github/FUNDING\.yml)
