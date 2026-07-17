@@ -133,7 +133,7 @@ repos:
     - '@eslint/js@^9.15.0'
     - globals@^15.0.0
     - '@typescript-eslint/eslint-plugin@^8.63.0'
-    - '@typescript-eslint/parser@^8.62.1'
+    - '@typescript-eslint/parser@^8.64.0'
     - typescript-eslint@^8.61.0
     - eslint-plugin-react@^7.37.5
     - eslint-plugin-react-hooks@^7.1.1
