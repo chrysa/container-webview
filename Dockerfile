@@ -8,7 +8,11 @@ WORKDIR /app
 
 COPY code/package.json ./
 
-RUN npm install --legacy-peer-deps
+# The node_modules named volume is seeded from this layer; chown it to the host
+# UID (default 1000) so bind-mount dev/test containers running as
+# "${UID:-1000}:${GID:-1000}" can write Vite/Vitest caches into node_modules/.
+RUN npm install --legacy-peer-deps \
+    && chown -R 1000:1000 /app/node_modules
 
 # ─────────────── Stage 2 : build Vite ───────────────
 
@@ -45,3 +49,18 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:3000/ || exit 1
 
 CMD ["serve", "-s", "dist", "-l", "3000"]
+
+# ─────────────── Stage 4 : dev (Vite HMR + test/lint tooling) ─────────────
+# Carries node_modules (dev deps: Vite, Vitest, ESLint). Compose bind-mounts
+# ./code over /app and runs as the host UID; caches stay out of the tree.
+FROM deps AS dev
+
+WORKDIR /app
+
+ENV NODE_ENV=development
+
+COPY code/ .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev"]
