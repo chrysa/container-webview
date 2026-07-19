@@ -42,3 +42,15 @@ HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
     CMD curl -f http://localhost:8000/api || exit 1
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# ── dev: production runtime + dev/test/lint tooling + live-reload ─────────────
+# Built on `deps` so it carries the editable install and the ".[dev]" extras
+# (pytest, ruff, mypy). Compose bind-mounts the source over /app and runs as the
+# host UID, so caches are redirected out of the tree via env (see docker-compose).
+FROM deps AS dev
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
