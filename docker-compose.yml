@@ -74,13 +74,23 @@ services:
         build:
             context: ./api
             dockerfile: Dockerfile
+            target: dev
         hostname: api
+        # Bind-mounts the repo → run as host UID, never root, so no root-owned
+        # artifacts land in ./api.
+        user: "${UID:-1000}:${GID:-1000}"
         command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
         environment:
             PROJECTS_PATH: /projects
             SECRET_KEY: dev-secret-key
             ADMIN_USERNAME: admin
             ADMIN_PASSWORD: admin
+            # Keep tool caches out of the mounted tree; HOME must be writable.
+            HOME: /tmp
+            PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+            RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+            MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+            PYTEST_ADDOPTS: -p no:cacheprovider
         volumes:
             - source: ./api
               target: /app
@@ -109,9 +119,18 @@ services:
             dockerfile: Dockerfile
             target: deps
         hostname: frontend-dev
+        # Bind-mounts the repo → run as host UID, never root.
+        user: "${UID:-1000}:${GID:-1000}"
         command: npm run dev
         environment:
             NODE_ENV: development
+            # Keep tool caches out of the mounted tree; HOME must be writable.
+            HOME: /tmp
+            npm_config_cache: /tmp/.npm
+            PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+            RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+            MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+            PYTEST_ADDOPTS: -p no:cacheprovider
         volumes:
             - source: ./code
               target: /app
@@ -131,11 +150,19 @@ services:
             dockerfile: Dockerfile
             target: test
         hostname: api-test
+        # Bind-mounts the repo → run as host UID, never root.
+        user: "${UID:-1000}:${GID:-1000}"
         environment:
             SECRET_KEY: test-secret-key-for-tests
             ADMIN_USERNAME: testuser
             ADMIN_PASSWORD: testpass
             PROJECTS_PATH: /tmp/projects
+            # Keep tool caches out of the mounted tree; HOME must be writable.
+            HOME: /tmp
+            PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+            RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+            MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+            PYTEST_ADDOPTS: -p no:cacheprovider
         volumes:
             - source: ./api
               target: /app
@@ -150,10 +177,19 @@ services:
             dockerfile: Dockerfile
             target: deps
         hostname: frontend-test
+        # Bind-mounts the repo → run as host UID, never root.
+        user: "${UID:-1000}:${GID:-1000}"
         command: npm run test
         environment:
             NODE_ENV: test
             CI: "true"
+            # Keep tool caches out of the mounted tree; HOME must be writable.
+            HOME: /tmp
+            npm_config_cache: /tmp/.npm
+            PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+            RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+            MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+            PYTEST_ADDOPTS: -p no:cacheprovider
         volumes:
             - source: ./code
               target: /app
@@ -170,11 +206,21 @@ services:
             context: .
             dockerfile: e2e/Dockerfile
         hostname: e2e
+        # Bind-mounts the repo (and writes reports back to ./e2e) → run as host
+        # UID, never root, so report artifacts stay host-owned.
+        user: "${UID:-1000}:${GID:-1000}"
         environment:
             BASE_URL: http://frontend:3000
             API_URL: http://api:8000
             ADMIN_USERNAME: admin
             ADMIN_PASSWORD: admin
+            # Keep tool caches out of the mounted tree; HOME must be writable.
+            HOME: /tmp
+            npm_config_cache: /tmp/.npm
+            PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+            RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+            MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+            PYTEST_ADDOPTS: -p no:cacheprovider
         depends_on:
             api:
                 condition: service_healthy
