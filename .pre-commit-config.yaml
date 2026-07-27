@@ -9,7 +9,7 @@ repos:
   - id: fix-smartquotes
   - id: fix-spaces
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-merge-conflict
     name: Check for merge conflicts
@@ -86,7 +86,7 @@ repos:
     - config-tools/.hadolint.yaml
     files: ^api/Dockerfile$
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.18
+  rev: v0.16.0
   hooks:
   - id: ruff-format
     name: Format Python (ruff)
@@ -121,7 +121,7 @@ repos:
     - prettier@^3.9.5
     - prettier-plugin-organize-imports@^4.3.0
 - repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v10.4.0
+  rev: v10.8.0
   hooks:
   - id: eslint
     name: ESLint (TypeScript/React)
@@ -167,7 +167,7 @@ repos:
     - '200'
     exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.48.0
+  rev: v0.49.1
   hooks:
   - id: markdownlint
     args:
@@ -189,17 +189,17 @@ repos:
     args:
     - --ignore=E006,E020
 - repo: https://github.com/rhysd/actionlint
-  rev: v1.7.9
+  rev: v1.7.12
   hooks:
   - id: actionlint
     name: Lint GitHub Actions workflows
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.30.1
+  rev: v8.30.0
   hooks:
   - id: gitleaks
     name: Detect secrets
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v2.2.0
+  rev: v2.3.0
   hooks:
   - id: mypy
     files: ^api/
@@ -226,6 +226,6 @@ repos:
     - revert
     - ci
 - repo: https://github.com/chrysa/guideline-checker
-  rev: v1.15.0
+  rev: v1.15.3
   hooks:
   - id: guideline-check
