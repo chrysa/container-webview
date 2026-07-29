@@ -55,18 +55,21 @@ repo has **not** adopted it. This feature adopts it (see §5) — a deliberate a
 ## 4. Scope & boundaries
 
 **In V1**
+
 - Host-wide collector: Docker events + periodic stats + on-trigger log excerpts.
 - Correlation engine producing read-only incidents with probable cause + fused timeline.
 - REST + WebSocket API for the incident feed and detail.
 - Global `/incidents` UI, filterable by compose project.
 
 **Out of V1 (later bricks)**
+
 - Auto-restart / remediation actions.
 - Long-term resource-trend dashboards.
 - ML-based anomaly detection — V1 uses EWMA / z-score only.
 - Full log NLP — the LLM is used *only* for the narrative summary.
 
 **Separate track (validated per element, not in this spec)**
+
 - Rename GitHub repo `container-webview` → `container-overview`, fleet ref updates.
 - Merge the two duplicate Notion fiches ("Docker Overview" concept + "container-webview"
   implementation) under the canonical name.
@@ -93,6 +96,7 @@ frontend /incidents           ← host-wide feed + project filter + detail timel
 ### 5.1 Components
 
 **`collector/`** (new module)
+
 - `event_consumer` — consumes `client.events(decode=True)`, filtered to relevant types
   (`die`, `oom`, `kill`, `health_status`, `restart`, `start`, `stop`). Normalizes and
   persists to `docker_events`. Reconnects with backoff on stream loss.
@@ -105,6 +109,7 @@ frontend /incidents           ← host-wide feed + project filter + detail timel
   self-contained so it can move to a dedicated worker service without API changes.
 
 **`services/incidents_service.py`** (new, DDD sibling of `alerts_service.py`)
+
 - **Trigger** = a primary signal: a Docker event (die/oom/unhealthy/restart-loop), a
   metric anomaly (EWMA baseline + z-score over the sample window), or a log error burst
   (rate spike of ERROR / exception lines).
@@ -121,6 +126,7 @@ frontend /incidents           ← host-wide feed + project filter + detail timel
   `INCIDENT_RESOLVE_S`.
 
 **`routers/incidents.py`** (new)
+
 - `GET /api/incidents?project=&status=&since=` → paginated list (host-wide).
 - `GET /api/incidents/{incident_id}` → detail: fused timeline (signals ordered), involved
   services, probable cause, narrative, bounded log excerpt.
@@ -130,6 +136,7 @@ frontend /incidents           ← host-wide feed + project filter + detail timel
   RFC-7807 errors, `Depends(get_current_user)` on all routes.
 
 **Frontend `/incidents`** (new global page)
+
 - Host-wide feed (severity chip, title, involved services, opened-at), project filter
   reusing the existing project list.
 - Detail view: interleaved timeline (event / metric / log signals), a mini ReactFlow graph

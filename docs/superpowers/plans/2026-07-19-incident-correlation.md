@@ -28,6 +28,7 @@
 ## File Structure
 
 **Backend (`api/app/`)**
+
 - `db/__init__.py`, `db/session.py` — async engine + session factory.
 - `db/base.py` — declarative base.
 - `models/metric_sample.py`, `models/docker_event.py`, `models/incident.py`, `models/incident_signal.py`, `models/log_excerpt.py` — one model per file.
@@ -42,6 +43,7 @@
 - `alembic/` — migration env + versions.
 
 **Frontend (`code/src/`)**
+
 - `domain/incidents/types.ts`, `domain/incidents/queries.ts` — types + TanStack hooks.
 - `features/incidents/IncidentsFeed.tsx`, `features/incidents/IncidentDetail.tsx`, `features/incidents/IncidentTimeline.tsx`, `features/incidents/CauseBanner.tsx` — components.
 - `pages/Incidents.tsx` — route page.
@@ -53,22 +55,27 @@
 ## Task 1: DB foundation — async engine + session
 
 **Files:**
+
 - Create: `api/app/db/__init__.py`, `api/app/db/base.py`, `api/app/db/session.py`
 - Modify: `api/pyproject.toml` (add deps), `api/app/config.py` (add `database_url`)
 - Test: `api/app/tests/db/test_session.py`
 
 **Interfaces:**
+
 - Produces: `get_session() -> AsyncIterator[AsyncSession]` (FastAPI dependency), `engine`, `AsyncSessionLocal`, `Base` (declarative base).
 
 - [ ] **Step 1: Add dependencies**
 
 Edit `api/pyproject.toml` `dependencies`: add
+
 ```toml
 "sqlalchemy[asyncio]>=2.0.36",
 "asyncpg>=0.30",
 "alembic>=1.14",
 ```
+
 Add to dev/test deps:
+
 ```toml
 "testcontainers[postgres]>=4.8",
 ```
@@ -76,6 +83,7 @@ Add to dev/test deps:
 - [ ] **Step 2: Add config field**
 
 In `api/app/config.py` `Settings`, add:
+
 ```python
 database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/overview"
 ```
@@ -83,6 +91,7 @@ database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/overv
 - [ ] **Step 3: Write the declarative base**
 
 `api/app/db/base.py`:
+
 ```python
 from sqlalchemy.orm import DeclarativeBase
 
@@ -94,6 +103,7 @@ class Base(DeclarativeBase):
 - [ ] **Step 4: Write the session module**
 
 `api/app/db/session.py`:
+
 ```python
 from collections.abc import AsyncIterator
 
@@ -110,7 +120,9 @@ async def get_session() -> AsyncIterator[AsyncSession]:
     async with AsyncSessionLocal() as session:
         yield session
 ```
+
 `api/app/db/__init__.py`:
+
 ```python
 from app.db.base import Base
 from app.db.session import AsyncSessionLocal, engine, get_session
@@ -121,6 +133,7 @@ __all__ = ["Base", "AsyncSessionLocal", "engine", "get_session"]
 - [ ] **Step 5: Write the failing test**
 
 `api/app/tests/db/test_session.py`:
+
 ```python
 import pytest
 from sqlalchemy import text
@@ -163,17 +176,20 @@ git commit -m "feat(db): add async SQLAlchemy engine, session, and declarative b
 ## Task 2: ORM models + Alembic + TimescaleDB hypertable
 
 **Files:**
+
 - Create: `api/app/models/metric_sample.py`, `docker_event.py`, `incident.py`, `incident_signal.py`, `log_excerpt.py`, `api/app/models/__init__.py`
 - Create: `api/alembic.ini`, `api/alembic/env.py`, `api/alembic/versions/0001_initial.py`
 - Test: `api/app/tests/models/test_schema.py`
 
 **Interfaces:**
+
 - Consumes: `Base` from Task 1.
 - Produces: models `MetricSample`, `DockerEvent`, `Incident`, `IncidentSignal`, `LogExcerpt`; enums `IncidentStatus`, `CauseCategory`, `SignalType`, `NarrativeSource`.
 
 - [ ] **Step 1: Write the enums + models**
 
 `api/app/models/incident.py`:
+
 ```python
 import enum
 from datetime import datetime
@@ -220,6 +236,7 @@ class Incident(Base):
 ```
 
 `api/app/models/metric_sample.py`:
+
 ```python
 from datetime import datetime
 
@@ -243,6 +260,7 @@ class MetricSample(Base):
 ```
 
 `api/app/models/docker_event.py`:
+
 ```python
 import enum
 from datetime import datetime
@@ -277,6 +295,7 @@ class DockerEvent(Base):
 ```
 
 `api/app/models/incident_signal.py`:
+
 ```python
 import enum
 from datetime import datetime
@@ -304,6 +323,7 @@ class IncidentSignal(Base):
 ```
 
 `api/app/models/log_excerpt.py`:
+
 ```python
 from datetime import datetime
 
@@ -324,6 +344,7 @@ class LogExcerpt(Base):
 ```
 
 `api/app/models/__init__.py`:
+
 ```python
 from app.models.docker_event import DockerEvent, DockerEventType
 from app.models.incident import (
@@ -351,6 +372,7 @@ Edit `api/alembic/env.py`: import `from app.db.base import Base` and `import app
 - [ ] **Step 3: Write the initial migration**
 
 `api/alembic/versions/0001_initial.py` — `op.create_table(...)` for all five tables (mirror the model columns above), then convert `metric_samples` to a hypertable and set retention:
+
 ```python
 def upgrade() -> None:
     op.execute("CREATE EXTENSION IF NOT EXISTS timescaledb")
@@ -363,11 +385,13 @@ def upgrade() -> None:
         "SELECT add_retention_policy('metric_samples', INTERVAL '7 days')"
     )
 ```
+
 Guard: if the `timescaledb` extension is unavailable, `CREATE EXTENSION` raises — this is the intended fail-fast (spec §7).
 
 - [ ] **Step 4: Write the failing test**
 
 `api/app/tests/models/test_schema.py`:
+
 ```python
 import pytest
 from sqlalchemy import inspect, text
@@ -415,16 +439,19 @@ git commit -m "feat(models): add incident, event, metric, signal, log ORM models
 ## Task 3: Intelligence config (external YAML + typed loader)
 
 **Files:**
+
 - Create: `api/app/config/intelligence.yaml`
 - Modify: `api/app/config.py` (add `IntelligenceSettings`, loader)
 - Test: `api/app/tests/test_intelligence_config.py`
 
 **Interfaces:**
+
 - Produces: `get_intelligence_settings() -> IntelligenceSettings` with fields matching the Global Constraints config keys.
 
 - [ ] **Step 1: Write the YAML**
 
 `api/app/config/intelligence.yaml`:
+
 ```yaml
 collector_stats_interval_s: 10
 incident_window_s: 90
@@ -442,6 +469,7 @@ ollama_url: "http://localhost:11434"
 - [ ] **Step 2: Write the failing test**
 
 `api/app/tests/test_intelligence_config.py`:
+
 ```python
 from app.config import get_intelligence_settings
 
@@ -463,6 +491,7 @@ Expected: FAIL — `ImportError: cannot import name 'get_intelligence_settings'`
 - [ ] **Step 4: Implement the loader**
 
 In `api/app/config.py`:
+
 ```python
 from functools import lru_cache
 from pathlib import Path
@@ -510,16 +539,19 @@ git commit -m "feat(config): add external intelligence config with typed loader"
 ## Task 4: Anomaly detector (EWMA / z-score)
 
 **Files:**
+
 - Create: `api/app/services/anomaly_service.py`
 - Test: `api/app/tests/services/test_anomaly_service.py`
 
 **Interfaces:**
+
 - Consumes: `get_intelligence_settings()`.
 - Produces: `detect_anomaly(samples: list[float]) -> bool` and `zscore(samples: list[float], value: float) -> float`. `detect_anomaly` returns True when the latest value's z-score exceeds `anomaly_z_threshold`.
 
 - [ ] **Step 1: Write the failing test**
 
 `api/app/tests/services/test_anomaly_service.py`:
+
 ```python
 from app.services.anomaly_service import detect_anomaly, zscore
 
@@ -549,6 +581,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement the detector**
 
 `api/app/services/anomaly_service.py`:
+
 ```python
 from statistics import mean, pstdev
 
@@ -591,16 +624,19 @@ git commit -m "feat(intelligence): add EWMA/z-score anomaly detector"
 ## Task 5: Deterministic cause rules
 
 **Files:**
+
 - Create: `api/app/services/cause_rules.py`
 - Test: `api/app/tests/services/test_cause_rules.py`
 
 **Interfaces:**
+
 - Consumes: `CauseCategory` (Task 2); a `CauseInput` dataclass defined here.
 - Produces: `CauseInput` dataclass and `infer_cause(data: CauseInput) -> CauseCategory`. Rules applied in order: OOM→memory, exit≠0→crash, healthcheck fail→readiness, upstream-incident-first→cascade, sustained spike→resource, else undetermined.
 
 - [ ] **Step 1: Write the failing test**
 
 `api/app/tests/services/test_cause_rules.py`:
+
 ```python
 from app.models import CauseCategory
 from app.services.cause_rules import CauseInput, infer_cause
@@ -647,6 +683,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement the rules**
 
 `api/app/services/cause_rules.py`:
+
 ```python
 from dataclasses import dataclass
 
@@ -693,16 +730,19 @@ git commit -m "feat(intelligence): add ordered deterministic cause rules"
 ## Task 6: Narrative service (Ollama + template fallback)
 
 **Files:**
+
 - Create: `api/app/services/narrative_service.py`
 - Test: `api/app/tests/services/test_narrative_service.py`
 
 **Interfaces:**
+
 - Consumes: `CauseCategory`, `NarrativeSource` (Task 2), `get_intelligence_settings()`.
 - Produces: `async build_narrative(cause: CauseCategory, service: str, signals: list[str]) -> tuple[str, NarrativeSource]`. Returns a template string with `NarrativeSource.TEMPLATE` when Ollama disabled or on error; otherwise the Ollama text with `NarrativeSource.OLLAMA`.
 
 - [ ] **Step 1: Write the failing test**
 
 `api/app/tests/services/test_narrative_service.py`:
+
 ```python
 import pytest
 
@@ -747,6 +787,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement the service**
 
 `api/app/services/narrative_service.py`:
+
 ```python
 import httpx
 
@@ -818,20 +859,23 @@ git commit -m "feat(intelligence): add Ollama narrative with template fallback"
 ## Task 7: Incident correlation service
 
 **Files:**
+
 - Create: `api/app/services/incidents_service.py`
 - Test: `api/app/tests/services/test_incidents_service.py`
 
 **Interfaces:**
+
 - Consumes: models (Task 2), `infer_cause`/`CauseInput` (Task 5), `build_narrative` (Task 6), `get_intelligence_settings()`, an `AsyncSession`.
 - Produces:
-  - `async correlate_trigger(session, trigger: Trigger) -> Incident` — creates or updates an incident, links signals, sets cause + narrative.
-  - `async list_incidents(session, project: str | None, status: str | None, since: datetime | None) -> list[Incident]`.
-  - `async get_incident(session, incident_id: int) -> Incident | None`.
-  - `Trigger` dataclass: `container_id, service, project, ts, oom_killed, exit_code, healthcheck_failed, upstream_incident_first, sustained_spike, signal_summaries: list[str]`.
+    - `async correlate_trigger(session, trigger: Trigger) -> Incident` — creates or updates an incident, links signals, sets cause + narrative.
+    - `async list_incidents(session, project: str | None, status: str | None, since: datetime | None) -> list[Incident]`.
+    - `async get_incident(session, incident_id: int) -> Incident | None`.
+    - `Trigger` dataclass: `container_id, service, project, ts, oom_killed, exit_code, healthcheck_failed, upstream_incident_first, sustained_spike, signal_summaries: list[str]`.
 
 - [ ] **Step 1: Write the failing test**
 
 `api/app/tests/services/test_incidents_service.py`:
+
 ```python
 from datetime import UTC, datetime
 
@@ -898,6 +942,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement the service**
 
 `api/app/services/incidents_service.py`:
+
 ```python
 from dataclasses import dataclass
 from datetime import datetime
@@ -1027,17 +1072,20 @@ git commit -m "feat(intelligence): add incident correlation service with dedup"
 ## Task 8: Incident schemas + REST routes
 
 **Files:**
+
 - Create: `api/app/schemas/incident.py`, `api/app/routers/incidents.py`
 - Modify: `api/app/main.py` (register router)
 - Test: `api/app/tests/routers/test_incidents.py`
 
 **Interfaces:**
+
 - Consumes: `list_incidents`/`get_incident` (Task 7), `get_session` (Task 1), `get_current_user` (existing).
 - Produces: `IncidentOut`, `IncidentDetailOut`, `SignalOut` Pydantic schemas; router at prefix `/api` with `GET /api/incidents` and `GET /api/incidents/{incident_id}`.
 
 - [ ] **Step 1: Write the schemas**
 
 `api/app/schemas/incident.py`:
+
 ```python
 from datetime import datetime
 
@@ -1074,6 +1122,7 @@ class IncidentDetailOut(IncidentOut):
 - [ ] **Step 2: Write the failing test**
 
 `api/app/tests/routers/test_incidents.py` (follow the existing router-test pattern in `api/app/tests/routers/`; override `get_session` and `get_current_user` dependencies with the testcontainer session + a fake user):
+
 ```python
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -1097,6 +1146,7 @@ async def test_get_missing_incident_returns_404(override_session, fake_user):
         resp = await client.get("/api/incidents/999")
     assert resp.status_code == 404
 ```
+
 (Define `override_session` and `fake_user` fixtures in `api/app/tests/conftest.py`, reusing the Timescale container fixture from Task 7 and `app.dependency_overrides`.)
 
 - [ ] **Step 3: Run test to verify it fails**
@@ -1107,6 +1157,7 @@ Expected: FAIL — route not registered (404 on list, or import error).
 - [ ] **Step 4: Implement the router**
 
 `api/app/routers/incidents.py`:
+
 ```python
 from datetime import datetime
 
@@ -1147,11 +1198,14 @@ async def get_incident(
     detail.signals = signals
     return detail
 ```
+
 Add relationship on `Incident` (Task 2 model) if needed for `.signals`:
+
 ```python
 from sqlalchemy.orm import relationship
 signals: Mapped[list["IncidentSignal"]] = relationship(lazy="selectin")
 ```
+
 Register in `api/app/main.py`: `from app.routers import incidents` then `app.include_router(incidents.router)`.
 
 - [ ] **Step 5: Run test to verify it passes**
@@ -1171,22 +1225,25 @@ git commit -m "feat(api): add incident list + detail REST endpoints"
 ## Task 9: Collector — event consumer + stats poller + supervisor
 
 **Files:**
+
 - Create: `api/app/collector/__init__.py`, `event_consumer.py`, `stats_poller.py`, `log_tailer.py`, `supervisor.py`
 - Modify: `api/app/main.py` (start/stop tasks in lifespan)
 - Test: `api/app/tests/collector/test_event_consumer.py`, `test_stats_poller.py`, `test_supervisor.py`
 
 **Interfaces:**
+
 - Consumes: `docker_client` (existing `services/docker_client.py`), models (Task 2), `correlate_trigger` (Task 7), `detect_anomaly` (Task 4), `AsyncSessionLocal` (Task 1), `get_intelligence_settings()`.
 - Produces:
-  - `normalize_event(raw: dict) -> DockerEvent | None` (returns None for irrelevant types).
-  - `async run_event_consumer(stop: asyncio.Event) -> None`.
-  - `async poll_once(session) -> list[MetricSample]`.
-  - `async run_stats_poller(stop: asyncio.Event) -> None`.
-  - `class CollectorSupervisor` with `async start()` / `async stop()`.
+    - `normalize_event(raw: dict) -> DockerEvent | None` (returns None for irrelevant types).
+    - `async run_event_consumer(stop: asyncio.Event) -> None`.
+    - `async poll_once(session) -> list[MetricSample]`.
+    - `async run_stats_poller(stop: asyncio.Event) -> None`.
+    - `class CollectorSupervisor` with `async start()` / `async stop()`.
 
 - [ ] **Step 1: Write the failing test for the normalizer**
 
 `api/app/tests/collector/test_event_consumer.py`:
+
 ```python
 from app.collector.event_consumer import normalize_event
 from app.models import DockerEventType
@@ -1220,6 +1277,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 3: Implement the normalizer + consumer**
 
 `api/app/collector/event_consumer.py`:
+
 ```python
 import asyncio
 from datetime import UTC, datetime
@@ -1262,11 +1320,13 @@ async def run_event_consumer(stop: asyncio.Event) -> None:
         except Exception:  # noqa: BLE001 — reconnect on stream loss
             await asyncio.sleep(2)
 ```
+
 Implement `_persist_and_correlate(event)` to open an `AsyncSessionLocal`, persist the event, build a `Trigger` (oom detected via `type == OOM` or exit 137, exit_code, healthcheck), and call `correlate_trigger`. (Show full code when implementing; keep the function ≤ 50 lines by delegating trigger-building to a helper.)
 
 - [ ] **Step 4: Write the stats-poller test**
 
 `api/app/tests/collector/test_stats_poller.py`:
+
 ```python
 import pytest
 
@@ -1296,6 +1356,7 @@ Implement `api/app/collector/stats_poller.py` with `compute_sample(container_id,
 - [ ] **Step 6: Write the supervisor test**
 
 `api/app/tests/collector/test_supervisor.py`:
+
 ```python
 import asyncio
 
@@ -1347,16 +1408,19 @@ git commit -m "feat(collector): add event consumer, stats poller, and supervised
 ## Task 10: WebSocket live incident stream
 
 **Files:**
+
 - Modify: `api/app/routers/incidents.py` (add WS route), `api/app/services/incidents_service.py` (add an in-process publisher)
 - Test: `api/app/tests/routers/test_incidents_ws.py`
 
 **Interfaces:**
+
 - Consumes: `verify_token` (existing, used by `routers/logs.py`).
 - Produces: `WS /api/incidents/stream`; `incident_publisher` (an `asyncio`-based fan-out) with `subscribe()` / `publish(incident_id: int)`.
 
 - [ ] **Step 1: Write the failing test**
 
 `api/app/tests/routers/test_incidents_ws.py`:
+
 ```python
 import pytest
 from starlette.testclient import TestClient
@@ -1380,6 +1444,7 @@ def test_ws_pushes_published_incident(valid_token, monkeypatch):
         msg = ws.receive_json()
         assert msg["incident_id"] == 42
 ```
+
 (`valid_token` fixture mints a token via the existing `create_access_token`.)
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1391,6 +1456,7 @@ Expected: FAIL — route/publisher missing.
 
 In `incidents_service.py` add a module-level `incident_publisher` with an `asyncio.Queue` per subscriber (`subscribe()` returns a queue, `publish(id)` puts on all queues). Call `incident_publisher.publish(incident.id)` at the end of `correlate_trigger`.
 In `routers/incidents.py` add:
+
 ```python
 @router.websocket("/incidents/stream")
 async def incidents_stream(websocket: WebSocket, token: str = Query(...)) -> None:
@@ -1424,16 +1490,19 @@ git commit -m "feat(api): add live incident WebSocket stream"
 ## Task 11: Frontend — incidents domain (types + queries)
 
 **Files:**
+
 - Create: `code/src/domain/incidents/types.ts`, `code/src/domain/incidents/queries.ts`
 - Test: `code/src/domain/incidents/queries.test.ts`
 
 **Interfaces:**
+
 - Consumes: the Axios client `api/http/client.ts` (existing).
 - Produces: `Incident`, `IncidentDetail`, `Signal` types; `useIncidents(filters)`, `useIncident(id)` TanStack hooks; `incidentsKeys` query-key factory.
 
 - [ ] **Step 1: Write the types**
 
 `code/src/domain/incidents/types.ts`:
+
 ```typescript
 export type CauseCategory =
   | "memory" | "crash" | "readiness" | "cascade" | "resource" | "undetermined";
@@ -1472,6 +1541,7 @@ export interface IncidentFilters {
 - [ ] **Step 2: Write the failing test**
 
 `code/src/domain/incidents/queries.test.ts`:
+
 ```typescript
 import { describe, expect, it } from "vitest";
 import { incidentsKeys } from "./queries";
@@ -1496,6 +1566,7 @@ Expected: FAIL — module not found.
 - [ ] **Step 4: Implement queries**
 
 `code/src/domain/incidents/queries.ts`:
+
 ```typescript
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "../../api/http/client";
@@ -1548,18 +1619,21 @@ git commit -m "feat(web): add incidents domain types and TanStack query hooks"
 ## Task 12: Frontend — feed, detail, timeline, cause banner + route
 
 **Files:**
+
 - Create: `code/src/features/incidents/IncidentsFeed.tsx`, `IncidentDetail.tsx`, `IncidentTimeline.tsx`, `CauseBanner.tsx` (+ SCSS modules)
 - Create: `code/src/pages/Incidents.tsx`
 - Modify: `code/src/App.tsx` (lazy route `/incidents`), navigation component
 - Test: `code/src/features/incidents/IncidentTimeline.test.tsx`, `CauseBanner.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `useIncidents`, `useIncident` (Task 11), types (Task 11), existing topology components for the involved-services mini-graph, Recharts for mini-charts.
 - Produces: route-level `<Incidents />`; presentational `<IncidentTimeline signals={...} />` and `<CauseBanner incident={...} />`.
 
 - [ ] **Step 1: Write the CauseBanner test**
 
 `code/src/features/incidents/CauseBanner.test.tsx`:
+
 ```typescript
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -1595,6 +1669,7 @@ Expected: FAIL — component not found.
 - [ ] **Step 4: Write the IncidentTimeline test**
 
 `code/src/features/incidents/IncidentTimeline.test.tsx`:
+
 ```typescript
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -1643,16 +1718,19 @@ git commit -m "feat(web): add incidents feed, detail, timeline, and route"
 ## Task 13: E2E, docker-compose Timescale service, coverage gate
 
 **Files:**
+
 - Create: `code/e2e/tests/incidents.spec.ts`
 - Modify: `docker-compose.yml` (add `db` timescale service + `DATABASE_URL`), `api/pyproject.toml` (`fail_under = 85`), `README.md`, `CLAUDE.md` (correct stale notes)
 - Test: the e2e spec itself
 
 **Interfaces:**
+
 - Consumes: the full stack.
 
 - [ ] **Step 1: Add the Timescale service to compose**
 
 In `docker-compose.yml` add:
+
 ```yaml
   db:
     image: timescale/timescaledb:latest-pg16
@@ -1665,11 +1743,13 @@ In `docker-compose.yml` add:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
 ```
+
 Add `overview_db:` under `volumes:`, set `DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/overview` on the `api` service, and `depends_on: [db]`.
 
 - [ ] **Step 2: Write the E2E spec**
 
 `code/e2e/tests/incidents.spec.ts`:
+
 ```typescript
 import { expect, test } from "@playwright/test";
 import { login } from "./helpers/auth";
@@ -1683,6 +1763,7 @@ test("incidents page renders a seeded incident with cause and timeline", async (
   await expect(page.getByRole("listitem")).not.toHaveCount(0);
 });
 ```
+
 (Seed one incident via an API call in a Playwright `beforeEach`, or a small seed script mirroring `app/demo.py`.)
 
 - [ ] **Step 3: Run E2E**
@@ -1711,6 +1792,7 @@ git commit -m "feat(intelligence): wire Timescale service, e2e, and raise covera
 ## Self-Review
 
 **Spec coverage:**
+
 - §5.1 collector → Task 9 · correlation service → Task 7 · narrative → Task 6 · cause rules → Task 5 · anomaly → Task 4 ✓
 - §5.1 API REST → Task 8 · WS → Task 10 ✓
 - §5.1 frontend feed/detail/timeline/route → Tasks 11–12 ✓
