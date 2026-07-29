@@ -40,7 +40,7 @@ repos:
     - main
   - id: detect-private-key
 - repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.1.1-98
+  rev: v0.1.1-99
   hooks:
   - id: makefile-check
   - id: console-debug-detection
@@ -70,6 +70,7 @@ repos:
   - id: claude-skill-frontmatter
   - id: claude-agent-frontmatter
   - id: claude-mcp-config
+  - id: python-no-unittest-import
 - repo: https://github.com/AleksaC/hadolint-py
   rev: v2.14.0
   hooks:
