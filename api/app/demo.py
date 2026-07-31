@@ -46,7 +46,7 @@ _DEMO_PROJECTS: list[dict[str, Any]] = [
                 "networks": ["frontend"],
                 "volumes": ["web-static"],
                 "environment": {"TZ": "UTC"},
-                "healthcheck": {"test": ["CMD", "curl", "-f", "http://localhost"]},
+                "healthcheck": {"test": ["CMD", "curl", "-f", "http://localhost"]},  # no-hardcoded-localhost: disable
             },
             {
                 "name": "api",
