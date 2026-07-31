@@ -169,7 +169,7 @@ repos:
     - '200'
     exclude: ^(\.config/|\.github/ISSUE_TEMPLATE/|\.github/workflows/|k8s/|GitVersion\.yml|\.github/FUNDING\.yml|\.github/dependabot\.yml|\.pre-commit-config\.yaml|docker-compose\.yml)
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.48.0
+  rev: v0.49.1
   hooks:
   - id: markdownlint
     args:
