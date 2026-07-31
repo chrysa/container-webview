@@ -1,6 +1,3 @@
-from unittest.mock import AsyncMock
-from unittest.mock import MagicMock
-
 from fastapi import WebSocketDisconnect
 from fastapi.testclient import TestClient
 import pytest
@@ -38,7 +35,7 @@ class TestStreamLogsWebSocket:
 
     def test_closes_4004_when_container_not_found(self, mocker, test_token):
         """Close with code 4004 when service container does not exist."""
-        mocker.patch("app.routers.logs.load_project", return_value=MagicMock())
+        mocker.patch("app.routers.logs.load_project", return_value=mocker.MagicMock())
         mocker.patch("app.routers.logs.get_container_for_service", return_value=None)
         with (
             TestClient(app) as client,
@@ -49,32 +46,28 @@ class TestStreamLogsWebSocket:
 
     async def test_streams_log_lines(self, mocker):
         """Verify stream_logs() calls container.logs() and sends text to websocket."""
-        from unittest.mock import MagicMock
-        from unittest.mock import patch
-
         from app.routers.logs import stream_logs
         from app.security import create_access_token
 
         token = create_access_token({"sub": "testuser"})
-        mock_ws = AsyncMock()
-        mock_ws.close = AsyncMock()
+        mock_ws = mocker.AsyncMock()
+        mock_ws.close = mocker.AsyncMock()
 
-        mock_project = MagicMock()
-        mock_container = MagicMock()
+        mock_project = mocker.MagicMock()
+        mock_container = mocker.MagicMock()
         mock_container.logs.return_value = iter([b"hello\n", b"world\n"])
 
-        with (
-            patch("app.routers.logs.load_project", return_value=mock_project),
-            patch("app.routers.logs.get_container_for_service", return_value=mock_container),
-            patch("app.routers.logs.asyncio.sleep", new=AsyncMock(return_value=None)),
-        ):
-            await stream_logs(
-                websocket=mock_ws,
-                project_id="myproject",
-                service_name="web",
-                token=token,
-                tail=100,
-            )
+        mocker.patch("app.routers.logs.load_project", return_value=mock_project)
+        mocker.patch("app.routers.logs.get_container_for_service", return_value=mock_container)
+        mocker.patch("app.routers.logs.asyncio.sleep", new=mocker.AsyncMock(return_value=None))
+
+        await stream_logs(
+            websocket=mock_ws,
+            project_id="myproject",
+            service_name="web",
+            token=token,
+            tail=100,
+        )
 
         mock_container.logs.assert_called_once_with(stream=True, follow=True, tail=100, timestamps=True)
         mock_ws.send_text.assert_any_call("hello")
