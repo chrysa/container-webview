@@ -1,11 +1,12 @@
-from unittest.mock import MagicMock
-
 from docker.errors import DockerException
+from pytest_mock import MockerFixture
+from pytest_mock import MockType
 
 from app.routers.alerts import _container_alerts
 
 
 def _make_container(
+    mocker: MockerFixture,
     *,
     short_id: str = "abc123",
     name: str = "web_1",
@@ -14,8 +15,8 @@ def _make_container(
     service: str = "web",
     exit_code: int = 0,
     health_status: str | None = None,
-) -> MagicMock:
-    container = MagicMock()
+) -> MockType:
+    container = mocker.MagicMock()
     container.short_id = short_id
     container.name = name
     container.status = status
@@ -35,7 +36,7 @@ class TestContainerAlerts:
 
     def test_returns_empty_when_no_containers(self, mocker):
         """Return empty list when Docker reports no containers."""
-        mock_client = MagicMock()
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = []
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -45,11 +46,11 @@ class TestContainerAlerts:
 
     def test_skips_containers_without_project_label(self, mocker):
         """Skip containers that have no compose project label."""
-        container = MagicMock()
+        container = mocker.MagicMock()
         container.labels = {}
         container.status = "running"
         container.attrs = {"State": {}}
-        mock_client = MagicMock()
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -59,8 +60,8 @@ class TestContainerAlerts:
 
     def test_exited_with_nonzero_code_creates_critical_alert(self, mocker):
         """Exited container with exit code != 0 should generate a critical alert."""
-        container = _make_container(status="exited", exit_code=1)
-        mock_client = MagicMock()
+        container = _make_container(mocker, status="exited", exit_code=1)
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -72,8 +73,8 @@ class TestContainerAlerts:
 
     def test_exited_with_zero_code_creates_info_alert(self, mocker):
         """Exited container with exit code 0 should generate an info alert."""
-        container = _make_container(status="exited", exit_code=0)
-        mock_client = MagicMock()
+        container = _make_container(mocker, status="exited", exit_code=0)
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -84,8 +85,8 @@ class TestContainerAlerts:
 
     def test_restarting_container_creates_warning_alert(self, mocker):
         """Restarting container should generate a warning alert."""
-        container = _make_container(status="restarting")
-        mock_client = MagicMock()
+        container = _make_container(mocker, status="restarting")
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -97,8 +98,8 @@ class TestContainerAlerts:
 
     def test_unhealthy_container_creates_critical_health_alert(self, mocker):
         """Container with unhealthy healthcheck should generate a critical alert."""
-        container = _make_container(health_status="unhealthy")
-        mock_client = MagicMock()
+        container = _make_container(mocker, health_status="unhealthy")
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -110,8 +111,8 @@ class TestContainerAlerts:
 
     def test_starting_health_creates_info_alert(self, mocker):
         """Container with healthcheck in starting state should generate an info alert."""
-        container = _make_container(health_status="starting")
-        mock_client = MagicMock()
+        container = _make_container(mocker, health_status="starting")
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -123,13 +124,13 @@ class TestContainerAlerts:
 
     def test_uses_container_name_when_no_service_label(self, mocker):
         """Use container.name as service when service label is absent."""
-        container = MagicMock()
+        container = mocker.MagicMock()
         container.short_id = "def456"
         container.name = "standalone_container"
         container.status = "restarting"
         container.labels = {"com.docker.compose.project": "myproject"}
         container.attrs = {"State": {}}
-        mock_client = MagicMock()
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 
@@ -147,8 +148,8 @@ class TestContainerAlerts:
 
     def test_multiple_alerts_for_one_container(self, mocker):
         """Exited (critical) + unhealthy health should produce two alerts."""
-        container = _make_container(status="exited", exit_code=1, health_status="unhealthy")
-        mock_client = MagicMock()
+        container = _make_container(mocker, status="exited", exit_code=1, health_status="unhealthy")
+        mock_client = mocker.MagicMock()
         mock_client.containers.list.return_value = [container]
         mocker.patch("app.routers.alerts.get_docker_client", return_value=mock_client)
 

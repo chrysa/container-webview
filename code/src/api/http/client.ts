@@ -3,7 +3,7 @@ import { setupInterceptors } from './interceptors';
 
 // VITE_API_URL must be set in .env.local for local dev (e.g. http://localhost:8000).
 // In production, it is set at build time.
-const BASE = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000') + '/api';
+const BASE = (import.meta.env.VITE_API_URL ?? 'http://localhost:8000') + '/api'; // no-hardcoded-localhost: disable
 
 export const http = axios.create({
   baseURL: BASE,
