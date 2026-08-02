@@ -51,7 +51,7 @@ jobs:
 
             - name: Update CHANGELOG.md
               if: steps.check-tag.outputs.skip == 'false'
-              uses: orhun/git-cliff-action@v4
+              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
               with:
                   config: cliff.toml
                   args: --verbose --tag v${{ steps.gitversion.outputs.semVer }}
@@ -62,7 +62,7 @@ jobs:
             - name: Generate release notes
               id: release-notes
               if: steps.check-tag.outputs.skip == 'false'
-              uses: orhun/git-cliff-action@v4
+              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
               with:
                   config: cliff.toml
                   args: >-
@@ -87,7 +87,7 @@ jobs:
 
             - name: Create GitHub Release
               if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
-              uses: softprops/action-gh-release@v2
+              uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
               with:
                   body: ${{ steps.release-notes.outputs.content }}
                   draft: false
