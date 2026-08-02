@@ -39,7 +39,7 @@ jobs:
 
             - name: GitVersion
               id: gitversion
-              uses: chrysa/github-actions/gitversion@main
+              uses: chrysa/github-actions/gitversion@v1.6.0
 
             - name: Summary
               run: |
@@ -86,17 +86,17 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Setup Python
-              uses: chrysa/github-actions/python-setup@main
+              uses: chrysa/github-actions/python-setup@v1.6.0
               with:
                   python-version: '3.12'
 
             - name: Install project
-              uses: chrysa/github-actions/install-project@main
+              uses: chrysa/github-actions/install-project@v1.6.0
               with:
                   extras: 'dev'
 
             - name: Ruff check
-              uses: chrysa/github-actions/ruff-check@main
+              uses: chrysa/github-actions/ruff-check@v1.6.0
               with:
                   python-version: '3.12'
                   latest-python: '3.12'
@@ -104,7 +104,7 @@ jobs:
                   sources: api/app
 
             - name: Mypy check
-              uses: chrysa/github-actions/mypy-check@main
+              uses: chrysa/github-actions/mypy-check@v1.6.0
               with:
                   python-version: '3.12'
                   latest-python: '3.12'
@@ -230,7 +230,7 @@ jobs:
                   fetch-depth: 0
 
             - name: SonarCloud scan
-              uses: chrysa/github-actions/sonar-scan@main
+              uses: chrysa/github-actions/sonar-scan@v1.6.0
               with:
                   latest-python: '3.12'
                   sonar-token: ${{ secrets.SONAR_TOKEN }}
