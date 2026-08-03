@@ -28,6 +28,14 @@ jobs:
     version:
         name: Compute Version
         runs-on: ubuntu-latest
+        timeout-minutes: 30
+        timeout-minutes: 30
+        timeout-minutes: 30
+        timeout-minutes: 30
+        timeout-minutes: 30
+        timeout-minutes: 30
+        timeout-minutes: 30
+        timeout-minutes: 30
         outputs:
             semVer: ${{ steps.gitversion.outputs.semVer }}
 

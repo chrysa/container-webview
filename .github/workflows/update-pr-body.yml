@@ -3,11 +3,16 @@ true:
     types:
     - opened
     - synchronize
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
   update-body:
     if: contains(github.event.pull_request.body, '<!-- auto-changes-start -->')
     name: Fill auto-changes section
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
     - name: Checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
