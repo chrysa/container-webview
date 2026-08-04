@@ -29,13 +29,6 @@ jobs:
         name: Compute Version
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        timeout-minutes: 30
-        timeout-minutes: 30
-        timeout-minutes: 30
-        timeout-minutes: 30
-        timeout-minutes: 30
-        timeout-minutes: 30
-        timeout-minutes: 30
         outputs:
             semVer: ${{ steps.gitversion.outputs.semVer }}
 
@@ -61,6 +54,7 @@ jobs:
     pre-commit:
         name: Pre-commit Checks
         runs-on: ubuntu-latest
+        timeout-minutes: 30
 
         steps:
             - name: Checkout
@@ -88,6 +82,7 @@ jobs:
     backend-lint:
         name: Backend Lint & Type Check
         runs-on: ubuntu-latest
+        timeout-minutes: 30
 
         steps:
             - name: Checkout
@@ -123,6 +118,7 @@ jobs:
     backend-tests:
         name: Backend Tests
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: backend-lint
 
         steps:
@@ -172,6 +168,7 @@ jobs:
     frontend-lint:
         name: Frontend Lint & Type Check
         runs-on: ubuntu-latest
+        timeout-minutes: 30
 
         steps:
             - name: Checkout
@@ -200,6 +197,7 @@ jobs:
     docker-build:
         name: Docker Build Validation
         runs-on: ubuntu-latest
+        timeout-minutes: 30
 
         steps:
             - name: Checkout
@@ -228,6 +226,7 @@ jobs:
     sonar:
         name: SonarCloud
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: [backend-tests]
         if: always()
 
@@ -253,6 +252,7 @@ jobs:
     ci-summary:
         name: CI Summary
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         needs: [version, pre-commit, backend-lint, backend-tests, frontend-lint, docker-build, sonar]
         if: always()
 
