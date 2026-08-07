@@ -45,7 +45,7 @@ services:
 
   # ── React frontend (CRA dev server) ─────────────────────────────────────
   frontend:
-    image: node:20-slim
+    image: node:25-slim
     container_name: container-webview-frontend
     working_dir: /app
     env_file: .env
