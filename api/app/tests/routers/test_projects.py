@@ -30,7 +30,7 @@ class TestProjectsRouter:
                 return_value=[_make_project("proj-a"), _make_project("proj-b")],
             )
             async with api_client() as client:
-                response = await client.get("/api/projects", headers=auth_headers())
+                response = await client.get("/api/v1/projects", headers=auth_headers())
 
             assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
             body = response.json()
@@ -46,7 +46,7 @@ class TestProjectsRouter:
             Then: Should return 401
             """
             async with api_client() as client:
-                response = await client.get("/api/projects")
+                response = await client.get("/api/v1/projects")
 
             assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
 
@@ -65,7 +65,7 @@ class TestProjectsRouter:
                 return_value=_make_project("my-project"),
             )
             async with api_client() as client:
-                response = await client.get("/api/projects/my-project", headers=auth_headers())
+                response = await client.get("/api/v1/projects/my-project", headers=auth_headers())
 
             assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
             assert response.json()["id"] == "my-project", f"Unexpected id {response.json()['id']=}"
@@ -82,6 +82,6 @@ class TestProjectsRouter:
                 return_value=None,
             )
             async with api_client() as client:
-                response = await client.get("/api/projects/unknown", headers=auth_headers())
+                response = await client.get("/api/v1/projects/unknown", headers=auth_headers())
 
             assert response.status_code == 404, f"Expected 404 but got {response.status_code=}"

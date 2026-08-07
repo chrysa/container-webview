@@ -52,13 +52,13 @@ docker-overview-webui/
 │   │   ├── main.py             # FastAPI app + CORS + routers
 │   │   ├── security.py         # JWT service
 │   │   ├── routers/            # HTTP controllers (thin)
-│   │   │   ├── auth.py         # POST /api/auth/login, GET /api/auth/check
-│   │   │   ├── projects.py     # GET /api/projects[/{id}]
-│   │   │   ├── topology.py     # GET /api/projects/{id}/topology
-│   │   │   ├── lifecycle.py    # POST /api/projects/{id}/services/{svc}/{action}
-│   │   │   ├── metrics.py      # GET /api/projects/{id}/metrics
-│   │   │   ├── alerts.py       # GET /api/alerts[/project/{id}]
-│   │   │   └── logs.py         # WebSocket /api/projects/{id}/services/{svc}/logs
+│   │   │   ├── auth.py         # POST /api/v1/auth/login, GET /api/v1/auth/check
+│   │   │   ├── projects.py     # GET /api/v1/projects[/{id}]
+│   │   │   ├── topology.py     # GET /api/v1/projects/{id}/topology
+│   │   │   ├── lifecycle.py    # POST /api/v1/projects/{id}/services/{svc}/{action}
+│   │   │   ├── metrics.py      # GET /api/v1/projects/{id}/metrics
+│   │   │   ├── alerts.py       # GET /api/v1/alerts[/project/{id}]
+│   │   │   └── logs.py         # WebSocket /api/v1/projects/{id}/services/{svc}/logs
 │   │   ├── services/           # Business logic
 │   │   │   ├── auth_service.py
 │   │   │   ├── docker_client.py
@@ -107,7 +107,7 @@ docker compose up --build
 
 # 5. Open the UI
 #   Frontend : http://localhost:3000
-#   API docs : http://localhost:8000/docs
+#   API docs : http://localhost:8000/api/docs
 ```
 
 Default credentials if not configured: `admin` / `admin`.
@@ -135,24 +135,24 @@ The volume `${PROJECTS_PATH:-./data/projects}:/projects:ro` in `docker-compose.y
 
 ## API Endpoints
 
-Interactive documentation available at `http://localhost:8000/docs` (Swagger UI).
+Interactive documentation available at `http://localhost:8000/api/docs` (Swagger UI).
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/api/auth/login` | Authentication — returns a JWT Bearer token |
-| `GET` | `/api/auth/check` | Validates the current token |
-| `GET` | `/api/projects` | Lists all detected Compose projects |
-| `GET` | `/api/projects/{id}` | Project details |
-| `GET` | `/api/projects/{id}/topology` | Project topology graph |
-| `GET` | `/api/projects/{id}/metrics` | CPU/RAM/network metrics for all containers |
-| `POST` | `/api/projects/{id}/services/{svc}/start` | Start a service |
-| `POST` | `/api/projects/{id}/services/{svc}/stop` | Stop a service |
-| `POST` | `/api/projects/{id}/services/{svc}/restart` | Restart a service |
-| `POST` | `/api/projects/{id}/services/{svc}/pause` | Pause a service |
-| `POST` | `/api/projects/{id}/services/{svc}/unpause` | Resume from pause |
-| `GET` | `/api/alerts` | All active alerts |
-| `GET` | `/api/alerts/project/{id}` | Alerts filtered by project |
-| `WS` | `/api/projects/{id}/services/{svc}/logs` | Streaming logs (WebSocket) |
+| `POST` | `/api/v1/auth/login` | Authentication — returns a JWT Bearer token |
+| `GET` | `/api/v1/auth/check` | Validates the current token |
+| `GET` | `/api/v1/projects` | Lists all detected Compose projects |
+| `GET` | `/api/v1/projects/{id}` | Project details |
+| `GET` | `/api/v1/projects/{id}/topology` | Project topology graph |
+| `GET` | `/api/v1/projects/{id}/metrics` | CPU/RAM/network metrics for all containers |
+| `POST` | `/api/v1/projects/{id}/services/{svc}/start` | Start a service |
+| `POST` | `/api/v1/projects/{id}/services/{svc}/stop` | Stop a service |
+| `POST` | `/api/v1/projects/{id}/services/{svc}/restart` | Restart a service |
+| `POST` | `/api/v1/projects/{id}/services/{svc}/pause` | Pause a service |
+| `POST` | `/api/v1/projects/{id}/services/{svc}/unpause` | Resume from pause |
+| `GET` | `/api/v1/alerts` | All active alerts |
+| `GET` | `/api/v1/alerts/project/{id}` | Alerts filtered by project |
+| `WS` | `/api/v1/projects/{id}/services/{svc}/logs` | Streaming logs (WebSocket) |
 
 ---
 
