@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "command": "sh -c 'f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/check-no-env-files.cjs\"; [ ! -f \"$f\" ] || node \"$f\"'",
+            "name": "check-no-env-files",
+            "timeout": 5000,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}
