@@ -23,7 +23,7 @@ repos:
     - main
     id: no-commit-to-branch
 - repo: https://github.com/chrysa/pre-commit-tools
-  rev: v0.2.0-247
+  rev: v0.2.0-253
   hooks:
   - id: console-debug-detection
   - id: console-log-detection
@@ -38,17 +38,22 @@ repos:
   - id: format-dockerfiles
   - id: dockerfile-no-latest
   - id: python-print-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: python-pprint-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: python-unreachable-code
   - id: python-dead-code
     stages:
     - manual
   - id: python-logger-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: no-bare-except
   - id: fastapi-missing-response-model
     files: (routers?)/.*\.py$
+    exclude: (^|/)tests/
   - id: no-sync-in-async
   - id: debugger-detection
+    exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: yaml-sorter
     exclude: ^(\.pre-commit-config\.yaml|config-tools/|\.github/)
   - id: json-sorter
@@ -62,10 +67,19 @@ repos:
   - id: claude-mcp-config
   - id: python-no-unittest-import
   - id: python-untyped-raise
-    exclude: ^tests?/
+    exclude: (^|/)tests?/
   - id: python-mutable-default
   - id: python-dispatch-ladder
   - id: claude-assets-present
+  - id: no-hardcoded-localhost
+    exclude: tests?/|\.test\.|\.spec\.
+  - id: regression-gate
+    stages:
+    - pre-push
+  - id: fastapi-missing-links
+    exclude: (^|/)tests/
+  - id: react-no-async-in-useeffect
+  - id: react-direct-dom
 - repo: https://github.com/chrysa/pre-commit-hooks-changelog
   rev: 40d13585c4c845c36108a565f00c23f2b946e9d9
   hooks:
