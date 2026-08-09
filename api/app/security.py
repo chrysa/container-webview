@@ -1,6 +1,6 @@
+from datetime import UTC
 from datetime import datetime
 from datetime import timedelta
-from datetime import timezone
 from typing import Annotated
 
 from fastapi import Depends
@@ -15,6 +15,7 @@ from app.constants import ERR_INVALID_TOKEN
 from app.constants import JWT_CLAIM_SUB
 from app.constants import OAUTH2_TOKEN_URL
 
+
 _oauth2_scheme = OAuth2PasswordBearer(tokenUrl=OAUTH2_TOKEN_URL)
 
 
@@ -25,7 +26,7 @@ class SecurityService:
     ) -> str:
         """Encode a JWT access token for *subject*."""
         settings = get_settings()
-        expire = datetime.now(timezone.utc) + (
+        expire = datetime.now(UTC) + (
             expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
         )
         return jwt.encode(

@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import yaml
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
+import yaml
 
 from app.config import get_settings
 from app.models.hateoas import ProjectLinks
-
 
 
 class ServiceModel(BaseModel):
@@ -64,17 +63,14 @@ class ProjectManager:
     @staticmethod
     def _parse_compose(compose_path: Path) -> dict[str, object]:
         """Read and parse a Compose YAML file."""
-        with open(compose_path) as fh:
+        with compose_path.open() as fh:
             return yaml.safe_load(fh) or {}
 
     @staticmethod
     def _normalize_ports(raw: list | None) -> list[str]:
         if not raw:
             return []
-        result = []
-        for p in raw:
-            result.append(str(p.get("target", "")) if isinstance(p, dict) else str(p))
-        return result
+        return [str(p.get("target", "")) if isinstance(p, dict) else str(p) for p in raw]
 
     @staticmethod
     def _normalize_list_or_dict_keys(raw: list | dict | None) -> list[str]:

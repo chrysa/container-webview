@@ -33,7 +33,7 @@ class TestGetMetrics:
             return_value=[_make_metrics("api"), _make_metrics("db")],
         )
         async with api_client() as client:
-            response = await client.get("/api/projects/my-project/metrics", headers=auth_headers())
+            response = await client.get("/api/v1/projects/my-project/metrics", headers=auth_headers())
 
         assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
         body = response.json()
@@ -50,7 +50,7 @@ class TestGetMetrics:
         """
         mocker.patch("app.routers.metrics.project_manager.load", return_value=None)
         async with api_client() as client:
-            response = await client.get("/api/projects/unknown/metrics", headers=auth_headers())
+            response = await client.get("/api/v1/projects/unknown/metrics", headers=auth_headers())
 
         assert response.status_code == 404, f"Expected 404 but got {response.status_code=}"
 
@@ -62,6 +62,6 @@ class TestGetMetrics:
         Then: Should return 401
         """
         async with api_client() as client:
-            response = await client.get("/api/projects/my-project/metrics")
+            response = await client.get("/api/v1/projects/my-project/metrics")
 
         assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
