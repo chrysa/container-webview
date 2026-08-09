@@ -101,14 +101,16 @@ class TopologyService:
                 },
             ))
 
-            for dependency_name in service.depends_on:
-                edges.append(GraphEdge(
+            edges.extend(
+                GraphEdge(
                     id=f"{_ID_PREFIX_DEP}{dependency_name}-{service.name}",
                     source=f"{_ID_PREFIX_SVC}{dependency_name}",
                     target=f"{_ID_PREFIX_SVC}{service.name}",
                     label=_EDGE_LABEL_DEPENDS_ON,
                     animated=status == ContainerState.RUNNING,
-                ))
+                )
+                for dependency_name in service.depends_on
+            )
 
         return nodes, edges
 
@@ -128,13 +130,15 @@ class TopologyService:
                 position=NodePosition(x=50 + i * 200, y=600),
                 data={"label": network_name, "color": color_map[network_name]},
             ))
-            for service in project.services:
-                if network_name in service.networks:
-                    edges.append(GraphEdge(
-                        id=f"{_ID_PREFIX_NET}{service.name}-{network_name}",
-                        source=f"{_ID_PREFIX_SVC}{service.name}",
-                        target=f"{_ID_PREFIX_NET}{network_name}",
-                    ))
+            edges.extend(
+                GraphEdge(
+                    id=f"{_ID_PREFIX_NET}{service.name}-{network_name}",
+                    source=f"{_ID_PREFIX_SVC}{service.name}",
+                    target=f"{_ID_PREFIX_NET}{network_name}",
+                )
+                for service in project.services
+                if network_name in service.networks
+            )
 
         return nodes, edges
 

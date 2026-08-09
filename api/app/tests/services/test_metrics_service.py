@@ -13,7 +13,7 @@ class TestMetricsService:
         @pytest.mark.parametrize("byte_count,expected_mb", [
             (0, 0.0),
             (1024 * 1024, 1.0),
-            (512 * 1024, 0.49),
+            (512 * 1024, 0.5),
             (10 * 1024 * 1024, 10.0),
         ])
         def test_converts_bytes_to_megabytes(self, byte_count, expected_mb):
