@@ -31,7 +31,7 @@ class TestAlertsRouter:
                 return_value=[_make_alert("proj-a"), _make_alert("proj-b")],
             )
             async with api_client() as client:
-                response = await client.get("/api/alerts", headers=auth_headers())
+                response = await client.get("/api/v1/alerts", headers=auth_headers())
 
             assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
             assert len(response.json()) == 2, f"Expected 2 alerts but got {len(response.json())=}"
@@ -45,7 +45,7 @@ class TestAlertsRouter:
             """
             mocker.patch("app.routers.alerts.alerts_service.get_all", return_value=[])
             async with api_client() as client:
-                response = await client.get("/api/alerts", headers=auth_headers())
+                response = await client.get("/api/v1/alerts", headers=auth_headers())
 
             assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
             assert response.json() == [], f"Expected [] but got {response.json()=}"
@@ -58,7 +58,7 @@ class TestAlertsRouter:
             Then: Should return 401
             """
             async with api_client() as client:
-                response = await client.get("/api/alerts")
+                response = await client.get("/api/v1/alerts")
 
             assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
 
@@ -77,7 +77,7 @@ class TestAlertsRouter:
                 return_value=[_make_alert("my-project")],
             )
             async with api_client() as client:
-                response = await client.get("/api/alerts/project/my-project", headers=auth_headers())
+                response = await client.get("/api/v1/alerts/project/my-project", headers=auth_headers())
 
             assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
             body = response.json()

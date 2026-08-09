@@ -23,7 +23,7 @@ class TestLifecycleActions:
         )
         async with api_client() as client:
             response = await client.post(
-                f"/api/projects/my-project/services/web/{action}",
+                f"/api/v1/projects/my-project/services/web/{action}",
                 headers=auth_headers(),
             )
 
@@ -48,7 +48,7 @@ class TestLifecycleActions:
         )
         async with api_client() as client:
             response = await client.post(
-                "/api/projects/missing/services/web/start",
+                "/api/v1/projects/missing/services/web/start",
                 headers=auth_headers(),
             )
 
@@ -67,7 +67,7 @@ class TestLifecycleActions:
         )
         async with api_client() as client:
             response = await client.post(
-                "/api/projects/proj/services/unknown/stop",
+                "/api/v1/projects/proj/services/unknown/stop",
                 headers=auth_headers(),
             )
 
@@ -86,7 +86,7 @@ class TestLifecycleActions:
         )
         async with api_client() as client:
             response = await client.post(
-                "/api/projects/proj/services/web/start",
+                "/api/v1/projects/proj/services/web/start",
                 headers=auth_headers(),
             )
 
@@ -100,6 +100,6 @@ class TestLifecycleActions:
         Then: Should return 401
         """
         async with api_client() as client:
-            response = await client.post("/api/projects/proj/services/web/start")
+            response = await client.post("/api/v1/projects/proj/services/web/start")
 
         assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"

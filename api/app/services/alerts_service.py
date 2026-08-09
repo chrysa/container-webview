@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 import typing
+from datetime import UTC
 from datetime import datetime
-from datetime import timezone
 
 import docker.errors
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ class AlertsService:
             return []
 
         service: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
-        now: str = datetime.now(timezone.utc).isoformat()
+        now: str = datetime.now(UTC).isoformat()
         state: dict = container.attrs.get("State", {})
         alerts: list[Alert] = []
 

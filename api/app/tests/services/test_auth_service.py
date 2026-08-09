@@ -19,7 +19,7 @@ class TestAuthService:
             """
             mocker.patch(
                 "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret", admin_password_hash=""),
             )
             service = AuthService()
             result = service._authenticate_local("admin", "secret")
@@ -34,7 +34,7 @@ class TestAuthService:
             """
             mocker.patch(
                 "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret", admin_password_hash=""),
             )
             service = AuthService()
             result = service._authenticate_local("admin", "wrongpassword")
@@ -49,10 +49,46 @@ class TestAuthService:
             """
             mocker.patch(
                 "app.services.auth_service.get_settings",
-                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret", admin_password_hash=""),
             )
             service = AuthService()
             result = service._authenticate_local("hacker", "secret")
+            assert result is False, f"Expected False but got {result=}"
+
+        def test_returns_true_for_valid_bcrypt_hash(self, mocker):
+            """Return True when the password matches the configured bcrypt hash.
+
+            Given: Settings with admin_password_hash set to bcrypt('secret')
+            When: Calling _authenticate_local('admin', 'secret')
+            Then: Should return True
+            """
+            import bcrypt
+
+            hashed = bcrypt.hashpw(b"secret", bcrypt.gensalt()).decode()
+            mocker.patch(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password_hash=hashed),
+            )
+            service = AuthService()
+            result = service._authenticate_local("admin", "secret")
+            assert result is True, f"Expected True but got {result=}"
+
+        def test_returns_false_for_wrong_password_against_hash(self, mocker):
+            """Return False when the password does not match the bcrypt hash.
+
+            Given: Settings with admin_password_hash set to bcrypt('secret')
+            When: Calling _authenticate_local('admin', 'wrong')
+            Then: Should return False
+            """
+            import bcrypt
+
+            hashed = bcrypt.hashpw(b"secret", bcrypt.gensalt()).decode()
+            mocker.patch(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password_hash=hashed),
+            )
+            service = AuthService()
+            result = service._authenticate_local("admin", "wrong")
             assert result is False, f"Expected False but got {result=}"
 
     class TestAuthenticateLdap:
@@ -129,6 +165,7 @@ class TestAuthService:
                     ldap_server="",
                     admin_username="admin",
                     admin_password="secret",
+                    admin_password_hash="",
                 ),
             )
             service = AuthService()
@@ -148,6 +185,7 @@ class TestAuthService:
                     ldap_server="",
                     admin_username="admin",
                     admin_password="secret",
+                    admin_password_hash="",
                 ),
             )
             service = AuthService()

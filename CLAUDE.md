@@ -1,16 +1,13 @@
-# CLAUDE.md — [PROJECT_NAME]
-
-> Replace [PROJECT_NAME] and all [PLACEHOLDER] values before committing.
-> @[claude-sonnet-4-6]
+# CLAUDE.md — container-webview
 
 > **Claude Code**: at session start, read `primer.md` FIRST (current state), then this file (conventions).
 > Also read `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md` for code specifications.
 
 ## Project
 
-**Name:** [PROJECT_NAME]
-**Stack:** [Python 3.14 / Node.js LTS / React / ...]
-**Purpose:** [One sentence description]
+**Name:** container-webview (Docker Overview WebUI)
+**Stack:** Python 3.12+ / FastAPI backend · React + TypeScript + Vite frontend
+**Purpose:** Discover, monitor and control local Docker Compose projects from a web UI.
 
 ## Conventions
 
@@ -18,7 +15,7 @@
 - Governance: the five strategic pillars and the refutable ADR format are mandatory — see the managed `chrysa:standards` block below (inlined by distribute-standards, Governance section).
 - Commits: Conventional Commits (`feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `ci`)
 - Branch naming: `feature/`, `bugfix/`, `chore/`, `hotfix/`, `release/`
-- Default branch: `develop`
+- Default branch: `main`
 
 ## Standards
 
@@ -26,7 +23,7 @@
 - Max file lines: 500
 - Max complexity (heuristic): 10
 - Lint warnings: 0
-- Test coverage: [X]%
+- Test coverage: 85% (floor 80%)
 
 ## Session Workflow
 

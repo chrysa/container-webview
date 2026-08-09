@@ -17,7 +17,7 @@ class TestAuthRouter:
             )
             async with api_client() as client:
                 response = await client.post(
-                    "/api/auth/login",
+                    "/api/v1/auth/login",
                     data={"username": "admin", "password": "secret"},
                 )
 
@@ -40,7 +40,7 @@ class TestAuthRouter:
             )
             async with api_client() as client:
                 response = await client.post(
-                    "/api/auth/login",
+                    "/api/v1/auth/login",
                     data={"username": "admin", "password": "wrong"},
                 )
 
@@ -57,7 +57,7 @@ class TestAuthRouter:
             Then: Should return 200 {"status": "ok"}
             """
             async with api_client() as client:
-                response = await client.get("/api/auth/check", headers=auth_headers())
+                response = await client.get("/api/v1/auth/check", headers=auth_headers())
 
             assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
             assert response.json() == {"status": "ok"}, f"Unexpected body {response.json()=}"
@@ -70,7 +70,7 @@ class TestAuthRouter:
             Then: Should return 401
             """
             async with api_client() as client:
-                response = await client.get("/api/auth/check")
+                response = await client.get("/api/v1/auth/check")
 
             assert response.status_code == 401, f"Expected 401 but got {response.status_code=}"
 
