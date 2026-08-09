@@ -3,8 +3,8 @@ true:
   workflow_call: null
   workflow_dispatch: null
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   labels:
@@ -21,8 +21,3 @@ jobs:
       uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b
       with:
         sync-labels: true
-name: Pull Request Labels
-permissions:
-  contents: read
-  pull-requests: write
-run-name: "\U0001F3F7\uFE0F apply labeler by ${{ github.actor }}"
