@@ -1,4 +1,5 @@
 from typing import Annotated
+from typing import Any
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -16,7 +17,7 @@ from app.services.project_manager import project_manager
 router = APIRouter()
 
 _CurrentUser = Annotated[dict, Depends(security.get_current_user)]
-_NOT_FOUND = {404: {"description": ERR_PROJECT_NOT_FOUND}}
+_NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"description": ERR_PROJECT_NOT_FOUND}}
 
 
 def _add_project_links(project: ProjectModel) -> ProjectModel:
