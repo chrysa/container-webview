@@ -36,6 +36,7 @@ dev = [
     "faker==25.0.0",
     "ruff==0.15.22",
     "mypy==1.10.0",
+    "types-PyYAML==6.0.12.20240808",
 ]
 
 # ── Pytest ─────────────────────────────────────────────────────────────────
@@ -163,6 +164,10 @@ python_version = "3.12"
 # modules resolve to `app.*` and the override applies.
 explicit_package_bases = true
 mypy_path = "api"
+# Pydantic v2 field aliases/defaults (e.g. `Field(None, alias="_links")`) are
+# only understood by mypy with this plugin; without it every model with an
+# aliased field reports a spurious "missing argument".
+plugins = ["pydantic.mypy"]
 strict = false
 ignore_missing_imports = true
 warn_unused_ignores = true
@@ -175,3 +180,10 @@ cache_dir = ".mypy_cache/"
 [[tool.mypy.overrides]]
 module = ["app.tests.*"]
 disallow_untyped_defs = false
+
+# The Docker SDK ships incomplete inline types (e.g. `docker.from_env`,
+# `docker.DockerClient` are dynamically re-exported); skip following it so the
+# vendor boundary is treated as untyped rather than mis-typed.
+[[tool.mypy.overrides]]
+module = ["docker.*"]
+follow_imports = "skip"
