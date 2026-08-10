@@ -22,9 +22,7 @@ class TestProjectManager:
             )
             manager = ProjectManager()
             result = manager._safe_project_path("myproject")
-            assert str(result).startswith(str(tmp_path)), (
-                f"Expected path under {tmp_path} but got {result=}"
-            )
+            assert str(result).startswith(str(tmp_path)), f"Expected path under {tmp_path} but got {result=}"
 
         def test_raises_on_path_traversal(self, tmp_path, mocker):
             """Raise ValueError when project id contains path traversal characters.

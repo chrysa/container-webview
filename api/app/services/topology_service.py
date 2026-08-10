@@ -12,8 +12,14 @@ from app.services.project_manager import project_manager
 
 
 _NETWORK_COLORS: list[str] = [
-    "#4f86f7", "#f76f4f", "#4ff79f", "#f7e94f",
-    "#c74ff7", "#4ff7f0", "#f74fa8", "#a8f74f",
+    "#4f86f7",
+    "#f76f4f",
+    "#4ff79f",
+    "#f7e94f",
+    "#c74ff7",
+    "#4ff7f0",
+    "#f74fa8",
+    "#a8f74f",
 ]
 _DEFAULT_NODE_COLOR: str = "#334155"
 _GRID_COLS: int = 3
@@ -53,6 +59,7 @@ class GraphEdge(BaseModel):
 
 class TopologyGraph(BaseModel):
     """Full topology graph for a Compose project."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     nodes: list[GraphNode]
@@ -82,24 +89,24 @@ class TopologyService:
             column_index, row_index = service_index % _GRID_COLS, service_index // _GRID_COLS
             status: str = docker_client.get_container_status(project_id, service.name)
             bg_color: str = (
-                color_map.get(service.networks[0], _DEFAULT_NODE_COLOR)
-                if service.networks
-                else _DEFAULT_NODE_COLOR
+                color_map.get(service.networks[0], _DEFAULT_NODE_COLOR) if service.networks else _DEFAULT_NODE_COLOR
             )
 
-            nodes.append(GraphNode(
-                id=f"{_ID_PREFIX_SVC}{service.name}",
-                type=_NODE_TYPE_SERVICE,
-                position=NodePosition(x=100 + column_index * 280, y=100 + row_index * 200),
-                data={
-                    "label": service.name,
-                    "image": service.image or "",
-                    "status": status,
-                    "ports": service.ports,
-                    "networks": service.networks,
-                    "bgColor": bg_color,
-                },
-            ))
+            nodes.append(
+                GraphNode(
+                    id=f"{_ID_PREFIX_SVC}{service.name}",
+                    type=_NODE_TYPE_SERVICE,
+                    position=NodePosition(x=100 + column_index * 280, y=100 + row_index * 200),
+                    data={
+                        "label": service.name,
+                        "image": service.image or "",
+                        "status": status,
+                        "ports": service.ports,
+                        "networks": service.networks,
+                        "bgColor": bg_color,
+                    },
+                )
+            )
 
             edges.extend(
                 GraphEdge(
@@ -124,12 +131,14 @@ class TopologyService:
         edges: list[GraphEdge] = []
 
         for i, network_name in enumerate(project.networks):
-            nodes.append(GraphNode(
-                id=f"{_ID_PREFIX_NET}{network_name}",
-                type=_NODE_TYPE_NETWORK,
-                position=NodePosition(x=50 + i * 200, y=600),
-                data={"label": network_name, "color": color_map[network_name]},
-            ))
+            nodes.append(
+                GraphNode(
+                    id=f"{_ID_PREFIX_NET}{network_name}",
+                    type=_NODE_TYPE_NETWORK,
+                    position=NodePosition(x=50 + i * 200, y=600),
+                    data={"label": network_name, "color": color_map[network_name]},
+                )
+            )
             edges.extend(
                 GraphEdge(
                     id=f"{_ID_PREFIX_NET}{service.name}-{network_name}",

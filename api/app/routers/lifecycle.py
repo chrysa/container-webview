@@ -36,11 +36,16 @@ def _run(project_id: str, service_name: str, action: str) -> ActionResponse:
         container_status = lifecycle_service.perform(project_id, service_name, action)
     except ValueError as exc:
         detail = str(exc)
-        status_code = 404 if detail in (
-            ERR_PROJECT_NOT_FOUND,
-            ERR_SERVICE_NOT_FOUND.format(service_name),
-            ERR_CONTAINER_NOT_FOUND.format(service_name),
-        ) else 400
+        status_code = (
+            404
+            if detail
+            in (
+                ERR_PROJECT_NOT_FOUND,
+                ERR_SERVICE_NOT_FOUND.format(service_name),
+                ERR_CONTAINER_NOT_FOUND.format(service_name),
+            )
+            else 400
+        )
         raise HTTPException(status_code=status_code, detail=detail) from exc
     return ActionResponse(service=service_name, action=action, status=container_status)
 
