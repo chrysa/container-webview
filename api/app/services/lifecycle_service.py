@@ -9,9 +9,16 @@ from app.services.project_manager import project_manager
 class LifecycleService:
     """Executes start/stop/restart/pause/unpause/kill on Compose service containers."""
 
-    _VALID_ACTIONS: frozenset[str] = frozenset({
-        "kill", "pause", "restart", "start", "stop", "unpause",
-    })
+    _VALID_ACTIONS: frozenset[str] = frozenset(
+        {
+            "kill",
+            "pause",
+            "restart",
+            "start",
+            "stop",
+            "unpause",
+        }
+    )
 
     def perform(self, project_id: str, service_name: str, action: str) -> str:
         """Execute a lifecycle action and return the resulting container status.
