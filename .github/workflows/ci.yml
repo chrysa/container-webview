@@ -97,6 +97,7 @@ jobs:
               uses: chrysa/github-actions/install-project@v1.6.0
               with:
                   extras: 'dev'
+                  working-directory: api
 
             - name: Ruff check
               uses: chrysa/github-actions/ruff-check@v1.6.0
@@ -248,11 +249,15 @@ jobs:
                   sources: api/app
                   tests: api/app/tests
 
-    # ── 8. CI Summary ──────────────────────────────────────────────────────
-    ci-summary:
-        name: CI Summary
+    # ── 8. Quality gate (required check) ───────────────────────────────────
+    # Aggregates every CI job into a single required status context named
+    # `quality-gate` (see branch protection on `develop`). It is fail-closed:
+    # if any upstream job reports `failure` or `cancelled`, the gate fails.
+    # `skipped` is tolerated (path-filtered/conditional jobs stay green).
+    quality-gate:
+        name: quality-gate
         runs-on: ubuntu-latest
-        timeout-minutes: 30
+        timeout-minutes: 10
         needs: [version, pre-commit, backend-lint, backend-tests, frontend-lint, docker-build, sonar]
         if: always()
 
@@ -270,3 +275,15 @@ jobs:
                   echo "| Docker Build | ${{ needs.docker-build.result }} |" >> "$GITHUB_STEP_SUMMARY"
                   echo "| SonarCloud | ${{ needs.sonar.result }} |" >> "$GITHUB_STEP_SUMMARY"
                   echo "" >> "$GITHUB_STEP_SUMMARY"
+
+            - name: Enforce gate
+              env:
+                  RESULTS: >-
+                      ${{ needs.version.result }},${{ needs.pre-commit.result }},${{ needs.backend-lint.result }},${{ needs.backend-tests.result }},${{ needs.frontend-lint.result }},${{ needs.docker-build.result }},${{ needs.sonar.result }}
+              run: |
+                  echo "Job results: ${RESULTS}"
+                  if printf '%s' "${RESULTS}" | tr ',' '\n' | grep -qE '^(failure|cancelled)$'; then
+                      echo "::error::quality-gate failed — one or more CI jobs did not pass"
+                      exit 1
+                  fi
+                  echo "quality-gate passed"

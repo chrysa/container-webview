@@ -12,6 +12,7 @@ from app.constants import DockerComposeLabel
 from app.models.hateoas import MetricsLinks
 from app.services.docker_client import docker_client
 
+
 if typing.TYPE_CHECKING:
     from docker.models.containers import Container
 

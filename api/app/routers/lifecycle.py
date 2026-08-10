@@ -11,6 +11,7 @@ from app.constants import ERR_SERVICE_NOT_FOUND
 from app.security import security
 from app.services.lifecycle_service import lifecycle_service
 
+
 router = APIRouter()
 
 _CurrentUser = Annotated[dict, Depends(security.get_current_user)]

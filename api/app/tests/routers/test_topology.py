@@ -1,4 +1,3 @@
-from app.services.topology_service import GraphEdge
 from app.services.topology_service import GraphNode
 from app.services.topology_service import NodePosition
 from app.services.topology_service import TopologyGraph

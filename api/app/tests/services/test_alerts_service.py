@@ -1,5 +1,4 @@
 import docker.errors
-import pytest
 
 from app.constants import AlertLevel
 from app.constants import ContainerState

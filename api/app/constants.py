@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import typing
 from enum import StrEnum
+import typing
+
 
 if typing.TYPE_CHECKING:
     from typing import Final
@@ -50,7 +51,7 @@ ERR_PROJECT_NOT_FOUND: Final[str] = "Project not found"
 ERR_SERVICE_NOT_FOUND: Final[str] = "Service '{}' not found"
 ERR_CONTAINER_NOT_FOUND: Final[str] = "No running container for '{}' (start via compose first)"
 ERR_UNKNOWN_ACTION: Final[str] = "Unknown action: {}"
-ERR_INVALID_TOKEN: Final[str] = "Invalid or expired token"
+ERR_INVALID_TOKEN: Final[str] = "Invalid or expired token"  # noqa: S105 — error message, not a secret
 ERR_INVALID_CREDENTIALS: Final[str] = "Invalid credentials"
 
 # ── JWT / OAuth2 ───────────────────────────────────────────────────────────
@@ -58,4 +59,4 @@ JWT_CLAIM_SUB: Final[str] = "sub"
 
 # ── API versioning ────────────────────────────────────────────────────────
 API_V1_PREFIX: Final[str] = "/api/v1"
-OAUTH2_TOKEN_URL: Final[str] = "/api/v1/auth/login"
+OAUTH2_TOKEN_URL: Final[str] = "/api/v1/auth/login"  # noqa: S105 — route path, not a secret

@@ -10,6 +10,7 @@ from app.security import security
 from app.services.alerts_service import Alert
 from app.services.alerts_service import alerts_service
 
+
 router = APIRouter()
 
 

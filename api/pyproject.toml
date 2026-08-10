@@ -102,14 +102,18 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"app/tests/*" = [
+"app/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
+    "S108",    # hardcoded /tmp path in fixtures
     "ANN",     # no type annotations in tests
     "ARG001", "ARG002",
     "PLR0913", "PLR2004",
+    "PT006",   # parametrize names style in tests
     "PT011",
+    "PLC0415", # local import for patching in tests
+    "SLF001",  # unit tests exercise private methods in isolation
 ]
 "app/main.py" = ["ANN"]
 # Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
@@ -148,6 +152,11 @@ docstring-code-format = true
 
 [tool.mypy]
 python_version = "3.12"
+# CI runs `mypy api/app` from the repo root; without an explicit base the tests
+# override (`app.tests.*`) never matches. Anchor `api` as the package base so
+# modules resolve to `app.*` and the override applies.
+explicit_package_bases = true
+mypy_path = "api"
 strict = false
 ignore_missing_imports = true
 warn_unused_ignores = true
