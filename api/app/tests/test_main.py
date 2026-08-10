@@ -8,7 +8,7 @@ from app.main import app
 class TestHealth:
     """Tests for the /health liveness endpoint."""
 
-    async def test_health_returns_ok(self):
+    async def test_health_returns_ok(self) -> None:
         """Health check endpoint returns 200 with status ok.
 
         Given: The FastAPI application is running

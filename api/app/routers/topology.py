@@ -12,6 +12,7 @@ from app.security import security
 from app.services.topology_service import TopologyGraph
 from app.services.topology_service import topology_service
 
+
 router = APIRouter()
 
 _NOT_FOUND = {404: {"description": ERR_PROJECT_NOT_FOUND}}
