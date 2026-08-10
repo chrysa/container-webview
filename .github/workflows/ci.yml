@@ -65,7 +65,11 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
               with:
-                  python-version: '3.12'
+                  # pre-commit config pins default_language_version python3.14;
+                  # install 3.14 (and keep 3.12) so hook envs resolve.
+                  python-version: |
+                      3.14
+                      3.12
 
             - name: Cache pre-commit environments
               uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -92,6 +96,11 @@ jobs:
               uses: chrysa/github-actions/python-setup@v1.6.0
               with:
                   python-version: '3.12'
+
+            # python-ldap (core dep) builds from source and needs LDAP/SASL
+            # headers; the runtime image ships them, the bare lint runner does not.
+            - name: Install LDAP build headers
+              run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev
 
             - name: Install project
               uses: chrysa/github-actions/install-project@v1.6.0
