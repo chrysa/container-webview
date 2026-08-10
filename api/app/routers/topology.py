@@ -1,4 +1,5 @@
 from typing import Annotated
+from typing import Any
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -15,7 +16,7 @@ from app.services.topology_service import topology_service
 
 router = APIRouter()
 
-_NOT_FOUND = {404: {"description": ERR_PROJECT_NOT_FOUND}}
+_NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"description": ERR_PROJECT_NOT_FOUND}}
 
 
 def _add_topology_links(graph: TopologyGraph, project_id: str) -> TopologyGraph:
