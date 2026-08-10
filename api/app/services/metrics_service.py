@@ -24,6 +24,7 @@ _BLKIO_OP_WRITE: str = "Write"
 
 class ServiceMetrics(BaseModel):
     """Resource usage snapshot for a single Compose service container."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     service: str
@@ -53,17 +54,11 @@ class MetricsService:
         """Compute CPU usage percentage from raw Docker stats, or 0.0 on missing data."""
         cpu_stats = stats.get("cpu_stats", {})
         precpu_stats = stats.get("precpu_stats", {})
-        cpu_delta = (
-            cpu_stats.get("cpu_usage", {}).get("total_usage", 0)
-            - precpu_stats.get("cpu_usage", {}).get("total_usage", 0)
+        cpu_delta = cpu_stats.get("cpu_usage", {}).get("total_usage", 0) - precpu_stats.get("cpu_usage", {}).get(
+            "total_usage", 0
         )
-        system_delta = (
-            cpu_stats.get("system_cpu_usage", 0)
-            - precpu_stats.get("system_cpu_usage", 0)
-        )
-        nb_cpus: int = cpu_stats.get("online_cpus") or len(
-            cpu_stats.get("cpu_usage", {}).get("percpu_usage", [None])
-        )
+        system_delta = cpu_stats.get("system_cpu_usage", 0) - precpu_stats.get("system_cpu_usage", 0)
+        nb_cpus: int = cpu_stats.get("online_cpus") or len(cpu_stats.get("cpu_usage", {}).get("percpu_usage", [None]))
         if system_delta <= 0 or nb_cpus <= 0:
             return 0.0
         return (cpu_delta / system_delta) * nb_cpus * 100.0
