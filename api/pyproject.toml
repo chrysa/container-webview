@@ -2,6 +2,12 @@
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
+# `api/` holds both the `app` package and a non-Python `docker/` dir
+# (entrypoint scripts); pin discovery to `app` so setuptools' flat-layout
+# auto-discovery does not choke on multiple top-level dirs.
+[tool.setuptools.packages.find]
+include = ["app*"]
+
 [project]
 name = "docker-overview-api"
 version = "1.0.0"
