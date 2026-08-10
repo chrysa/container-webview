@@ -34,7 +34,7 @@ dev = [
     "pytest-asyncio==1.4.0",
     "coverage[toml]==7.5.1",
     "faker==25.0.0",
-    "ruff==0.4.4",
+    "ruff==0.15.22",
     "mypy==1.10.0",
 ]
 
@@ -108,7 +108,7 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"app/tests/**" = [
+"**/app/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
@@ -121,12 +121,12 @@ fixable = ["ALL"]
     "PLC0415", # local import for patching in tests
     "SLF001",  # unit tests exercise private methods in isolation
 ]
-"app/main.py" = ["ANN"]
+"**/app/main.py" = ["ANN"]
 # Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
-"app/services/project_manager.py" = ["TCH001"]
-"app/services/alerts_service.py"  = ["TCH001"]
-"app/services/metrics_service.py" = ["TCH001"]
-"app/services/topology_service.py" = ["TCH001"]
+"**/app/services/project_manager.py" = ["TCH001"]
+"**/app/services/alerts_service.py"  = ["TCH001"]
+"**/app/services/metrics_service.py" = ["TCH001"]
+"**/app/services/topology_service.py" = ["TCH001"]
 
 [tool.ruff.lint.isort]
 force-single-line = true
