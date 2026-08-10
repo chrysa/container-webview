@@ -12,6 +12,7 @@ from app.security import security
 from app.services.project_manager import ProjectModel
 from app.services.project_manager import project_manager
 
+
 router = APIRouter()
 
 _CurrentUser = Annotated[dict, Depends(security.get_current_user)]

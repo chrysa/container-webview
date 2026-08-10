@@ -15,6 +15,7 @@ from app.routers import metrics
 from app.routers import projects
 from app.routers import topology
 
+
 _V1_PROJECTS = f"{API_V1_PREFIX}/projects"
 
 # ── Metadata OpenAPI ────────────────────────────────────────────────────────
@@ -24,7 +25,7 @@ REST API for the **Docker Overview WebUI** — manage and monitor Docker Compose
 
 ## Authentication
 
-All `/api/v1/` endpoints require a **JWT Bearer token**.  
+All `/api/v1/` endpoints require a **JWT Bearer token**.
 Obtain one via `POST /api/v1/auth/login` (OAuth2 password flow).
 
 ## HATEOAS

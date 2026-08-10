@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import logging
-import typing
 from datetime import UTC
 from datetime import datetime
+import logging
+import typing
 
 import docker.errors
 from pydantic import BaseModel
@@ -16,6 +16,7 @@ from app.constants import DockerComposeLabel
 from app.constants import HealthState
 from app.models.hateoas import AlertLinks
 from app.services.docker_client import docker_client
+
 
 if typing.TYPE_CHECKING:
     from docker.models.containers import Container

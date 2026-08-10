@@ -12,6 +12,7 @@ from app.constants import TokenType
 from app.security import security
 from app.services.auth_service import auth_service
 
+
 router = APIRouter()
 
 
