@@ -163,7 +163,9 @@ jobs:
               if: always()
               with:
                   name: test-results-3.12
-                  path: reports/
+                  # the api-test container mounts ./api:/app, so pytest writes
+                  # coverage/junit under api/reports, not the repo-root reports/
+                  path: api/reports/
                   retention-days: 7
 
             - name: Publish test results to PR
