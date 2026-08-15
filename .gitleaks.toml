@@ -1,0 +1,16 @@
+title = "chrysa gitleaks config"
+
+# Inherit the full default gitleaks rule set, then allowlist the
+# security/guideline baseline files. These files store hashed digests and
+# fingerprints (detect-secrets `.secrets.baseline`, guideline hashes), never
+# live credentials, so gitleaks' generic-api-key / high-entropy rules fire on
+# them as false positives.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Ignore self-referential baseline files (hashed digests, not live secrets)"
+paths = [
+  '''\.secrets\.baseline$''',
+  '''\.guideline-baseline\.json$''',
+]
