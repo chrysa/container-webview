@@ -21,3 +21,8 @@ code/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local-only compose overrides and generated reports
+docker-compose.override.yml
+guideline-report.html
+code/design-system/

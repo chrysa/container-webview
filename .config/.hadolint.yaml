@@ -1,15 +1,9 @@
----
-# Hadolint configuration
-# https://github.com/hadolint/hadolint
-
 failure-threshold: error
-
 ignored:
-    - DL3008 # Pin versions in apt get install
-    - DL3009 # Delete the apt-get lists after installing something
-    - DL3015 # Avoid additional packages by specifying --no-install-recommends
-    - DL4006 # Set the SHELL option -o pipefail before RUN with a pipe
-
+- DL3008
+- DL3009
+- DL3015
+- DL4006
 trustedRegistries:
-    - docker.io
-    - ghcr.io
+- docker.io
+- ghcr.io
