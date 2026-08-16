@@ -1,4 +1,4 @@
-import type { ServiceMetrics } from '../../types/api'
+import type { ServiceMetrics } from '@/types/api'
 
 const STATUS_VARIANT: Record<string, string> = {
   running: 'bg-success',

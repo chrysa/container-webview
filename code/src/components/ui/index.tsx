@@ -16,4 +16,4 @@ export function ErrorAlert({ message }: { readonly message: string }) {
   )
 }
 
-export { GlobalLoader } from '../loaders/GlobalLoader'
+export { GlobalLoader } from '@/components/loaders/GlobalLoader'
