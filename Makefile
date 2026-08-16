@@ -1,4 +1,5 @@
 #!make
+# makefile-tier: fullstack
 ifneq (,)
 	$(error This Makefile requires GNU Make)
 endif

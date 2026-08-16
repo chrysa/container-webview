@@ -29,7 +29,7 @@ def _add_topology_links(graph: TopologyGraph, project_id: str) -> TopologyGraph:
     return graph
 
 
-@router.get("/{project_id}/topology", responses=_NOT_FOUND)
+@router.get("/{project_id}/topology", responses=_NOT_FOUND, response_model=TopologyGraph)
 def get_topology(project_id: str, _: Annotated[dict, Depends(security.get_current_user)]) -> TopologyGraph:
     """Return the topology graph for a Compose project."""
     graph = topology_service.build(project_id)

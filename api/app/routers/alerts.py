@@ -23,13 +23,13 @@ def _add_alert_links(alert: Alert) -> Alert:
     return alert
 
 
-@router.get("")
+@router.get("", response_model=list[Alert])
 def get_alerts(_: Annotated[dict, Depends(security.get_current_user)]) -> list[Alert]:
     """Return all operational alerts across every running container."""
     return [_add_alert_links(a) for a in alerts_service.get_all()]
 
 
-@router.get("/project/{project_id}")
+@router.get("/project/{project_id}", response_model=list[Alert])
 def get_project_alerts(
     project_id: str,
     _: Annotated[dict, Depends(security.get_current_user)],

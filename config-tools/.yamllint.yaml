@@ -1,6 +1,13 @@
 ---
 extends: default
 
+# GitHub Actions workflows are validated by GitHub/actionlint, not yamllint:
+# they use GitHub-lenient run-block indentation and `on:` truthy keys that a
+# strict YAML linter rejects. Per shared-standards, .github/workflows is exempt
+# from generic YAML processing.
+ignore: |
+  .github/workflows/
+
 rules:
   document-start: disable
   colons:
