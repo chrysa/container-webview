@@ -15,7 +15,7 @@ class TestHealth:
         When: GET /health
         Then: Should return 200 with a payload whose status is "ok"
         """
-        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore[arg-type]
             response = await client.get("/health")
 
         assert response.status_code == status.HTTP_200_OK, f"Expected 200 but got {response.status_code=}"
