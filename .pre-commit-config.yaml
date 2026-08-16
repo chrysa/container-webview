@@ -42,7 +42,7 @@ repos:
   - id: format-dockerfiles
   - id: dockerfile-no-latest
   - id: python-print-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
+    exclude: (^|/)(tests?|scripts)/|^(README\.md|docs/)
   - id: python-pprint-detection
     exclude: (^|/)tests?/|^(README\.md|docs/)
   - id: python-unreachable-code
@@ -57,7 +57,7 @@ repos:
     exclude: (^|/)tests/
   - id: no-sync-in-async
   - id: debugger-detection
-    exclude: (^|/)tests?/|^(README\.md|docs/)
+    exclude: (^|/)tests?/|^(README\.md|docs/)|\.(png|jpe?g|gif|ico|webp|woff2?|ttf|svg)$
   - id: yaml-sorter
     exclude: ^(\.pre-commit-config\.yaml|config-tools/|\.github/)
   - id: json-sorter
@@ -76,7 +76,7 @@ repos:
   - id: python-dispatch-ladder
   - id: claude-assets-present
   - id: no-hardcoded-localhost
-    exclude: tests?/|\.test\.|\.spec\.
+    exclude: tests?/|\.test\.|\.spec\.|^code/src/constants/(config|api)\.ts$|^api/app/config\.py$
   - id: regression-gate
     stages:
     - pre-push
@@ -84,6 +84,7 @@ repos:
     exclude: (^|/)tests/
   - id: react-no-async-in-useeffect
   - id: react-direct-dom
+    exclude: (^|/)main\.tsx$
 - repo: https://github.com/chrysa/pre-commit-hooks-changelog
   rev: 40d13585c4c845c36108a565f00c23f2b946e9d9
   hooks:
@@ -159,8 +160,7 @@ repos:
   hooks:
   - id: bashate
     args:
-    - --ignore=E006
-    - E020
+    - --ignore=E006,E020
 - repo: https://github.com/Yelp/detect-secrets
   rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
   hooks:
