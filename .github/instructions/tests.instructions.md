@@ -23,7 +23,7 @@ applyTo: "api/**/tests/**/*.py"
 # pyproject.toml
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["api/app/tests"]
+testpaths = ["api/tests"]
 
 [tool.coverage.run]
 source = ["api/app"]
@@ -359,7 +359,7 @@ def test_container_state_active(self, state, expected_active, mocker):
 ## File Structure
 
 ```
-api/app/tests/
+api/tests/
 ├── conftest.py                     # Shared fixtures and pytest config
 ├── test_main.py                    # Health check / ping tests
 ├── services/
