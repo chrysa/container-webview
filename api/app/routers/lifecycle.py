@@ -5,10 +5,12 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from pydantic import BaseModel
+from pydantic import Field
 
 from app.constants import ERR_CONTAINER_NOT_FOUND
 from app.constants import ERR_PROJECT_NOT_FOUND
 from app.constants import ERR_SERVICE_NOT_FOUND
+from app.models.hateoas import HateoasLink
 from app.security import security
 from app.services.lifecycle_service import lifecycle_service
 
@@ -29,6 +31,7 @@ class ActionResponse(BaseModel):
     action: str
     status: str
     message: str = ""
+    links: dict[str, HateoasLink] | None = Field(None, alias="_links")
 
 
 def _run(project_id: str, service_name: str, action: str) -> ActionResponse:
