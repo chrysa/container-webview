@@ -44,7 +44,7 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["app/tests"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -57,7 +57,7 @@ addopts = [
 
 [tool.coverage.run]
 source = ["app"]
-omit = ["app/tests/*", "*/conftest.py"]
+omit = ["tests/*", "*/conftest.py"]
 branch = true
 
 [tool.coverage.report]
@@ -110,7 +110,7 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/app/tests/**" = [
+"**/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
@@ -160,9 +160,8 @@ docstring-code-format = true
 
 [tool.mypy]
 python_version = "3.12"
-# CI runs `mypy api/app` from the repo root; without an explicit base the tests
-# override (`app.tests.*`) never matches. Anchor `api` as the package base so
-# modules resolve to `app.*` and the override applies.
+# CI runs `mypy api/app` from the repo root; anchor `api` as the package base so
+# modules resolve to `app.*` (and `tests.*` when the suite is checked locally).
 explicit_package_bases = true
 mypy_path = "api"
 # Pydantic v2 field aliases/defaults (e.g. `Field(None, alias="_links")`) are
@@ -179,7 +178,7 @@ no_implicit_optional = true
 cache_dir = ".mypy_cache/"
 
 [[tool.mypy.overrides]]
-module = ["app.tests.*"]
+module = ["tests.*"]
 disallow_untyped_defs = false
 
 # The Docker SDK ships incomplete inline types (e.g. `docker.from_env`,

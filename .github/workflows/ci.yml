@@ -258,7 +258,7 @@ jobs:
                   organization: chrysa
                   project-name: container-webview
                   sources: api/app
-                  tests: api/app/tests
+                  tests: api/tests
 
     # ── 8. Quality gate (required check) ───────────────────────────────────
     # Aggregates every CI job into a single required status context named

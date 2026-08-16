@@ -195,7 +195,7 @@ make api-tests-html
 Test structure:
 
 ```
-api/app/tests/
+api/tests/
 ├── conftest.py                  # Shared fixtures (fake, api_client, auth_headers…)
 ├── test_main.py                 # /api endpoint (ping)
 ├── services/
