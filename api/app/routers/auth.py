@@ -6,9 +6,11 @@ from fastapi import HTTPException
 from fastapi import status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
+from pydantic import Field
 
 from app.constants import ERR_INVALID_CREDENTIALS
 from app.constants import TokenType
+from app.models.hateoas import HateoasLink
 from app.security import security
 from app.services.auth_service import auth_service
 
@@ -22,6 +24,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     username: str
+    links: dict[str, HateoasLink] | None = Field(None, alias="_links")
 
 
 @router.post("/login", response_model=Token)
