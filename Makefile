@@ -59,3 +59,6 @@ help: ## Display this help message
 help-%: ## Show detailed help for a specific command
 	@echo "Showing help for: $*"
 	@grep -A 5 -B 2 "^$*:" $(shell find . -name "*.[Mm]akefile" -not -path "*/\.*" -type f) 2>/dev/null || echo "Command '$*' not found"
+
+.PHONY: ci
+ci: app-quality node-test  ## CI: run all checks (backend + frontend quality + frontend tests)
