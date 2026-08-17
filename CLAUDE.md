@@ -110,6 +110,9 @@ Where an annexe and this file disagree, **this file wins**.
 | `AGENTIC-CAPABILITIES.md` | agent actions: manifests, risk R0–R5, sandboxing, audit trail   |
 | `PROJECT-DECOUPLING.md`   | inter-project contracts, forbidden linkages, degradation        |
 | `CONTAINERS-K3S.md`       | reference stage shape · container responsibility · k3s workload baseline |
+| `DATA-MIGRATIONS.md`      | data ownership & classification · versioned schemas · safe migrations · rollback · retention/export |
+| `OBSERVABILITY-OPS.md`    | probes · OpenTelemetry (replaceable backend) · alerts+runbooks · SLI/SLO · resource envelope · `/version` · production-ready gate |
+| `API-CONTRACTS.md`        | machine-readable contract · versioning & deprecation · typed errors · cursor pagination · idempotency · contract tests · events/webhooks |
 | `TESTING.md`              | common test levels and rules across languages                   |
 | `CI-CD.md`                | pipeline architecture · action pinning · least privilege · cost · what the gate proves |
 | `GOVERNANCE.md`           | rule identity, maturity ladder, enforcement rollout, sources of truth |
@@ -202,6 +205,19 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   boundaries; external data validated at **runtime** even when typed; contract types
   generated from OpenAPI/AsyncAPI, never hand-copied. One committed lockfile, frozen CI
   installs, no `latest` dependency. Detail: annexe `FRONTEND.md` §1.
+- **The JS/TS package manager is `pnpm` — `npm` and `yarn` are forbidden.** Every
+  Node/TypeScript repo (app, library, workspace, tooling) installs, runs scripts, and
+  resolves dependencies with **pnpm**. Concretely: the committed lockfile is
+  **`pnpm-lock.yaml`** (a `package-lock.json` or `yarn.lock` in the tree is a defect — delete
+  it and regenerate with pnpm), workspaces are pnpm workspaces (`pnpm-workspace.yaml`) under
+  Turborepo, CI installs with **`pnpm install --frozen-lockfile`** (never `npm ci`), images
+  install with pnpm in the builder stage, and scripts run as `pnpm <script>` / `pnpm dlx`
+  (never `npm run` / `npx`). The version is pinned via `packageManager` in `package.json` and
+  provisioned by Corepack, so every machine and runner resolves the same pnpm. This makes
+  *one committed lockfile* and *no host installs* concrete for the JS side: the lockfile is
+  `pnpm-lock.yaml`, `node_modules` stays a pnpm-managed build output (see *dependency
+  directories are a build output*), never materialised on the host. The only `npm` left
+  anywhere is the registry it talks to; the command is always `pnpm`.
 - **React is a presentation layer, not the domain.** `domain/` and `application/` never
   import React; no `fetch`, browser storage, or vendor SDK in `domain/`. Components and hooks
   stay pure, props/state immutable, derived state computed rather than duplicated;
@@ -227,12 +243,52 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   (`role="alert"` / `role="status"`) and its behaviour is tested against a network error and a
   503. A frontend Definition of Done includes its **API-down state**. Detail: annexe
   `FRONTEND.md` FE-050.
+- **The frontend is reactive and real-time by default.** A human-facing surface reflects the
+  true state of the system as soon as it changes — the user never stares at stale data and never
+  reaches for a manual refresh to find out what happened. Server state is owned by the cache layer
+  (TanStack Query) and kept fresh: a mutation invalidates or optimistically updates the queries it
+  affects, and data that a *different* actor (another user, a job, a device) can change is
+  **pushed, not polled** — a live transport (WebSocket / SSE) updates the UI in place, with polling
+  as a bounded fallback only where a push channel is genuinely unavailable. The interface reacts
+  immediately to input (optimistic UI, debounced derived state, no blocking spinner for a
+  sub-second action) and reconciles with the server result, rolling back visibly on failure. Live
+  updates propagate across the app's own tabs and on refocus (see *UI state survives reload &
+  focus*). Real-time is **layered over a correct offline/degraded state**, not a substitute for it:
+  losing the live channel degrades to the last known state with the API-down banner (FE-050), never
+  to a frozen or lying screen. A surface that shows data a refresh would change is a defect. Detail:
+  annexe `FRONTEND.md` FE-080.
 - **Every repo declares its profile and DDD level** (`project_profile`, `ddd_level`,
   `bounded_context`, `standards_version`) — architecture is proportionate to business
   complexity, and small tools are not over-architected. Detail: annexe `ARCHITECTURE-DDD.md`.
 - **Dark mode** mandatory from V1. **Accessibility** WCAG 2.1 AA — Lighthouse a11y score **≥ 90**,
   full keyboard navigation (Tab/Esc/visible focus), contrast ≥ 4.5:1 (3:1 large text), screen-reader
   tested on critical flows (signup, login, checkout).
+- **Every site is usable by the majority of disabilities — not only the screen-reader case.**
+  WCAG 2.1 AA is the floor; the obligation is that a real person from each major disability
+  category can actually complete the product's core tasks. The categories are named and each
+  carries a concrete, testable requirement:
+  1. **Visual** (blind, low-vision, colour-blind) — screen-reader operable end to end (semantic
+     markup + labels + live regions), reflows to 400% zoom and 320 px with no loss of content or
+     function, honours `prefers-contrast`, and **never encodes meaning by colour alone** (icon,
+     text, or pattern too).
+  2. **Motor** (limited dexterity, no pointer, switch/voice control) — fully keyboard-operable
+     with a visible focus order and no keyboard trap, touch targets **≥ 44 px**, no action that
+     requires a drag, a precise gesture, or a hover-only reveal, and no timeout the user cannot
+     extend.
+  3. **Auditory** (deaf, hard-of-hearing) — captions on every video, transcript for audio, and
+     no information conveyed by sound alone (a visual equivalent for every audio cue).
+  4. **Cognitive** (attention, memory, literacy, dyslexia) — plain language, consistent and
+     predictable navigation, errors that say what to fix (see *every form is a hostile input
+     surface*), no unavoidable time pressure, and progress that survives reload (see *UI state
+     survives reload & focus*).
+  5. **Vestibular / photosensitivity** — honours `prefers-reduced-motion`, no auto-playing or
+     looping motion the user cannot stop, and nothing that flashes more than three times a second.
+  A public micro-site or generated page is held to the same bar as the app — accessibility is not
+  waived because a surface is small, auto-generated, or "just a showcase". The Definition of Done
+  for any human-facing surface includes exercising these five paths, mechanised by the a11y gates
+  already required (Lighthouse ≥ 90, axe/keyboard/contrast) plus manual screen-reader and
+  keyboard-only passes on the core flow. Detail: annexe `FRONTEND.md`, the `accessibility` skill
+  (per-category contract + testable DoD), and the `ui-ux` skill.
 - **UI state survives reload & focus** — human-facing surfaces persist their navigation
   and view state (active tab/section, selected sub-view, active context/filters) so a
   **manual reload keeps the current page** — the user lands exactly where they were, never
@@ -501,6 +557,27 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   to reach one attribute through it. Imports sit at module top level (never inside a function
   except to break a cycle, and that is commented), and are ordered/deduplicated by Ruff
   (`I` rules) — the linter owns the ordering, no hand-sorting.
+- **Functions and methods are called with named arguments — positional call sites are the
+  exception, not the rule.** A call reads `create_user(name="Ada", role=Role.ADMIN,
+  active=True)`, never `create_user("Ada", Role.ADMIN, True)`: the argument names are part of
+  what the reader needs, and a bare positional value (especially a bool, a number, or a `None`)
+  is a *boolean trap* / magic value the reader has to jump to the signature to decode. So:
+  1. **Definitions force it where it matters.** Any function/method taking more than one
+     parameter, or **any** boolean/optional/`None`-defaulted parameter, declares them
+     **keyword-only** with a bare `*` (`def build(*, source: Source, strict: bool = False)`),
+     so callers *must* name them and arguments cannot be silently reordered. Adding a parameter
+     then never shifts an existing positional meaning.
+  2. **Call sites name their arguments.** Even when a signature still allows positional passing,
+     call sites pass by keyword. The narrow, allowed exceptions where positional is clearer:
+     a single obvious argument (`len(items)`, `Path(raw)`, `str(value)`), the receiver of a
+     dunder, and genuine `*args`/`**kwargs` pass-through.
+  3. **Not a substitute for value objects.** Naming four primitives at the call site is better
+     than four bare positionals, but a signature that needs many named primitives is still
+     *primitive obsession* — the fix is a value object / Pydantic model, then one named argument
+     carries it.
+  Mechanisation: Ruff `FBT001`/`FBT002` (boolean-positional) already flag the worst case; the
+  keyword-only `*` in definitions is the enforcement mechanism the reviewer checks. A public
+  API added with a multi-parameter positional signature is a defect.
 - **Everything is machine-agnostic and portable — no rule, repo, or script is bound to one
   machine.** A standard, a Makefile target, a script, a hook, a compose file, or a CI job must
   behave identically on any developer machine, any runner, and the server, with nothing but a
@@ -516,6 +593,47 @@ deprecated and archived — nothing is added to it, nothing reads from it.
   particular machine, user account, or local directory layout. The test is mechanical: a fresh
   clone on an unknown machine, with git + Docker + pre-commit, must reach a green
   `make ci` — if it needs a manual step that only the owner knows, that is a defect.
+- **Every external server the service talks to is addressed through the environment — never
+  hardcoded.** The location and credentials of anything the service does not itself own — a
+  database, cache, broker, object store, another chrysa service's API, a third-party endpoint, an
+  SSO/OIDC issuer, an LLM or inference host — arrive as **environment variables** (host, port, URL,
+  DSN, region, secret), read once through the typed config loader (Pydantic Settings on the
+  backend, the generated typed env module on the frontend), with a committed `.env.example`
+  documenting every key and safe local defaults. A hostname, IP, port, or connection string of an
+  external server written as a literal in code, a compose file, or a manifest is a defect: it pins
+  the build to one environment and breaks *build once, promote the artefact* — the same image can
+  no longer travel from local to CI to prod, because its endpoints are baked in. This is the
+  transport-level twin of *no hardcoded constants* and of the *adaptation layer*: the endpoint is
+  configuration, the client wrapping it is an adapter, and between two chrysa projects the endpoint
+  still resolves to a versioned contract, not a private address (*projects talk through versioned
+  contracts only*). Secrets travel by env or a secrets manager, never committed (see the `.env`
+  rules) — the variable holds the value, the repo holds only the documented key.
+- **Data, persistence & migrations follow the `STD-DATA-001` contract.** Every data category
+  declares its owner, system of record and classification; schemas and events are versioned and
+  migrations are reproducible, ordered, tested, and safe (`expand → migrate → contract`, snapshot
+  before destructive change, a rollback or documented restore per migration); backups are
+  restore-tested, and data is exportable to an open format with no vendor lock-in. Full rules and
+  gates: annexe [`DATA-MIGRATIONS.md`](https://github.com/chrysa/shared-standards/blob/main/standards/annexes/DATA-MIGRATIONS.md)
+  (`DA-nnn`).
+- **Observability & production readiness follow the `STD-OPS-001` contract.** A deployable
+  service exposes startup/liveness/readiness probes, emits structured logs + metrics + traces
+  correlated through a common id via **OpenTelemetry with a replaceable backend**, and ships an
+  actionable alert + owner + runbook per principal incident. Resource limits and saturation
+  behaviour are explicit; graceful shutdown, restart recovery and dependency-loss are tested;
+  backup/restore/rollback/degraded mode are documented before the first prod deploy; and the
+  service publishes `/version`. Full rules and the Production-Ready gate: annexe
+  [`OBSERVABILITY-OPS.md`](https://github.com/chrysa/shared-standards/blob/main/standards/annexes/OBSERVABILITY-OPS.md)
+  (`OP-nnn`).
+- **APIs, SDKs & public contracts follow the `STD-API-001` contract.** A machine-readable
+  contract (OpenAPI/AsyncAPI/JSON Schema) is the canonical interface; public versions are
+  explicit with a backward-compatibility guarantee and a dated deprecation policy; errors are
+  typed with a machine code + correlation id; collections paginate by cursor; critical writes
+  are idempotent; guards (timeouts, sizes, authz) live in the contract; inter-project contracts
+  are tested provider **and** consumer side; SDKs track the public contract, never internal
+  models; and events/webhooks are identified, versioned, signed, replay-protected, with bounded
+  retry + dead-letter. Full rules and gates: annexe
+  [`API-CONTRACTS.md`](https://github.com/chrysa/shared-standards/blob/main/standards/annexes/API-CONTRACTS.md)
+  (`AP-nnn`) and the `api-design` skill.
 - **External dependencies are installed in containers, never on the host.** A project's
   runtime dependencies — language packages (pip/npm/cargo/nuget), databases, brokers, caches,
   system libraries, compilers, CLIs a service shells out to — are declared in the image
@@ -566,6 +684,17 @@ deprecated and archived — nothing is added to it, nothing reads from it.
      **never `user: root`** — root-owned artifacts written into a bind mount are unremovable
      without `sudo` and are treated as a defect. Root user is allowed only for containers with
      **no** repo bind mount (e.g. `.:/code` absent).
+  4. **Dependency directories are a build output, never a source artifact.** `node_modules` and
+     its per-ecosystem equivalents — `vendor/` (Go/PHP), `target/` (Rust/Maven), `.gradle/`,
+     `Pods/` (CocoaPods), `bin/`+`obj/` (.NET), and `.venv`/`site-packages` (already forbidden in
+     the tree by *no virtualenv in a repo*) — are **generated at build time**, either baked into
+     the image layer (`RUN npm ci` / `pip install` / `cargo build` in the `builder` stage) or
+     mounted from a **named volume that shadows the bind mount** (`node-modules:/code/node_modules`
+     above). They are **never materialised in the working copy on the host**: a `node_modules/`
+     (or equivalent) sitting in the project tree is a defect — machine-specific, unreproducible,
+     and it shadows the container's own install. The **lockfile is committed; the resolved tree is
+     not**, and a fresh clone reaches a green `make ci` without ever running an install on the
+     host (see *external dependencies are installed in containers*).
   Regenerable artifacts already in a repo are purged with `scripts/purge-artifacts.sh`.
 - **Every tracked file and folder must earn its place — a repo holds only what is useful to it
   now.** A repository contains its own source, its tests, config that is actually loaded, docs
@@ -1178,6 +1307,7 @@ and CI invokes `pre-commit`, not `make`.
 - `contract-testing` — library contract / breaking-change tests (@chrysa/* releases)
 - `agent-patterns` — LangGraph + PydanticAI + Claude API (building agents)
 - `ui-ux` — UX/UI/ergonomics + WCAG 2.1 AA + dark mode + i18n (human-facing surfaces)
+- `accessibility` — per-disability-category contract + testable DoD (any surface, incl. public micro-sites)
 
 ## Error handling pattern (all automations)
 
@@ -1209,15 +1339,22 @@ Per-project activation checklist:
 
 ## Session lifecycle (primer + memory + hindsight)
 
-Every repo ships a session lifecycle so an AI agent keeps context across sessions. Bootstrap with
-`make memory-init`; scripts live in `shared-standards/scripts/`.
+A repo **may** carry a session lifecycle so an AI agent keeps context across sessions. The
+substance is a set of **committed files**, not a required Make target — the convention below is
+what matters; any `make`/slash-command wrappers are an **optional convenience** provided where a
+repo has them, not a universal socle target every Makefile must expose.
 
 - `primer.md` (committed) — current state, what to do NOW; read **before** `CLAUDE.md`.
 - `.claude/memory/session.md` — volatile session notes, **not** committed (reset each session).
 - `.claude/memory/decisions.md`, `known-issues.md`, `progress.md` (append-only history) — committed.
-- **Session start**: `make prepare` (`/prepare`) — shows primer + git context + open PRs.
-- **Session end**: `make hindsight` (`/hindsight`) — updates `primer.md` + `progress.md`, clears
-  `session.md`, optional Obsidian export (`OBSIDIAN=<path>`).
+- **Session start** — surface the primer + git context + open PRs (a `prepare` wrapper where present).
+- **Session end** — update `primer.md` + `progress.md`, clear `session.md` (a `hindsight` wrapper
+  where present), optional Obsidian export.
+
+> **Not a mandated Make target.** `memory-init` / `prepare` / `hindsight` are convenience
+> wrappers, not part of the canonical Makefile socle contract (*Makefile targets*), and are not
+> assumed to exist in every repo. A repo governs its session state through the committed files
+> above; the wrappers and their scripts are added per repo when useful.
 
 ## Compliance targets
 
@@ -1247,7 +1384,27 @@ requires an ADR with a kill-test, not a shrug.
 
 1. **LLM-provider independence** — no vendor SDK in business code; inference goes through a
    local port with **≥2 real, tested adapters** (e.g. Claude + a local model). A prompt that
-   only works on one vendor is a bug, not a feature.
+   only works on one vendor is a bug, not a feature. **"Local model" means a model running on
+   the machine or self-hosted** — an interpreter/weights the owner runs (Ollama, llama.cpp, a
+   vLLM/TGI server on chrysa infrastructure), never a third-party hosted API dressed up as
+   "local". The independence is only proven when one of the tested adapters needs no external
+   provider to answer. **Every LLM call — internal or external — goes through the `chrysa-LLM`
+   gateway**, never a vendor SDK or raw provider endpoint called directly from a product's
+   business code. `chrysa-LLM` *is* the local port of this pillar made concrete across the
+   fleet: it owns provider selection and the ≥2 tested adapters, and it is the one place where
+   routing, fallback, prompt/model/version pinning, evaluation, cost and token budgets, caching,
+   rate limiting and observability live (satisfying the *AI feature is evaluated* and *agent
+   actions are governed* obligations once, not per repo). A product calls it as a **versioned
+   contract** through a thin local adapter (*projects talk through versioned contracts only*)
+   and degrades to a documented no-AI / fallback mode when it is unreachable — it never reaches
+   a model by any other path. A direct call to Claude, OpenAI, Ollama, or any inference endpoint
+   that bypasses `chrysa-LLM` is a defect, not a shortcut; the single documented exception is
+   `chrysa-LLM` itself, which owns the real adapters. Products built *on top of* the gateway —
+   e.g. `ai-aggregator`, a showcase/front consuming `chrysa-LLM` — are consumers of this
+   contract, not alternative gateways: they route through `chrysa-LLM` like everything else and
+   never re-implement provider access. This is the transport-level application of *no code
+   duplication* and *external servers addressed through the environment*: the gateway's endpoint
+   arrives by env, and the adapters exist once, there.
 2. **GAFAM independence** — every managed-cloud dependency has a documented self-hosted exit
    path; the cloud SDK stays confined to an adapter (`BlobStore`, not `S3Client`).
 3. **Portable personalisation data** — all user/personal data is exportable to an open format
