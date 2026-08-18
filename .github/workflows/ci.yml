@@ -166,7 +166,12 @@ jobs:
               # repo-relative path so cobertura resolves to api/app/<file>.
               if: always()
               run: |
-                  sed -i 's#<source>/app/app</source>#<source>api/app</source>#' api/reports/coverage.xml
+                  # api-test runs as root, so reports/ is root-owned on the runner;
+                  # take ownership before the in-place edit (sed -i writes a temp file
+                  # in the target dir).
+                  sudo chown -R "$(id -u):$(id -g)" api/reports || true
+                  [ -f api/reports/coverage.xml ] && \
+                    sed -i 's#<source>/app/app</source>#<source>api/app</source>#' api/reports/coverage.xml || true
 
             - name: Upload test results
               uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
