@@ -158,6 +158,16 @@ jobs:
                   ADMIN_PASSWORD: testpass
                   PROJECTS_PATH: /tmp/projects
 
+            - name: Rewrite coverage source path for SonarCloud
+              # pytest runs in the api-test container (mounts ./api:/app), so
+              # coverage.xml records <source>/app/app</source> with bare filenames.
+              # SonarCloud scans api/app on the runner, so those paths never match
+              # and new-code coverage reads 0%. Rewrite the container root to the
+              # repo-relative path so cobertura resolves to api/app/<file>.
+              if: always()
+              run: |
+                  sed -i 's#<source>/app/app</source>#<source>api/app</source>#' api/reports/coverage.xml
+
             - name: Upload test results
               uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
               if: always()
