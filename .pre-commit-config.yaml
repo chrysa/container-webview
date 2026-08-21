@@ -87,7 +87,7 @@ repos:
         stages:
           - manual
   - repo: https://github.com/hadolint/hadolint.git
-    rev: v2.12.0
+    rev: v2.15.1
     hooks:
       - id: hadolint-docker
         args:
