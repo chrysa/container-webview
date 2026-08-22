@@ -5,6 +5,7 @@ import typing
 
 
 if typing.TYPE_CHECKING:
+    from typing import Any
     from typing import Final
 
 
@@ -56,6 +57,12 @@ ERR_INVALID_CREDENTIALS: Final[str] = "Invalid credentials"
 
 # ── JWT / OAuth2 ───────────────────────────────────────────────────────────
 JWT_CLAIM_SUB: Final[str] = "sub"
+
+# ── OpenAPI responses ──────────────────────────────────────────────────────
+# Shared "404 not found" responses map for routers; FastAPI expects int|str keys.
+RESPONSES_NOT_FOUND: Final[dict[int | str, dict[str, Any]]] = {
+    404: {"description": ERR_PROJECT_NOT_FOUND},
+}
 
 # ── API versioning ────────────────────────────────────────────────────────
 API_V1_PREFIX: Final[str] = "/api/v1"

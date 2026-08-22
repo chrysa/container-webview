@@ -1,4 +1,5 @@
 from typing import Annotated
+from typing import Any
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -15,7 +16,7 @@ from app.services.lifecycle_service import lifecycle_service
 router = APIRouter()
 
 _CurrentUser = Annotated[dict, Depends(security.get_current_user)]
-_NOT_FOUND = {
+_NOT_FOUND: dict[int | str, dict[str, Any]] = {
     400: {"description": "Unknown action"},
     404: {"description": "Project, service or container not found"},
 }
