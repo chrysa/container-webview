@@ -24,9 +24,7 @@ def _add_alert_links(alert: Alert) -> Alert:
 
 
 @router.get("")
-def get_alerts(
-    _: Annotated[dict, Depends(security.get_current_user)]
-) -> list[Alert]:
+def get_alerts(_: Annotated[dict, Depends(security.get_current_user)]) -> list[Alert]:
     """Return all operational alerts across every running container."""
     return [_add_alert_links(a) for a in alerts_service.get_all()]
 

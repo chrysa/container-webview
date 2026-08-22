@@ -10,12 +10,15 @@ class TestMetricsService:
     class TestBytesToMb:
         """Tests for _bytes_to_mb()."""
 
-        @pytest.mark.parametrize(("byte_count", "expected_mb"), [
-            (0, 0.0),
-            (1024 * 1024, 1.0),
-            (512 * 1024, 0.5),
-            (10 * 1024 * 1024, 10.0),
-        ])
+        @pytest.mark.parametrize(
+            ("byte_count", "expected_mb"),
+            [
+                (0, 0.0),
+                (1024 * 1024, 1.0),
+                (512 * 1024, 0.5),
+                (10 * 1024 * 1024, 10.0),
+            ],
+        )
         def test_converts_bytes_to_megabytes(self, byte_count, expected_mb):
             """Convert byte count to megabytes, rounded to 2 decimal places.
 
@@ -105,10 +108,12 @@ class TestMetricsService:
                 "networks": {
                     "eth0": {"rx_bytes": 1024 * 1024, "tx_bytes": 512 * 1024},
                 },
-                "blkio_stats": {"io_service_bytes_recursive": [
-                    {"op": "Read", "value": 2 * 1024 * 1024},
-                    {"op": "Write", "value": 1 * 1024 * 1024},
-                ]},
+                "blkio_stats": {
+                    "io_service_bytes_recursive": [
+                        {"op": "Read", "value": 2 * 1024 * 1024},
+                        {"op": "Write", "value": 1 * 1024 * 1024},
+                    ]
+                },
             }
 
             service = MetricsService()

@@ -1,4 +1,3 @@
-
 from app.constants import ContainerState
 from app.services.project_manager import ProjectModel
 from app.services.project_manager import ServiceModel

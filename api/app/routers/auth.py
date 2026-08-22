@@ -18,6 +18,7 @@ router = APIRouter()
 
 class Token(BaseModel):
     """OAuth2 token response payload."""
+
     access_token: str
     token_type: str
     username: str
