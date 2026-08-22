@@ -35,7 +35,7 @@ class Alert(BaseModel):
     service: str
     message: str
     timestamp: str
-    links: AlertLinks | None = Field(None, alias="_links")
+    links: AlertLinks | None = Field(default=None, alias="_links")
 
 
 class AlertsService:

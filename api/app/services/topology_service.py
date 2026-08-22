@@ -64,7 +64,7 @@ class TopologyGraph(BaseModel):
 
     nodes: list[GraphNode]
     edges: list[GraphEdge]
-    links: TopologyLinks | None = Field(None, alias="_links")
+    links: TopologyLinks | None = Field(default=None, alias="_links")
 
 
 class TopologyService:
