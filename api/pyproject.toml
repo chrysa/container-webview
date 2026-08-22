@@ -165,5 +165,5 @@ no_implicit_optional = true
 cache_dir = ".mypy_cache/"
 
 [[tool.mypy.overrides]]
-module = ["app.tests.*"]
+module = ["tests.*", "app.tests.*"]
 disallow_untyped_defs = false
