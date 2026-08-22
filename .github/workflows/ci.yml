@@ -97,6 +97,7 @@ jobs:
               uses: chrysa/github-actions/install-project@v1.6.0
               with:
                   extras: 'dev'
+                  working-directory: api
 
             - name: Ruff check
               uses: chrysa/github-actions/ruff-check@v1.6.0
