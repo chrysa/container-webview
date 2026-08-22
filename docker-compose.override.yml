@@ -1,0 +1,12 @@
+# Local dev override
+services:
+  api:
+    command: ["sh","-c","pip install --no-cache-dir --target=/tmp/pylibs sentry-sdk >/tmp/pip.log 2>&1; PYTHONPATH=/tmp/pylibs exec uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+    environment:
+      CORS_ORIGINS: '["http://localhost:5174"]'
+  frontend-dev:
+    ports: !override
+      - "5174:5173"
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: "http://localhost:9003"
