@@ -36,7 +36,4 @@ def get_metrics(
     """Return real-time resource metrics for all containers in a project."""
     if not project_manager.load(project_id):
         raise HTTPException(status_code=404, detail=ERR_PROJECT_NOT_FOUND)
-    return [
-        _add_metrics_links(m, project_id)
-        for m in metrics_service.get_project_metrics(project_id)
-    ]
+    return [_add_metrics_links(m, project_id) for m in metrics_service.get_project_metrics(project_id)]

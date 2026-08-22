@@ -13,6 +13,7 @@ from app.models.hateoas import ProjectLinks
 
 class ServiceModel(BaseModel):
     """Schema for a single service entry in a Compose file."""
+
     name: str
     image: str | None = None
     ports: list[str] = []
@@ -25,6 +26,7 @@ class ServiceModel(BaseModel):
 
 class ProjectModel(BaseModel):
     """High-level representation of a detected Compose project."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     id: str
@@ -38,6 +40,7 @@ class ProjectModel(BaseModel):
 
 class ProjectManager:
     """Discovers and parses Docker Compose projects from the configured projects directory."""
+
     _COMPOSE_CANDIDATES: tuple[str, ...] = (
         "docker-compose.yml",
         "docker-compose.yaml",

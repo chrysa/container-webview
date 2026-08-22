@@ -26,6 +26,7 @@ _logger = logging.getLogger(__name__)
 
 class Alert(BaseModel):
     """A single operational alert for a Docker Compose service."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     id: str
@@ -53,43 +54,51 @@ class AlertsService:
 
         if container.status == ContainerState.EXITED:
             exit_code: int = state.get("ExitCode", 0)
-            alerts.append(Alert(
-                id=f"{container.short_id}-exited",
-                level=AlertLevel.CRITICAL if exit_code != 0 else AlertLevel.INFO,
-                project=project,
-                service=service,
-                message=f"Container stopped (exit code {exit_code})",
-                timestamp=now,
-            ))
+            alerts.append(
+                Alert(
+                    id=f"{container.short_id}-exited",
+                    level=AlertLevel.CRITICAL if exit_code != 0 else AlertLevel.INFO,
+                    project=project,
+                    service=service,
+                    message=f"Container stopped (exit code {exit_code})",
+                    timestamp=now,
+                )
+            )
         elif container.status == ContainerState.RESTARTING:
-            alerts.append(Alert(
-                id=f"{container.short_id}-restart",
-                level=AlertLevel.WARNING,
-                project=project,
-                service=service,
-                message="Container is restarting",
-                timestamp=now,
-            ))
+            alerts.append(
+                Alert(
+                    id=f"{container.short_id}-restart",
+                    level=AlertLevel.WARNING,
+                    project=project,
+                    service=service,
+                    message="Container is restarting",
+                    timestamp=now,
+                )
+            )
 
         health_status: str = state.get("Health", {}).get("Status", "")
         if health_status == HealthState.UNHEALTHY:
-            alerts.append(Alert(
-                id=f"{container.short_id}-health",
-                level=AlertLevel.CRITICAL,
-                project=project,
-                service=service,
-                message="Healthcheck failed",
-                timestamp=now,
-            ))
+            alerts.append(
+                Alert(
+                    id=f"{container.short_id}-health",
+                    level=AlertLevel.CRITICAL,
+                    project=project,
+                    service=service,
+                    message="Healthcheck failed",
+                    timestamp=now,
+                )
+            )
         elif health_status == HealthState.STARTING:
-            alerts.append(Alert(
-                id=f"{container.short_id}-starting",
-                level=AlertLevel.INFO,
-                project=project,
-                service=service,
-                message="Healthcheck pending (starting)",
-                timestamp=now,
-            ))
+            alerts.append(
+                Alert(
+                    id=f"{container.short_id}-starting",
+                    level=AlertLevel.INFO,
+                    project=project,
+                    service=service,
+                    message="Healthcheck pending (starting)",
+                    timestamp=now,
+                )
+            )
 
         return alerts
 

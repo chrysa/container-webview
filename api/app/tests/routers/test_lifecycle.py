@@ -30,9 +30,7 @@ class TestLifecycleActions:
         body = response.json()
         assert body["service"] == "web", f"Expected 'web' but got {body['service']=}"
         assert body["action"] == action, f"Expected {action!r} but got {body['action']=}"
-        assert body["status"] == ContainerState.RUNNING, (
-            f"Expected RUNNING but got {body['status']=}"
-        )
+        assert body["status"] == ContainerState.RUNNING, f"Expected RUNNING but got {body['status']=}"
 
     async def test_returns_404_when_project_not_found(self, api_client, auth_headers, mocker):
         """Return 404 when the project does not exist.
