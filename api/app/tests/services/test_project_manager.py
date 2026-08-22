@@ -1,7 +1,6 @@
 import pytest
 
 from app.services.project_manager import ProjectManager
-from app.services.project_manager import ProjectModel
 
 
 class TestProjectManager:

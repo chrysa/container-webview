@@ -13,6 +13,7 @@ from app.services.metrics_service import ServiceMetrics
 from app.services.metrics_service import metrics_service
 from app.services.project_manager import project_manager
 
+
 router = APIRouter()
 
 _NOT_FOUND = {404: {"description": ERR_PROJECT_NOT_FOUND}}
