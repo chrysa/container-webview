@@ -106,7 +106,7 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"app/tests/**" = [
+"**/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
@@ -118,12 +118,12 @@ fixable = ["ALL"]
     "SLF001",  # tests legitimately exercise private members
     "PLC0415", # local imports inside tests are fine
 ]
-"app/main.py" = ["ANN"]
+"**/app/main.py" = ["ANN"]
 # Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
-"app/services/project_manager.py" = ["TCH001"]
-"app/services/alerts_service.py"  = ["TCH001"]
-"app/services/metrics_service.py" = ["TCH001"]
-"app/services/topology_service.py" = ["TCH001"]
+"**/services/project_manager.py" = ["TCH001"]
+"**/services/alerts_service.py"  = ["TCH001"]
+"**/services/metrics_service.py" = ["TCH001"]
+"**/services/topology_service.py" = ["TCH001"]
 
 [tool.ruff.lint.isort]
 force-single-line = true
