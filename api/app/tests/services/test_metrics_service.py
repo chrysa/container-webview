@@ -10,7 +10,7 @@ class TestMetricsService:
     class TestBytesToMb:
         """Tests for _bytes_to_mb()."""
 
-        @pytest.mark.parametrize("byte_count,expected_mb", [
+        @pytest.mark.parametrize(("byte_count", "expected_mb"), [
             (0, 0.0),
             (1024 * 1024, 1.0),
             (512 * 1024, 0.5),

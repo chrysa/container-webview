@@ -1,7 +1,7 @@
-import pytest
 from faker import Faker
 from httpx import ASGITransport
 from httpx import AsyncClient
+import pytest
 
 from app.config import Settings
 from app.config import get_settings

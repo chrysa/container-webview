@@ -106,14 +106,17 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"app/tests/*" = [
+"app/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
+    "S108",    # temp path literals in tests
     "ANN",     # no type annotations in tests
     "ARG001", "ARG002",
     "PLR0913", "PLR2004",
     "PT011",
+    "SLF001",  # tests legitimately exercise private members
+    "PLC0415", # local imports inside tests are fine
 ]
 "app/main.py" = ["ANN"]
 # Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
