@@ -6,6 +6,7 @@ from fastapi import HTTPException
 
 from app.constants import API_V1_PREFIX
 from app.constants import ERR_PROJECT_NOT_FOUND
+from app.constants import RESPONSES_NOT_FOUND
 from app.models.hateoas import HateoasLink
 from app.models.hateoas import MetricsLinks
 from app.security import security
@@ -15,8 +16,6 @@ from app.services.project_manager import project_manager
 
 
 router = APIRouter()
-
-_NOT_FOUND = {404: {"description": ERR_PROJECT_NOT_FOUND}}
 
 
 def _add_metrics_links(metrics: ServiceMetrics, project_id: str) -> ServiceMetrics:
@@ -28,7 +27,7 @@ def _add_metrics_links(metrics: ServiceMetrics, project_id: str) -> ServiceMetri
     return metrics
 
 
-@router.get("/{project_id}/metrics", responses=_NOT_FOUND)
+@router.get("/{project_id}/metrics", responses=RESPONSES_NOT_FOUND)
 def get_metrics(
     project_id: str,
     _: Annotated[dict, Depends(security.get_current_user)],
