@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -35,7 +36,7 @@ class ProjectModel(BaseModel):
     compose_file: str
     services: list[ServiceModel] = []
     networks: list[str] = []
-    links: ProjectLinks | None = Field(None, alias="_links")
+    links: ProjectLinks | None = Field(default=None, alias="_links")
 
 
 class ProjectManager:
@@ -64,7 +65,7 @@ class ProjectManager:
     # ── Compose parsing helpers ─────────────────────────────────────────────
 
     @staticmethod
-    def _parse_compose(compose_path: Path) -> dict[str, object]:
+    def _parse_compose(compose_path: Path) -> dict[str, Any]:
         """Read and parse a Compose YAML file."""
         with compose_path.open() as fh:
             return yaml.safe_load(fh) or {}
@@ -115,7 +116,7 @@ class ProjectManager:
             return result
         return {}
 
-    def _build_service(self, name: str, conf: dict[str, object]) -> ServiceModel:
+    def _build_service(self, name: str, conf: dict[str, Any]) -> ServiceModel:
         return ServiceModel(
             name=name,
             image=conf.get("image"),

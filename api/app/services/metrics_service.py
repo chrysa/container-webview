@@ -38,7 +38,7 @@ class ServiceMetrics(BaseModel):
     net_tx_mb: float
     block_read_mb: float
     block_write_mb: float
-    links: MetricsLinks | None = Field(None, alias="_links")
+    links: MetricsLinks | None = Field(default=None, alias="_links")
 
 
 class MetricsService:
@@ -63,7 +63,7 @@ class MetricsService:
             return 0.0
         return (cpu_delta / system_delta) * nb_cpus * 100.0
 
-    def _parse_stats(self, container: Container, stats: dict[str, object]) -> ServiceMetrics:
+    def _parse_stats(self, container: Container, stats: dict[str, typing.Any]) -> ServiceMetrics:
         """Build a ServiceMetrics instance from raw Docker stats."""
         service_name: str = container.labels.get(DockerComposeLabel.SERVICE, container.name)
         mem: dict = stats.get("memory_stats", {})
