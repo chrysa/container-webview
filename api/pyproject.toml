@@ -92,7 +92,7 @@ select = [
     "A", "ANN", "ARG", "ASYNC", "BLE", "DTZ", "EM",
     "FBT", "G", "ICN", "ISC", "LOG", "PERF", "PIE",
     "PL", "PT", "PTH", "Q", "RET", "RSE", "RUF",
-    "S", "SIM", "SLF", "T20", "TC", "TID",
+    "S", "SIM", "SLF", "T20", "TCH", "TID",
 ]
 ignore = [
     "E501",    # line length (handled by formatter)
