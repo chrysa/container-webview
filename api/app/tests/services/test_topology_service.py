@@ -1,12 +1,10 @@
-import pytest
-
 from app.constants import ContainerState
 from app.services.project_manager import ProjectModel
 from app.services.project_manager import ServiceModel
-from app.services.topology_service import TopologyService
 from app.services.topology_service import _ID_PREFIX_NET
 from app.services.topology_service import _ID_PREFIX_SVC
 from app.services.topology_service import _NETWORK_COLORS
+from app.services.topology_service import TopologyService
 
 
 def _make_project(services=None, networks=None):

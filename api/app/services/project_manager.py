@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -13,6 +14,7 @@ from app.models.hateoas import ProjectLinks
 
 class ServiceModel(BaseModel):
     """Schema for a single service entry in a Compose file."""
+
     name: str
     image: str | None = None
     ports: list[str] = []
@@ -25,6 +27,7 @@ class ServiceModel(BaseModel):
 
 class ProjectModel(BaseModel):
     """High-level representation of a detected Compose project."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     id: str
@@ -33,11 +36,12 @@ class ProjectModel(BaseModel):
     compose_file: str
     services: list[ServiceModel] = []
     networks: list[str] = []
-    links: ProjectLinks | None = Field(None, alias="_links")
+    links: ProjectLinks | None = Field(default=None, alias="_links")
 
 
 class ProjectManager:
     """Discovers and parses Docker Compose projects from the configured projects directory."""
+
     _COMPOSE_CANDIDATES: tuple[str, ...] = (
         "docker-compose.yml",
         "docker-compose.yaml",
@@ -61,7 +65,7 @@ class ProjectManager:
     # ── Compose parsing helpers ─────────────────────────────────────────────
 
     @staticmethod
-    def _parse_compose(compose_path: Path) -> dict[str, object]:
+    def _parse_compose(compose_path: Path) -> dict[str, Any]:
         """Read and parse a Compose YAML file."""
         with compose_path.open() as fh:
             return yaml.safe_load(fh) or {}
@@ -112,7 +116,7 @@ class ProjectManager:
             return result
         return {}
 
-    def _build_service(self, name: str, conf: dict[str, object]) -> ServiceModel:
+    def _build_service(self, name: str, conf: dict[str, Any]) -> ServiceModel:
         return ServiceModel(
             name=name,
             image=conf.get("image"),

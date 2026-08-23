@@ -119,8 +119,6 @@ class TestLifecycleService:
             service = LifecycleService()
             result = service.perform("myproject", "web", action)
 
-            getattr(mock_container, action).assert_called_once(), (
-                f"Expected {action}() to be called on container"
-            )
+            getattr(mock_container, action).assert_called_once(), (f"Expected {action}() to be called on container")
             mock_container.reload.assert_called_once(), "Container.reload() should be called after action"
             assert result == mock_container.status, f"Expected container status but got {result=}"

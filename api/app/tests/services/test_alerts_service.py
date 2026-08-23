@@ -1,5 +1,4 @@
 import docker.errors
-import pytest
 
 from app.constants import AlertLevel
 from app.constants import ContainerState
@@ -205,14 +204,20 @@ class TestAlertsService:
             Then: Should return only the alert for proj1
             """
             alert1 = Alert(
-                id="x-exited", level=AlertLevel.CRITICAL,
-                project="proj1", service="web",
-                message="stopped", timestamp="2026-01-01T00:00:00+00:00",
+                id="x-exited",
+                level=AlertLevel.CRITICAL,
+                project="proj1",
+                service="web",
+                message="stopped",
+                timestamp="2026-01-01T00:00:00+00:00",
             )
             alert2 = Alert(
-                id="y-exited", level=AlertLevel.INFO,
-                project="proj2", service="api",
-                message="stopped", timestamp="2026-01-01T00:00:00+00:00",
+                id="y-exited",
+                level=AlertLevel.INFO,
+                project="proj2",
+                service="api",
+                message="stopped",
+                timestamp="2026-01-01T00:00:00+00:00",
             )
             mocker.patch.object(AlertsService, "get_all", return_value=[alert1, alert2])
 

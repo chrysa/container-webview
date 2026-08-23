@@ -2,6 +2,10 @@
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
 [project]
 name = "docker-overview-api"
 version = "1.0.0"
@@ -26,10 +30,11 @@ dev = [
     "pytest==9.0.3",
     "pytest-mock==3.14.0",
     "pytest-asyncio==1.4.0",
+    "pytest-cov==7.0.0",
     "coverage[toml]==7.5.1",
     "faker==25.0.0",
-    "ruff==0.4.4",
-    "mypy==1.10.0",
+    "ruff==0.15.22",
+    "mypy==2.3.0",
 ]
 
 # ── Pytest ─────────────────────────────────────────────────────────────────
@@ -88,7 +93,7 @@ select = [
     "A", "ANN", "ARG", "ASYNC", "BLE", "DTZ", "EM",
     "FBT", "G", "ICN", "ISC", "LOG", "PERF", "PIE",
     "PL", "PT", "PTH", "Q", "RET", "RSE", "RUF",
-    "S", "SIM", "SLF", "T20", "TC", "TID",
+    "S", "SIM", "SLF", "T20", "TCH", "TID",
 ]
 ignore = [
     "E501",    # line length (handled by formatter)
@@ -102,21 +107,24 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"app/tests/*" = [
+"**/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
+    "S108",    # temp path literals in tests
     "ANN",     # no type annotations in tests
     "ARG001", "ARG002",
     "PLR0913", "PLR2004",
     "PT011",
+    "SLF001",  # tests legitimately exercise private members
+    "PLC0415", # local imports inside tests are fine
 ]
-"app/main.py" = ["ANN"]
+"**/app/main.py" = ["ANN"]
 # Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
-"app/services/project_manager.py" = ["TCH001"]
-"app/services/alerts_service.py"  = ["TCH001"]
-"app/services/metrics_service.py" = ["TCH001"]
-"app/services/topology_service.py" = ["TCH001"]
+"**/services/project_manager.py" = ["TCH001"]
+"**/services/alerts_service.py"  = ["TCH001"]
+"**/services/metrics_service.py" = ["TCH001"]
+"**/services/topology_service.py" = ["TCH001"]
 
 [tool.ruff.lint.isort]
 force-single-line = true
@@ -158,5 +166,5 @@ no_implicit_optional = true
 cache_dir = ".mypy_cache/"
 
 [[tool.mypy.overrides]]
-module = ["app.tests.*"]
+module = ["tests.*", "app.tests.*"]
 disallow_untyped_defs = false

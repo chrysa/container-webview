@@ -65,7 +65,8 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
               with:
-                  python-version: '3.12'
+                  # Must match default_language_version in .pre-commit-config.yaml
+                  python-version: '3.14'
 
             - name: Cache pre-commit environments
               uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -93,10 +94,14 @@ jobs:
               with:
                   python-version: '3.12'
 
+            - name: Install system deps for python-ldap
+              run: sudo apt-get update && sudo apt-get install -y libldap2-dev libsasl2-dev
+
             - name: Install project
               uses: chrysa/github-actions/install-project@v1.6.0
               with:
                   extras: 'dev'
+                  working-directory: api
 
             - name: Ruff check
               uses: chrysa/github-actions/ruff-check@v1.6.0
@@ -237,9 +242,9 @@ jobs:
                   fetch-depth: 0
 
             - name: SonarCloud scan
-              uses: chrysa/github-actions/sonar-scan@v1.6.0
+              uses: chrysa/github-actions/sonar-scan-python@v1.6.0
               with:
-                  latest-python: '3.12'
+                  python-version: '3.12'
                   sonar-token: ${{ secrets.SONAR_TOKEN }}
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   project-key: chrysa_container-webview

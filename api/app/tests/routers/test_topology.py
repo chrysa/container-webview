@@ -1,4 +1,3 @@
-from app.services.topology_service import GraphEdge
 from app.services.topology_service import GraphNode
 from app.services.topology_service import NodePosition
 from app.services.topology_service import TopologyGraph
@@ -11,7 +10,14 @@ def _make_graph():
                 id="svc-web",
                 type="service",
                 position=NodePosition(x=100, y=100),
-                data={"label": "web", "image": "nginx", "status": "running", "ports": [], "networks": [], "bgColor": "#334155"},
+                data={
+                    "label": "web",
+                    "image": "nginx",
+                    "status": "running",
+                    "ports": [],
+                    "networks": [],
+                    "bgColor": "#334155",
+                },
             ),
         ],
         edges=[],

@@ -15,6 +15,7 @@ from app.routers import metrics
 from app.routers import projects
 from app.routers import topology
 
+
 _V1_PROJECTS = f"{API_V1_PREFIX}/projects"
 
 # ── Metadata OpenAPI ────────────────────────────────────────────────────────
@@ -24,7 +25,7 @@ REST API for the **Docker Overview WebUI** — manage and monitor Docker Compose
 
 ## Authentication
 
-All `/api/v1/` endpoints require a **JWT Bearer token**.  
+All `/api/v1/` endpoints require a **JWT Bearer token**.
 Obtain one via `POST /api/v1/auth/login` (OAuth2 password flow).
 
 ## HATEOAS
@@ -97,13 +98,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router,      prefix=f"{API_V1_PREFIX}/auth",     tags=["auth"])
-app.include_router(projects.router,  prefix=_V1_PROJECTS,                tags=["projects"])
-app.include_router(topology.router,  prefix=_V1_PROJECTS,                tags=["topology"])
-app.include_router(lifecycle.router, prefix=_V1_PROJECTS,                tags=["lifecycle"])
-app.include_router(logs.router,      prefix=_V1_PROJECTS,                tags=["logs"])
-app.include_router(metrics.router,   prefix=_V1_PROJECTS,                tags=["metrics"])
-app.include_router(alerts.router,    prefix=f"{API_V1_PREFIX}/alerts",   tags=["alerts"])
+app.include_router(auth.router, prefix=f"{API_V1_PREFIX}/auth", tags=["auth"])
+app.include_router(projects.router, prefix=_V1_PROJECTS, tags=["projects"])
+app.include_router(topology.router, prefix=_V1_PROJECTS, tags=["topology"])
+app.include_router(lifecycle.router, prefix=_V1_PROJECTS, tags=["lifecycle"])
+app.include_router(logs.router, prefix=_V1_PROJECTS, tags=["logs"])
+app.include_router(metrics.router, prefix=_V1_PROJECTS, tags=["metrics"])
+app.include_router(alerts.router, prefix=f"{API_V1_PREFIX}/alerts", tags=["alerts"])
 
 # ── Public endpoints ─────────────────────────────────────────────────────────
 
@@ -115,12 +116,12 @@ def health() -> dict:
         "status": "ok",
         "version": "1.0.0",
         "_links": {
-            "docs":     {"href": "/api/docs"},
-            "redoc":    {"href": "/api/redoc"},
-            "openapi":  {"href": "/api/openapi.json"},
+            "docs": {"href": "/api/docs"},
+            "redoc": {"href": "/api/redoc"},
+            "openapi": {"href": "/api/openapi.json"},
             "projects": {"href": f"{API_V1_PREFIX}/projects"},
-            "alerts":   {"href": f"{API_V1_PREFIX}/alerts"},
-            "login":    {"href": OAUTH2_TOKEN_URL},
+            "alerts": {"href": f"{API_V1_PREFIX}/alerts"},
+            "login": {"href": OAUTH2_TOKEN_URL},
         },
     }
 
