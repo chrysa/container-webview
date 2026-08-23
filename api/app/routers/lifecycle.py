@@ -1,4 +1,5 @@
 from typing import Annotated
+from typing import Any
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -11,10 +12,11 @@ from app.constants import ERR_SERVICE_NOT_FOUND
 from app.security import security
 from app.services.lifecycle_service import lifecycle_service
 
+
 router = APIRouter()
 
 _CurrentUser = Annotated[dict, Depends(security.get_current_user)]
-_NOT_FOUND = {
+_NOT_FOUND: dict[int | str, dict[str, Any]] = {
     400: {"description": "Unknown action"},
     404: {"description": "Project, service or container not found"},
 }
@@ -35,11 +37,16 @@ def _run(project_id: str, service_name: str, action: str) -> ActionResponse:
         container_status = lifecycle_service.perform(project_id, service_name, action)
     except ValueError as exc:
         detail = str(exc)
-        status_code = 404 if detail in (
-            ERR_PROJECT_NOT_FOUND,
-            ERR_SERVICE_NOT_FOUND.format(service_name),
-            ERR_CONTAINER_NOT_FOUND.format(service_name),
-        ) else 400
+        status_code = (
+            404
+            if detail
+            in (
+                ERR_PROJECT_NOT_FOUND,
+                ERR_SERVICE_NOT_FOUND.format(service_name),
+                ERR_CONTAINER_NOT_FOUND.format(service_name),
+            )
+            else 400
+        )
         raise HTTPException(status_code=status_code, detail=detail) from exc
     return ActionResponse(service=service_name, action=action, status=container_status)
 

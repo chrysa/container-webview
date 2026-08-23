@@ -159,6 +159,4 @@ class TestDockerClientService:
             service = DockerClientService()
             result = service.get_container_status("myproject", "web")
 
-            assert result == ContainerState.UNKNOWN, (
-                f"Expected {ContainerState.UNKNOWN=} but got {result=}"
-            )
+            assert result == ContainerState.UNKNOWN, f"Expected {ContainerState.UNKNOWN=} but got {result=}"

@@ -1,5 +1,4 @@
 import ldap
-import pytest
 
 from app.services.auth_service import AuthService
 

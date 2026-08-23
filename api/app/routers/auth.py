@@ -12,11 +12,13 @@ from app.constants import TokenType
 from app.security import security
 from app.services.auth_service import auth_service
 
+
 router = APIRouter()
 
 
 class Token(BaseModel):
     """OAuth2 token response payload."""
+
     access_token: str
     token_type: str
     username: str

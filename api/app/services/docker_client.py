@@ -7,6 +7,7 @@ import docker
 from app.constants import ContainerState
 from app.constants import DockerComposeLabel
 
+
 if typing.TYPE_CHECKING:
     from docker.models.containers import Container
 
