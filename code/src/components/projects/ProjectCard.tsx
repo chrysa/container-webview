@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { ROUTES } from '../../constants/config'
-import type { ProjectModel } from '../../types/api'
+import { ROUTES } from '@/constants/config'
+import type { ProjectModel } from '@/types/api'
 
 export function ProjectCard({ project }: { project: ProjectModel }) {
   return (

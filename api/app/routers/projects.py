@@ -31,13 +31,13 @@ def _add_project_links(project: ProjectModel) -> ProjectModel:
     return project
 
 
-@router.get("", responses=RESPONSES_NOT_FOUND)
+@router.get("", response_model=list[ProjectModel], responses=RESPONSES_NOT_FOUND)
 def get_projects(_: _CurrentUser) -> list[ProjectModel]:
     """List all discovered Compose projects."""
     return [_add_project_links(p) for p in project_manager.list_all()]
 
 
-@router.get("/{project_id}", responses=RESPONSES_NOT_FOUND)
+@router.get("/{project_id}", response_model=ProjectModel, responses=RESPONSES_NOT_FOUND)
 def get_project(project_id: str, _: _CurrentUser) -> ProjectModel:
     """Return a single Compose project by ID."""
     project = project_manager.load(project_id)

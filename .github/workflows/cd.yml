@@ -78,8 +78,7 @@ jobs:
                   echo "## CD Summary" >> "$GITHUB_STEP_SUMMARY"
                   echo "**Image:** \`ghcr.io/${{ github.repository_owner }}/container-webview-api:${{ steps.gitversion.outputs.semVer }}\`" >> "$GITHUB_STEP_SUMMARY"
                   echo "" >> "$GITHUB_STEP_SUMMARY"
-
-          echo "### Tags published" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ steps.meta.outputs.tags }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+                  echo "### Tags published" >> "$GITHUB_STEP_SUMMARY"
+                  echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"
+                  echo "${{ steps.meta.outputs.tags }}" >> "$GITHUB_STEP_SUMMARY"
+                  echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"

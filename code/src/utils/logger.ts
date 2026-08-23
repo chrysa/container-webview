@@ -1,4 +1,4 @@
-/** Utilitaire de log minimal. Les messages debug ne s'affichent qu'en développement. */
+/** Minimal logging utility. Debug messages are only emitted in development. */
 export const logger = {
   debug: (...args: unknown[]) => {
     if (import.meta.env.DEV) {
