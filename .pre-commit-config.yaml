@@ -50,12 +50,12 @@ repos:
       - id: no-bare-except
       - id: fastapi-missing-response-model
         files: (routers?)/.*\.py$
-        exclude: (^|/)tests/
+        exclude: '(^|/)tests/'
       - id: no-sync-in-async
       - id: debugger-detection
         exclude: '(^|/)tests?/|^(README\.md|docs/)'
       - id: yaml-sorter
-        exclude: ^(\.pre-commit-config\.yaml|config-tools/|\.github/)
+        exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
       - id: json-sorter
       - id: requirements-sort
       - id: env-file-check
@@ -77,7 +77,7 @@ repos:
         stages:
           - pre-push
       - id: fastapi-missing-links
-        exclude: (^|/)tests/
+        exclude: '(^|/)tests/'
       - id: react-no-async-in-useeffect
       - id: react-direct-dom
   - repo: https://github.com/chrysa/pre-commit-hooks-changelog
