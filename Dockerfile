@@ -33,7 +33,7 @@ RUN set -ex \
     && apt-get purge -y --auto-remove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*set -ex \
-    && npm install -g serve --silent
+    && npm install -g serve@14.2.4 --silent
 
 CMD [ "serve", "-s", "/app/build" ]
 VOLUME ["/configs"]
