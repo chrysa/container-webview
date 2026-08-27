@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
   },
 })
 
-const root = document.getElementById('root')
+const root = document.getElementById('root') // react-direct-dom: disable -- required root mount at app entry point
 if (!root) throw new Error('Élément root introuvable')
 
 createRoot(root).render(

@@ -1,4 +1,4 @@
-import type { Alert } from '../../types/api'
+import type { Alert } from '@/types/api'
 
 const LEVEL_CLASS: Record<string, string> = {
   info: 'alert-info',

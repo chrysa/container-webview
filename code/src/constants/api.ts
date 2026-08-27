@@ -1,5 +1,5 @@
 /** URL de base de l'API (obligatoire via variable d'environnement). */
-export const API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000'
+export const API_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000' // no-hardcoded-localhost: disable -- dev fallback, real value from VITE_API_URL
 
 export const API_TIMEOUT = 10_000
 
