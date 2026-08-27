@@ -27,7 +27,7 @@ def _add_metrics_links(metrics: ServiceMetrics, project_id: str) -> ServiceMetri
     return metrics
 
 
-@router.get("/{project_id}/metrics", responses=RESPONSES_NOT_FOUND)
+@router.get("/{project_id}/metrics", response_model=list[ServiceMetrics], responses=RESPONSES_NOT_FOUND)
 def get_metrics(
     project_id: str,
     _: Annotated[dict, Depends(security.get_current_user)],

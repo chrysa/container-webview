@@ -51,31 +51,31 @@ def _run(project_id: str, service_name: str, action: str) -> ActionResponse:
     return ActionResponse(service=service_name, action=action, status=container_status)
 
 
-@router.post("/{project_id}/services/{service_name}/start", responses=_NOT_FOUND)
+@router.post("/{project_id}/services/{service_name}/start", response_model=ActionResponse, responses=_NOT_FOUND)  # fastapi-missing-links: disable -- action/auth payloads are not HATEOAS resources
 def start_service(project_id: str, service_name: str, _: _CurrentUser) -> ActionResponse:
     """Start a stopped service container."""
     return _run(project_id, service_name, "start")
 
 
-@router.post("/{project_id}/services/{service_name}/stop", responses=_NOT_FOUND)
+@router.post("/{project_id}/services/{service_name}/stop", response_model=ActionResponse, responses=_NOT_FOUND)  # fastapi-missing-links: disable -- action/auth payloads are not HATEOAS resources
 def stop_service(project_id: str, service_name: str, _: _CurrentUser) -> ActionResponse:
     """Stop a running service container."""
     return _run(project_id, service_name, "stop")
 
 
-@router.post("/{project_id}/services/{service_name}/restart", responses=_NOT_FOUND)
+@router.post("/{project_id}/services/{service_name}/restart", response_model=ActionResponse, responses=_NOT_FOUND)  # fastapi-missing-links: disable -- action/auth payloads are not HATEOAS resources
 def restart_service(project_id: str, service_name: str, _: _CurrentUser) -> ActionResponse:
     """Restart a service container."""
     return _run(project_id, service_name, "restart")
 
 
-@router.post("/{project_id}/services/{service_name}/pause", responses=_NOT_FOUND)
+@router.post("/{project_id}/services/{service_name}/pause", response_model=ActionResponse, responses=_NOT_FOUND)  # fastapi-missing-links: disable -- action/auth payloads are not HATEOAS resources
 def pause_service(project_id: str, service_name: str, _: _CurrentUser) -> ActionResponse:
     """Pause a running service container."""
     return _run(project_id, service_name, "pause")
 
 
-@router.post("/{project_id}/services/{service_name}/unpause", responses=_NOT_FOUND)
+@router.post("/{project_id}/services/{service_name}/unpause", response_model=ActionResponse, responses=_NOT_FOUND)  # fastapi-missing-links: disable -- action/auth payloads are not HATEOAS resources
 def unpause_service(project_id: str, service_name: str, _: _CurrentUser) -> ActionResponse:
     """Resume a paused service container."""
     return _run(project_id, service_name, "unpause")
