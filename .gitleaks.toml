@@ -1,0 +1,11 @@
+# Gitleaks configuration for container-webview.
+# Extends the bundled default ruleset and allowlists files that legitimately
+# contain hashed / non-recoverable secret fingerprints.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "detect-secrets baseline only stores hashed fingerprints, not live secrets"
+paths = [
+  '''\.secrets\.baseline$''',
+]
