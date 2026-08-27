@@ -8,3 +8,12 @@ app-install: ## install all dependencies (frontend + backend)
 	@docker compose run --rm frontend npm install --legacy-peer-deps
 
 app-quality: api-quality node-lint ## run full quality checks (backend + frontend)
+
+ci-lint: api-lint node-lint ## run all linters (backend + frontend)
+	@:
+
+ci-test: api-tests node-test ## run all test suites (backend + frontend)
+	@:
+
+ci: ci-lint ci-test ## canonical CI gate: lint + test (shared-standards socle)
+	@:
