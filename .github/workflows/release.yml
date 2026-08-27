@@ -27,7 +27,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
               with:
                   fetch-depth: 0
 
@@ -52,7 +52,7 @@ jobs:
 
             - name: Update CHANGELOG.md
               if: steps.check-tag.outputs.skip == 'false'
-              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
+              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5  # v4
               with:
                   config: cliff.toml
                   args: --verbose --tag v${{ steps.gitversion.outputs.semVer }}
@@ -63,7 +63,7 @@ jobs:
             - name: Generate release notes
               id: release-notes
               if: steps.check-tag.outputs.skip == 'false'
-              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
+              uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5  # v4
               with:
                   config: cliff.toml
                   args: >-
@@ -88,7 +88,7 @@ jobs:
 
             - name: Create GitHub Release
               if: steps.check-tag.outputs.skip == 'false' && inputs.dry-run != true
-              uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+              uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2
               with:
                   body: ${{ steps.release-notes.outputs.content }}
                   draft: false
@@ -96,15 +96,15 @@ jobs:
                   prerelease: false
                   tag_name: v${{ steps.gitversion.outputs.semVer }}
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ── 8. Dry-run summary ─────────────────────────────────────────────────
-      - name: Dry-run summary
-        if: inputs.dry-run == true
-        run: |
-          echo "### Dry-run: no release created" >> "$GITHUB_STEP_SUMMARY"
-          echo "Next version would be: **v${{ steps.gitversion.outputs.semVer }}**" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "#### Release notes preview" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ steps.release-notes.outputs.content }}" >> "$GITHUB_STEP_SUMMARY"
+            # ── 8. Dry-run summary ─────────────────────────────────────────────────
+            - name: Dry-run summary
+              if: inputs.dry-run == true
+              run: |
+                  echo "### Dry-run: no release created" >> "$GITHUB_STEP_SUMMARY"
+                  echo "Next version would be: **v${{ steps.gitversion.outputs.semVer }}**" >> "$GITHUB_STEP_SUMMARY"
+                  echo "" >> "$GITHUB_STEP_SUMMARY"
+                  echo "#### Release notes preview" >> "$GITHUB_STEP_SUMMARY"
+                  echo "${{ steps.release-notes.outputs.content }}" >> "$GITHUB_STEP_SUMMARY"

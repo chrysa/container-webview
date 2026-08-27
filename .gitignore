@@ -21,3 +21,6 @@ code/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# CI bootstrap backup artifacts
+.ci-backup-*/
