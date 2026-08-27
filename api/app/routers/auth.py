@@ -24,7 +24,7 @@ class Token(BaseModel):
     username: str
 
 
-@router.post("/login", response_model=Token)  # fastapi-missing-links: disable -- action/auth payloads are not HATEOAS resources
+@router.post("/login", response_model=Token)  # fastapi-missing-links: disable
 def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     """Authenticate a user and return a JWT bearer token."""
     if not auth_service.authenticate(form_data.username, form_data.password):
