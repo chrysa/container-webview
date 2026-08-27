@@ -156,8 +156,7 @@ repos:
     hooks:
       - id: bashate
         args:
-          - --ignore=E006
-          - E020
+          - --ignore=E006,E020
   - repo: https://github.com/Yelp/detect-secrets
     rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
     hooks:
