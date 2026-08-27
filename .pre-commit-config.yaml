@@ -53,6 +53,7 @@ repos:
         exclude: '(^|/)tests/'
       - id: no-sync-in-async
       - id: debugger-detection
+        types_or: [javascript, ts, tsx, jsx, python]
         exclude: '(^|/)tests?/|^(README\.md|docs/)'
       - id: yaml-sorter
         exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
