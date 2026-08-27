@@ -8,4 +8,5 @@ useDefault = true
 description = "detect-secrets baseline only stores hashed fingerprints, not live secrets"
 paths = [
   '''\.secrets\.baseline$''',
+  '''\.guideline-baseline\.json$''',
 ]

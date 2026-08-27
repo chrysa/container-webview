@@ -164,7 +164,7 @@ repos:
         args:
           - --baseline
           - .secrets.baseline
-        exclude: \.pre-commit-config\.yaml
+        exclude: (\.pre-commit-config\.yaml|\.guideline-baseline\.json)
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:
