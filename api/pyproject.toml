@@ -31,7 +31,7 @@ dev = [
     "pytest-mock==3.14.0",
     "pytest-asyncio==1.4.0",
     "pytest-cov==7.0.0",
-    "coverage[toml]==7.5.1",
+    "coverage[toml]==7.10.6",
     "faker==25.0.0",
     "ruff==0.15.22",
     "mypy==2.3.0",
