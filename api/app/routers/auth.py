@@ -24,7 +24,7 @@ class Token(BaseModel):
     username: str
 
 
-@router.post("/login")
+@router.post("/login", response_model=Token)  # fastapi-missing-links: disable
 def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     """Authenticate a user and return a JWT bearer token."""
     if not auth_service.authenticate(form_data.username, form_data.password):
@@ -39,7 +39,7 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     )
 
 
-@router.get("/check")
+@router.get("/check", response_model=dict)
 def check_token(_: Annotated[dict, Depends(security.get_current_user)]) -> dict:
     """Validate the current bearer token and return a confirmation payload."""
     return {"status": "ok"}
