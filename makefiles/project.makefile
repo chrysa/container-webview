@@ -1,20 +1,19 @@
-prod-up: ## Start in production mode (port 8080)
-	@docker compose up --detach --wait
+app-build: ## build frontend for production
+	@docker compose run --rm frontend npm run build
 
-prod-down: ## Stop production services
-	@docker compose down
+app-dev: ## launch full stack in development mode
+	@docker compose up --build
 
-dev-up: ## Start development mode (Vite 5173 + API 8000)
-	@docker compose --profile dev up --no-log-prefix api-dev frontend-dev
+app-install: ## install all dependencies (frontend + backend)
+	@docker compose run --rm frontend npm install --legacy-peer-deps
 
-dev-api: ## Start API only in dev mode
-	@docker compose --profile dev up --no-log-prefix api-dev
+app-quality: api-quality node-lint ## run full quality checks (backend + frontend)
 
-dev-front: ## Start frontend only in dev mode
-	@docker compose --profile dev up --no-log-prefix frontend-dev
+ci-lint: api-lint node-lint ## run all linters (backend + frontend)
+	@:
 
-shell-api: ## Shell dans le container API (dev)
-	@docker compose --profile dev exec api-dev sh
+ci-test: api-tests node-test ## run all test suites (backend + frontend)
+	@:
 
-shell-front: ## Shell dans le container frontend (dev)
-	@docker compose --profile dev exec frontend-dev sh
+ci: ci-lint ci-test ## canonical CI gate: lint + test (shared-standards socle)
+	@:

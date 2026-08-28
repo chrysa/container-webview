@@ -2,35 +2,47 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 
-from app import demo
-from app.config import settings
-from app.security import get_current_user
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+
+from app.constants import API_V1_PREFIX
+from app.constants import ERR_PROJECT_NOT_FOUND
+from app.constants import RESPONSES_NOT_FOUND
+from app.models.hateoas import HateoasLink
+from app.models.hateoas import ProjectLinks
+from app.security import security
 from app.services.project_manager import ProjectModel
-from app.services.project_manager import list_projects
-from app.services.project_manager import load_project
+from app.services.project_manager import project_manager
 
 
 router = APIRouter()
 
-
-_PROJECT_RESPONSES: dict[int | str, dict] = {404: {"description": "Project not found"}}
-
-
-@router.get("", response_model=list[ProjectModel])
-def get_projects(_: dict = Depends(get_current_user)) -> list[ProjectModel]:
-    if settings.demo_mode:
-        return [ProjectModel(**project) for project in demo.list_projects()]
-    return list_projects()
+_CurrentUser = Annotated[dict, Depends(security.get_current_user)]
 
 
-@router.get("/{project_id}", response_model=ProjectModel, responses=_PROJECT_RESPONSES)
-def get_project(project_id: str, _: dict = Depends(get_current_user)) -> ProjectModel:
-    if settings.demo_mode:
-        demo_project = demo.load_project(project_id)
-        if not demo_project:
-            raise HTTPException(status_code=404, detail="Projet introuvable")
-        return ProjectModel(**demo_project)
-    project = load_project(project_id)
-    if not project:
-        raise HTTPException(status_code=404, detail="Projet introuvable")
+def _add_project_links(project: ProjectModel) -> ProjectModel:
+    """Attach HATEOAS navigation links to a ProjectModel instance."""
+    pid = project.id
+    project.links = ProjectLinks(
+        self=HateoasLink(href=f"{API_V1_PREFIX}/projects/{pid}"),
+        topology=HateoasLink(href=f"{API_V1_PREFIX}/projects/{pid}/topology"),
+        metrics=HateoasLink(href=f"{API_V1_PREFIX}/projects/{pid}/metrics"),
+        alerts=HateoasLink(href=f"{API_V1_PREFIX}/alerts/project/{pid}"),
+    )
     return project
+
+
+@router.get("", response_model=list[ProjectModel], responses=RESPONSES_NOT_FOUND)
+def get_projects(_: _CurrentUser) -> list[ProjectModel]:
+    """List all discovered Compose projects."""
+    return [_add_project_links(p) for p in project_manager.list_all()]
+
+
+@router.get("/{project_id}", response_model=ProjectModel, responses=RESPONSES_NOT_FOUND)
+def get_project(project_id: str, _: _CurrentUser) -> ProjectModel:
+    """Return a single Compose project by ID."""
+    project = project_manager.load(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail=ERR_PROJECT_NOT_FOUND)
+    return _add_project_links(project)

@@ -1,6 +1,8 @@
+import pytest
+
+from app.constants import ContainerState
 from app.constants import DockerComposeLabel
-from app.services.docker_client import get_all_containers_for_project
-from app.services.docker_client import get_container_for_service
+from app.services.docker_client import DockerClientService
 
 
 class TestGetContainerForService:
@@ -108,4 +110,46 @@ class TestGetAllContainersForProject:
 
         result = get_all_containers_for_project("myproject")
 
-        assert result == [], f"Expected empty list but got {result=}"
+            assert result == [], f"Expected empty list but got {result=}"
+
+    class TestGetContainerStatus:
+        """Tests for get_container_status()."""
+
+        @pytest.mark.parametrize("status_value", ["running", "exited", "paused"])
+        def test_returns_container_status(self, mocker, status_value):
+            """Return the container's current status string.
+
+            Given: A container with a known status
+            When: Calling get_container_status(project_id, service_name)
+            Then: Should return the container status string
+            """
+            mock_container = mocker.MagicMock()
+            mock_container.status = status_value
+            mocker.patch.object(
+                DockerClientService,
+                "get_container_for_service",
+                return_value=mock_container,
+            )
+
+            service = DockerClientService()
+            result = service.get_container_status("myproject", "web")
+
+            assert result == status_value, f"Expected {status_value=} but got {result=}"
+
+        def test_returns_unknown_when_container_missing(self, mocker):
+            """Return UNKNOWN when no container is found for the service.
+
+            Given: No container matching the service
+            When: Calling get_container_status
+            Then: Should return ContainerState.UNKNOWN
+            """
+            mocker.patch.object(
+                DockerClientService,
+                "get_container_for_service",
+                return_value=None,
+            )
+
+            service = DockerClientService()
+            result = service.get_container_status("myproject", "web")
+
+            assert result == ContainerState.UNKNOWN, f"Expected {ContainerState.UNKNOWN=} but got {result=}"

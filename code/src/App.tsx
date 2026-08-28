@@ -1,60 +1,48 @@
-import { Suspense, lazy } from 'react';
-import { createBrowserRouter, RouterProvider, Navigate, type RouteObject } from 'react-router-dom';
-import GlobalLoader from '@/components/loaders/GlobalLoader';
-import Layout from '@/components/layouts/Layout';
-import { ToastProvider } from '@/components/feedback/Toast';
-import { DemoBanner } from '@/components/ui/DemoBanner';
-import { isAuthenticated } from '@/utils/auth';
+import { Suspense, lazy } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { GlobalLoader } from './components/loaders/GlobalLoader'
+import Layout from './components/layouts/Layout'
+import { ProtectedRoute } from './components/layouts/ProtectedRoute'
+import { PublicRoute } from './components/layouts/PublicRoute'
+import { ROUTES } from './constants/routes'
 
-const Login = lazy(() => import('@/pages/Login'));
-const Projects = lazy(() => import('@/pages/Projects'));
-const ProjectWorkspacePage = lazy(() => import('@/pages/ProjectWorkspacePage'));
-const Topology = lazy(() => import('@/pages/Topology'));
-const Services = lazy(() => import('@/pages/Services'));
-const Logs = lazy(() => import('@/pages/Logs'));
-const Metrics = lazy(() => import('@/pages/Metrics'));
-const Alerts = lazy(() => import('@/pages/Alerts'));
-const NotFound = lazy(() => import('@/pages/NotFound'));
+const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })))
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })))
+const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage').then((m) => ({ default: m.ProjectDetailPage })))
 
-function RequireAuth({ children }: Readonly<{ children: React.ReactNode }>) {
-  if (!isAuthenticated()) return <Navigate to="/login" replace />;
-  return <>{children}</>;
-}
-
-// A data router is required because the layout consumes `useMatches()`
-// (breadcrumbs). `createBrowserRouter` provides the matches context that the
-// legacy `<BrowserRouter>` did not.
-const routes: RouteObject[] = [
-  { path: '/login', element: <Login /> },
-  {
-    element: (
-      <RequireAuth>
-        <Layout />
-      </RequireAuth>
-    ),
-    children: [
-      { index: true, element: <Navigate to="/projects" replace /> },
-      { path: '/projects', element: <Projects /> },
-      { path: '/projects/:projectId', element: <ProjectWorkspacePage /> },
-      { path: '/projects/:projectId/topology', element: <Topology /> },
-      { path: '/projects/:projectId/services', element: <Services /> },
-      { path: '/projects/:projectId/logs', element: <Logs /> },
-      { path: '/projects/:projectId/metrics', element: <Metrics /> },
-      { path: '/alerts', element: <Alerts /> },
-    ],
-  },
-  { path: '*', element: <NotFound /> },
-];
-
-const router = createBrowserRouter(routes);
-
-export default function App() {
+export function App() {
   return (
-    <ToastProvider>
-      <DemoBanner />
+    <BrowserRouter>
       <Suspense fallback={<GlobalLoader />}>
-        <RouterProvider router={router} />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route
+              path={ROUTES.DASHBOARD}
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.PROJECT_DETAIL}
+              element={
+                <ProtectedRoute>
+                  <ProjectDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.LOGIN}
+              element={
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              }
+            />
+          </Route>
+        </Routes>
       </Suspense>
-    </ToastProvider>
-  );
+    </BrowserRouter>
+  )
 }

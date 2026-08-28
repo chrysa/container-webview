@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -5,10 +7,10 @@ from fastapi import status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 
-from app import demo
-from app.config import settings
-from app.security import create_access_token
-from app.security import get_current_user
+from app.constants import ERR_INVALID_CREDENTIALS
+from app.constants import TokenType
+from app.security import security
+from app.services.auth_service import auth_service
 
 
 router = APIRouter()
@@ -22,43 +24,17 @@ except ImportError:
 
 
 class Token(BaseModel):
+    """OAuth2 token response payload."""
+
     access_token: str
     token_type: str
     username: str
 
 
-def _authenticate_demo(username: str, password: str) -> bool:
-    """Accept the built-in demo credentials only while demo mode is enabled."""
-    return settings.demo_mode and username == demo.DEMO_USERNAME and password == demo.DEMO_PASSWORD
-
-
-def _authenticate_local(username: str, password: str) -> bool:
-    return username == settings.admin_username and password == settings.admin_password
-
-
-def _authenticate_ldap(username: str, password: str) -> bool:
-    if not settings.ldap_server or not _HAS_LDAP:
-        return False
-    try:
-        safe_username = _ldap.dn.escape_dn_chars(username)  # prevent LDAP injection
-        conn = _ldap.initialize(settings.ldap_server)
-        conn.simple_bind_s(
-            f"cn={safe_username},{settings.ldap_base_dn}",
-            password,
-        )
-        return True
-    except Exception:  # noqa: BLE001 — ldap can throw many undocumented subtypes
-        return False
-
-
-@router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    authenticated = (
-        _authenticate_demo(form_data.username, form_data.password)
-        or _authenticate_ldap(form_data.username, form_data.password)
-        or _authenticate_local(form_data.username, form_data.password)
-    )
-    if not authenticated:
+@router.post("/login", response_model=Token)  # fastapi-missing-links: disable
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
+    """Authenticate a user and return a JWT bearer token."""
+    if not auth_service.authenticate(form_data.username, form_data.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Identifiants incorrects",
@@ -67,6 +43,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     return Token(access_token=token, token_type="bearer", username=form_data.username)  # noqa: S106  # nosec B106
 
 
-@router.get("/check")
-def check_token(_: dict = Depends(get_current_user)) -> dict:
+@router.get("/check", response_model=dict)
+def check_token(_: Annotated[dict, Depends(security.get_current_user)]) -> dict:
+    """Validate the current bearer token and return a confirmation payload."""
     return {"status": "ok"}

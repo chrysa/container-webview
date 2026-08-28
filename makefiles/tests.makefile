@@ -15,14 +15,13 @@ api-tests-xml: ## run backend tests with XML coverage report (CI)
 api-lint: ## run ruff linter on backend code
 	@docker compose run --rm --no-deps api-test python -m ruff check app/
 
+api-lint-fix: ## run ruff linter with auto-fix on backend code
+	@docker compose run --rm api python -m ruff check --fix app/
+
 api-format: ## run ruff formatter on backend code
 	@docker compose run --rm --no-deps api-test python -m ruff format app/
 
 api-typecheck: ## run mypy type checking on backend code
-	@docker compose run --rm --no-deps api-test python -m mypy app/
+	@docker compose run --rm api python -m mypy app/
 
-e2e: ## run E2E Playwright tests (requires prod stack running)
-	@docker compose --profile e2e run --rm e2e
-
-e2e-report: ## open Playwright HTML report
-	@npx playwright show-report e2e/playwright-report
+api-quality: api-lint api-format api-typecheck api-tests ## run full quality checks (lint + format + type + tests)

@@ -1,3 +1,5 @@
+import ldap
+
 from app.services.auth_service import AuthService
 
 
@@ -15,8 +17,8 @@ class TestAuthService:
             Then: Should return True
             """
             mocker.patch(
-                "app.services.auth_service.settings",
-                new=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret", admin_password_hash=""),
             )
             service = AuthService()
             result = service._authenticate_local("admin", "secret")
@@ -30,8 +32,8 @@ class TestAuthService:
             Then: Should return False
             """
             mocker.patch(
-                "app.services.auth_service.settings",
-                new=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret", admin_password_hash=""),
             )
             service = AuthService()
             result = service._authenticate_local("admin", "wrongpassword")
@@ -45,11 +47,47 @@ class TestAuthService:
             Then: Should return False
             """
             mocker.patch(
-                "app.services.auth_service.settings",
-                new=mocker.MagicMock(admin_username="admin", admin_password="secret"),
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password="secret", admin_password_hash=""),
             )
             service = AuthService()
             result = service._authenticate_local("hacker", "secret")
+            assert result is False, f"Expected False but got {result=}"
+
+        def test_returns_true_for_valid_bcrypt_hash(self, mocker):
+            """Return True when the password matches the configured bcrypt hash.
+
+            Given: Settings with admin_password_hash set to bcrypt('secret')
+            When: Calling _authenticate_local('admin', 'secret')
+            Then: Should return True
+            """
+            import bcrypt
+
+            hashed = bcrypt.hashpw(b"secret", bcrypt.gensalt()).decode()
+            mocker.patch(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password_hash=hashed),
+            )
+            service = AuthService()
+            result = service._authenticate_local("admin", "secret")
+            assert result is True, f"Expected True but got {result=}"
+
+        def test_returns_false_for_wrong_password_against_hash(self, mocker):
+            """Return False when the password does not match the bcrypt hash.
+
+            Given: Settings with admin_password_hash set to bcrypt('secret')
+            When: Calling _authenticate_local('admin', 'wrong')
+            Then: Should return False
+            """
+            import bcrypt
+
+            hashed = bcrypt.hashpw(b"secret", bcrypt.gensalt()).decode()
+            mocker.patch(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(admin_username="admin", admin_password_hash=hashed),
+            )
+            service = AuthService()
+            result = service._authenticate_local("admin", "wrong")
             assert result is False, f"Expected False but got {result=}"
 
     class TestAuthenticateLdap:
@@ -62,7 +100,10 @@ class TestAuthService:
             When: Calling _authenticate_ldap(...)
             Then: Should return False without attempting to connect
             """
-            mocker.patch("app.services.auth_service.settings", new=mocker.MagicMock(ldap_server=""))
+            mocker.patch(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(ldap_server=""),
+            )
             service = AuthService()
             result = service._authenticate_ldap("user", "pass")
             assert result is False, f"Expected False but got {result=}"
@@ -78,7 +119,7 @@ class TestAuthService:
                 ldap_server="ldap://ldap.example.com",
                 ldap_base_dn="dc=example,dc=com",
             )
-            mocker.patch("app.services.auth_service.settings", new=mock_settings)
+            mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
             mock_conn = mocker.MagicMock()
             mock_conn.simple_bind_s.return_value = (97, [])
             mocker.patch("ldap.initialize", return_value=mock_conn)
@@ -94,15 +135,13 @@ class TestAuthService:
             When: Calling _authenticate_ldap(...)
             Then: Should return False without propagating the exception
             """
-            import ldap as _ldap
-
             mock_settings = mocker.MagicMock(
                 ldap_server="ldap://ldap.example.com",
                 ldap_base_dn="dc=example,dc=com",
             )
-            mocker.patch("app.services.auth_service.settings", new=mock_settings)
+            mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
             mock_conn = mocker.MagicMock()
-            mock_conn.simple_bind_s.side_effect = _ldap.LDAPError({"desc": "Invalid credentials"})
+            mock_conn.simple_bind_s.side_effect = ldap.LDAPError({"desc": "Invalid credentials"})
             mocker.patch("ldap.initialize", return_value=mock_conn)
 
             service = AuthService()
@@ -120,11 +159,12 @@ class TestAuthService:
             Then: Should return True via local authentication
             """
             mocker.patch(
-                "app.services.auth_service.settings",
-                new=mocker.MagicMock(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(
                     ldap_server="",
                     admin_username="admin",
                     admin_password="secret",
+                    admin_password_hash="",
                 ),
             )
             service = AuthService()
@@ -139,11 +179,12 @@ class TestAuthService:
             Then: Should return False
             """
             mocker.patch(
-                "app.services.auth_service.settings",
-                new=mocker.MagicMock(
+                "app.services.auth_service.get_settings",
+                return_value=mocker.MagicMock(
                     ldap_server="",
                     admin_username="admin",
                     admin_password="secret",
+                    admin_password_hash="",
                 ),
             )
             service = AuthService()

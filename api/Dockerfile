@@ -1,56 +1,55 @@
 # syntax=docker/dockerfile:1.4
 
-# ── base: system deps + production requirements ──────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 1 — system dependencies + pip install
+# ─────────────────────────────────────────────────────────────────────────────
+
 FROM python:3.12-slim AS base
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libldap2-dev libsasl2-dev gcc curl \
+# Build-time deps for python-ldap
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libldap2-dev libsasl2-dev gcc \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY requirements.txt pyproject.toml ./
-RUN pip install --no-cache-dir "setuptools>=70" wheel && \
-    pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml .
 
-# ── deps: install dev/test extras on top of base ─────────────────────────────
-FROM base AS deps
+RUN pip install --no-cache-dir .
 
-RUN pip install --no-cache-dir "setuptools>=70" wheel && \
-    pip install --no-cache-dir -e ".[dev]"
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 2 — development (uvicorn --reload)
+# ─────────────────────────────────────────────────────────────────────────────
 
-# ── test: run the test suite ─────────────────────────────────────────────────
-FROM deps AS test
-
-COPY . .
-
-CMD ["python", "-m", "pytest", "--tb=short", "-q"]
-
-# ── production ────────────────────────────────────────────────────────────────
-FROM base AS production
-
-COPY . .
-
-RUN addgroup --system app && adduser --system --ingroup app app \
-    && chown -R app:app /app
-
-USER app
-
-EXPOSE 8000
-
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api || exit 1
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# ── dev: production runtime + dev/test/lint tooling + live-reload ─────────────
-# Built on `deps` so it carries the editable install and the ".[dev]" extras
-# (pytest, ruff, mypy). Compose bind-mounts the source over /app and runs as the
-# host UID, so caches are redirected out of the tree via env (see docker-compose).
-FROM deps AS dev
+FROM base AS dev
 
 COPY . .
 
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 3 — test (run pytest with coverage)
+# ─────────────────────────────────────────────────────────────────────────────
+
+FROM base AS test
+
+RUN pip install --no-cache-dir ".[dev]"
+
+COPY . .
+
+CMD ["python", "-m", "pytest", "--cov=app", "--cov-report=term-missing", "--cov-report=xml"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 4 — production (no reload, no dev tools)
+# ─────────────────────────────────────────────────────────────────────────────
+
+FROM base AS production
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

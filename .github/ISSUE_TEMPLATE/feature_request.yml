@@ -1,42 +1,76 @@
----
-name: Feature request
-about: Propose a new feature or enhancement
-title: 'feat: '
-labels: ['enhancement']
-assignees: ''
----
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement!
+        Please describe your idea clearly so we can evaluate it.
 
-## Priority
-<!-- Select one: High | Medium | Low -->
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: Is your feature request related to a problem? Please describe it.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
 
-## Summary
-<!-- Brief description of the feature (1–2 sentences) -->
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe clearly what you want to happen.
+    validations:
+      required: true
 
-## Motivation
-<!-- Why is this feature needed? What problem does it solve? -->
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any alternative solutions or features you've considered.
 
-## Proposed solution
-<!-- How should this be implemented? Stack, approach, constraints -->
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component would this feature affect?
+      options:
+        - API (FastAPI backend)
+        - Frontend (React)
+        - Docker / docker-compose
+        - Makefile
+        - CI/CD (GitHub Actions)
+        - pre-commit hooks
+        - Documentation
+        - Other
+    validations:
+      required: true
 
-## Acceptance criteria
-- [ ]
-- [ ]
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Low — nice to have
+        - Medium — would improve workflow
+        - High — blocking or critical
+    validations:
+      required: true
 
-## Milestone
-<!-- GitHub milestone this issue belongs to — e.g. M2-Core, M3-Next -->
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add any other context, mockups, or screenshots about the feature request here.
 
-## Notion
-<!-- Notion page or task link if tracked — leave blank if none -->
-
-## Depends on
-<!-- Issues blocking this one. Format: chrysa/REPO#NUMBER or bare #NUMBER -->
-<!-- None -->
-
-## Out of scope
-<!-- What is explicitly NOT part of this issue -->
-
-## Additional context
-<!-- Links to Notion, mockups, related issues -->
-
-## Next step
-<!-- This issue should be covered by exactly 1 PR: `Closes #<this issue number>` -->
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched for existing issues/PRs before creating this one
+          required: true
+        - label: I am willing to contribute a PR for this feature

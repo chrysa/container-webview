@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=70", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -12,28 +12,28 @@ version = "1.0.0"
 description = "FastAPI backend for Docker Overview WebUI"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi==0.139.2",
-    "uvicorn[standard]==0.51.0",
-    "docker==7.2.0",
-    "pyyaml==6.0.3",
-    "PyJWT>=2.8.0",
-    "python-multipart==0.0.32",
-    "websockets==16.1.1",
-    "httpx==0.28.1",
-    "python-ldap==3.4.7",
-    "pydantic-settings==2.14.2",
-    "sentry-sdk[fastapi]>=2.0.0",
+    "fastapi==0.111.0",
+    "uvicorn[standard]==0.29.0",
+    "docker==7.0.0",
+    "pyyaml==6.0.1",
+    "python-jose[cryptography]==3.4.0",
+    "bcrypt==4.2.0",
+    "python-multipart==0.0.31",
+    "websockets==12.0",
+    "httpx==0.27.0",
+    "python-ldap==3.4.5",
+    "pydantic-settings==2.2.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==9.1.1",
-    "pytest-mock==3.15.1",
+    "pytest==9.0.3",
+    "pytest-mock==3.14.0",
     "pytest-asyncio==1.4.0",
-    "pytest-cov==7.1.0",
-    "coverage[toml]==7.15.2",
-    "faker==40.35.0",
-    "ruff==0.16.0",
+    "pytest-cov==7.0.0",
+    "coverage[toml]==7.10.6",
+    "faker==25.0.0",
+    "ruff==0.15.22",
     "mypy==2.3.0",
 ]
 
@@ -86,42 +86,11 @@ extend-exclude = [
 
 [tool.ruff.lint]
 select = [
-    "E",
-    "W",
-    "F",
-    "I",
-    "N",
-    "UP",
-    "B",
-    "C4",
-    "C90",
-    "A",
-    "ANN",
-    "ARG",
-    "ASYNC",
-    "BLE",
-    "DTZ",
-    "EM",
-    "FBT",
-    "G",
-    "ICN",
-    "ISC",
-    "LOG",
-    "PERF",
-    "PIE",
-    "PL",
-    "PT",
-    "PTH",
-    "Q",
-    "RET",
-    "RSE",
-    "RUF",
-    "S",
-    "SIM",
-    "SLF",
-    "T20",
-    "TC",
-    "TID",
+    "E", "W", "F", "I", "N", "UP", "B", "C4", "C90",
+    "A", "ANN", "ARG", "ASYNC", "BLE", "DTZ", "EM",
+    "FBT", "G", "ICN", "ISC", "LOG", "PERF", "PIE",
+    "PL", "PT", "PTH", "Q", "RET", "RSE", "RUF",
+    "S", "SIM", "SLF", "T20", "TCH", "TID",
 ]
 ignore = [
     "E501",    # line length (handled by formatter)
@@ -141,12 +110,11 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-# Patterns cover both running from api/ and from repo root (ruff resolves relative to CWD)
-"api/app/tests/**" = [
+"**/tests/**" = [
     "S101",    # assert in tests
     "S106",    # hardcoded password in fixtures
     "S105",    # hardcoded password in strings
-    "S108",    # /tmp usage acceptable in tests
+    "S108",    # temp path literals in tests
     "ANN",     # no type annotations in tests
     "ARG001",
     "ARG002",
@@ -154,32 +122,15 @@ fixable = ["ALL"]
     "PLR2004",
     "PT006",   # parametrize type
     "PT011",
-    "PLC0415", # imports inside functions acceptable in tests
-    "SLF001",  # tests may access private members
+    "SLF001",  # tests legitimately exercise private members
+    "PLC0415", # local imports inside tests are fine
 ]
-"app/tests/**" = [
-    "S101",
-    "S106",
-    "S105",
-    "S108",
-    "ANN",
-    "ARG001",
-    "ARG002",
-    "PLR0913",
-    "PLR2004",
-    "PT006",
-    "PT011",
-    "PLC0415",
-    "SLF001",
-]
-"app/main.py" = ["ANN"]
-"api/app/main.py" = ["ANN"]
-"app/config.py" = ["S105", "S106"]
-"api/app/config.py" = ["S105", "S106"]
-"app/constants.py" = ["S105"]
-"api/app/constants.py" = ["S105"]
-"app/services/docker_client.py" = ["I001"]
-"api/app/services/docker_client.py" = ["I001"]
+"**/app/main.py" = ["ANN"]
+# Pydantic v2 requires hateoas types at runtime — cannot be under TYPE_CHECKING
+"**/services/project_manager.py" = ["TCH001"]
+"**/services/alerts_service.py"  = ["TCH001"]
+"**/services/metrics_service.py" = ["TCH001"]
+"**/services/topology_service.py" = ["TCH001"]
 
 [tool.ruff.lint.isort]
 force-single-line = true
@@ -221,7 +172,7 @@ no_implicit_optional = true
 cache_dir = ".mypy_cache/"
 
 [[tool.mypy.overrides]]
-module = ["app.tests.*"]
+module = ["tests.*", "app.tests.*"]
 disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]

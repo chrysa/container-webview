@@ -1,21 +1,23 @@
-docker-build: ## Build all images (production)
-	@docker compose build --pull --no-cache
+docker-build: ## build all images (no cache)
+	@docker compose build --pull --no-cache --compress --force-rm
 
-docker-build-dev: ## Build development images
-	@docker compose --profile dev build --pull
+docker-connect-api: ## open a shell in the api container
+	@docker compose run --rm -it --entrypoint sh api
 
-docker-stop: ## Stop all services
-	@docker compose --profile dev stop
+docker-stop: ## stop all services
+	@docker compose stop
 
-docker-down: ## Stop and remove containers
-	@docker compose --profile dev down
+docker-up: ## start all services
+	@docker compose up
 
-docker-ps: ## List running containers
-	@docker compose --profile dev ps
+docker-up-detach: ## start all services in background
+	@docker compose up --detach
 
-docker-logs: ## Tail service logs (usage: make docker-logs SERVICE=api)
-	@docker compose logs --follow --tail=100 $(SERVICE)
+docker-down: ## stop and remove all containers
+	@docker compose down
 
-docker-clean: ## Remove images and orphan volumes
-	@docker compose down --volumes --remove-orphans
-	@docker image prune -f
+docker-logs: ## follow logs for all services
+	@docker compose logs -f
+
+docker-ps: ## list running containers
+	@docker compose ps

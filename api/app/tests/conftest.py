@@ -6,7 +6,7 @@ import pytest
 from app.config import Settings
 from app.config import get_settings
 from app.main import app
-from app.security import create_access_token
+from app.security import security
 
 
 @pytest.fixture(name="faker_instance")
@@ -68,7 +68,8 @@ def fixt_valid_token():
     """Return a valid JWT token for test authentication."""
 
     def _load(**kwargs):
-        return create_access_token({"sub": kwargs.get("username", "testuser")})
+        get_settings.cache_clear()
+        return security.create_access_token(kwargs.get("username", "testuser"))
 
     return _load
 

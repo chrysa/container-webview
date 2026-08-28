@@ -6,85 +6,57 @@ endif
 
 include $(shell find . -type f -name "*.[Mm]akefile" -not -path "*/\.*" -exec echo " {}" \;)
 
-.DEFAULT_GOAL := help
+__project_directory=$(shell pwd)
 
 SHELL := /bin/bash
 
-SERVICE ?=
-PROJECTS_PATH ?= /opt/projects
+.DEFAULT_GOAL := help
+
+.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(shell find . -type f -name "*.[Mm]akefile" -not -path "*/\.*") | sort | cut -d":" -f1 | tr "\n" " ")
+
+check-defined-% :
+	@:$(call check_defined, $*, target-specific)
 
 .PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(shell find makefiles -name "*.Makefile" -o -name "*.makefile" -type f) | sort | cut -d":" -f1 | tr "\n" " ")
 
-help: ## Afficher l'aide
+__check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value ), required by target $)))
+
+help: ## Display this help message
 	@echo "==================================================================="
-	@echo " Docker Overview WebUI"
+	@echo "$(shell basename "$$(pwd)") Development Environment"
 	@echo "==================================================================="
 	@echo ""
-	@for file in $(shell find . -type f \( -name "*.Makefile" -o -name "*.makefile" \) -not -path "*/\.*" -exec echo "{}" \; 2>/dev/null | sort); do \
+	@echo "Available commands:"
+	@echo ""
+	@for file in $(shell find . -type f -name "*.[Mm]akefile" -not -path "*/\.*" 2>/dev/null | sort); do \
 		category=$$(basename $$file .makefile); \
-		category=$$(basename $$category .Makefile); \
+		category=$$(echo $$category | sed 's/\.Makefile//'); \
 		case $$category in \
-			docker)   icon="🐳" ;; \
-			node)     icon="📦" ;; \
-			api)      icon="⚙️ " ;; \
-			project)  icon="🚀" ;; \
-			*)        icon="📋" ;; \
+			docker)    icon="🐳" ;; \
+			node)      icon="📦" ;; \
+			project)   icon="🚀" ;; \
+			tests)     icon="🧪" ;; \
+			tools)     icon="🔧" ;; \
+			*)         icon="📌" ;; \
 		esac; \
-		entries=$$(grep -E '^[a-zA-Z_-]+:.*?## .*$$' $$file 2>/dev/null); \
-		if [ -n "$$entries" ]; then \
-			echo "$$icon $$(echo $$category | tr '[:lower:]' '[:upper:]'):"; \
-			echo "$$entries" | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-28s\033[0m %s\n", $$1, $$2}'; \
-			echo ""; \
-		fi; \
+		echo ""; \
+		echo "$$icon $$(echo $$category | tr '[:lower:]' '[:upper:]'):"; \
+		grep -E '^[a-zA-Z_-]+(\([^)]*\))?:.*?## .*$$' $$file 2>/dev/null | sort | \
+			awk 'BEGIN {FS = ":.*?## "}; { \
+				cmd = $$1; \
+				desc = $$2; \
+				if (match(cmd, /\([^)]+\)/)) { \
+					args = substr(cmd, RSTART+1, RLENGTH-2); \
+					gsub(/\([^)]+\)/, "", cmd); \
+					printf "  \033[36m%-30s\033[0m \033[33m%-15s\033[0m %s\n", cmd, args, desc; \
+				} else { \
+					printf "  \033[36m%-30s\033[0m \033[33m%-15s\033[0m %s\n", cmd, "", desc; \
+				} \
+			}'; \
 	done
-	@echo "Variables d'environnement :"
-	@echo "  PROJECTS_PATH=$(PROJECTS_PATH)"
-	@echo "  SERVICE=$(SERVICE)"
+	@echo ""
 	@echo "==================================================================="
 
-help-%: ## Show detailed help for a command
-	@grep -A 3 -B 1 "^$*:" $(shell find makefiles -name "*.makefile" -o -name "*.Makefile" -type f) || echo "Commande '$*' introuvable"
-
-# ─── Standards compliance stubs ───────────────────────────────────────────────
-
-install: ## Install all dependencies (API + Node)
-	$(MAKE) api-install node-install
-
-dev: ## Start development environment
-	$(MAKE) dev-up
-
-test: ## Run all tests
-	$(MAKE) api-tests node-test
-
-test-cov: ## Run tests with coverage
-	$(MAKE) api-tests-cov node-test-cov
-
-lint: ## Run all linters
-	$(MAKE) api-lint node-lint
-
-format: ## Format all code
-	$(MAKE) api-format
-
-typecheck: ## Run type checks
-	$(MAKE) api-typecheck
-
-build: ## Build Docker images
-	$(MAKE) docker-build
-
-docker-up: ## Start all services (detached)
-	$(MAKE) -f makefiles/docker.makefile docker-up
-
-docker-down: ## Stop and remove containers
-	$(MAKE) -f makefiles/docker.makefile docker-down
-
-docker-test: ## Run tests inside Docker
-	$(MAKE) api-tests
-
-clean: ## Clean build artifacts
-	$(MAKE) node-clean docker-clean
-
-pre-commit: ## Run pre-commit hooks on all files
-	pre-commit run --all-files
-
-# ─── CI gate ────────────────────────────────────
-ci: lint typecheck test ## Run the full local gate (lint + typecheck + test)
+help-%: ## Show detailed help for a specific command
+	@echo "Showing help for: $*"
+	@grep -A 5 -B 2 "^$*:" $(shell find . -name "*.[Mm]akefile" -not -path "*/\.*" -type f) 2>/dev/null || echo "Command '$*' not found"

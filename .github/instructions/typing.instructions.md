@@ -159,3 +159,13 @@ ______________________________________________________________________
 - Ruff ANN rules enforce all public functions have type annotations
 - Type errors must be fixed before committing
 - `# type: ignore` is treated the same as `# noqa` — prohibited; fix the root cause
+- For third-party libraries without stubs (e.g. `ldap`), configure `ignore_missing_imports = true` globally in `[tool.mypy]` of `pyproject.toml` — never use per-callsite `# type: ignore[import]`
+
+```toml
+# ✅ CORRECT — global mypy opt-in in pyproject.toml
+[tool.mypy]
+ignore_missing_imports = true
+
+# ❌ FORBIDDEN — per-callsite suppression
+import ldap  # type: ignore[import]
+```

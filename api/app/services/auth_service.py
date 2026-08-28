@@ -1,8 +1,8 @@
+import hmac
 import logging
 
-import ldap  # type: ignore[import-untyped]
+import bcrypt
 
-from app.config import settings
 
 
 _logger = logging.getLogger(__name__)
@@ -21,6 +21,11 @@ class AuthService:
         if not settings.ldap_server:
             return False
         try:
+            import ldap  # noqa: PLC0415 — optional dependency, imported only when LDAP is enabled
+        except ImportError:
+            _logger.warning("LDAP is configured but python-ldap is not installed; skipping LDAP auth")
+            return False
+        try:
             conn = ldap.initialize(settings.ldap_server)
             conn.simple_bind_s(
                 _LDAP_DN_TEMPLATE.format(username, settings.ldap_base_dn),
@@ -32,8 +37,26 @@ class AuthService:
         return True
 
     def _authenticate_local(self, username: str, password: str) -> bool:
-        """Return True if username/password match the configured admin credentials."""
-        return username == settings.admin_username and password == settings.admin_password
+        """Return True if username/password match the configured admin credentials.
+
+        Verification prefers a bcrypt hash (``admin_password_hash``); a plaintext
+        ``admin_password`` is a development-only fallback compared in constant time.
+        """
+        settings = get_settings()
+        if not hmac.compare_digest(username, settings.admin_username):
+            return False
+        if settings.admin_password_hash:
+            try:
+                return bcrypt.checkpw(
+                    password.encode("utf-8"),
+                    settings.admin_password_hash.encode("utf-8"),
+                )
+            except ValueError:
+                _logger.error("admin_password_hash is not a valid bcrypt hash")
+                return False
+        if settings.admin_password:
+            return hmac.compare_digest(password, settings.admin_password)
+        return False
 
 
 auth_service = AuthService()

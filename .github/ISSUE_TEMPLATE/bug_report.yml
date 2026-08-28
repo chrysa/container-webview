@@ -1,45 +1,95 @@
----
-name: Bug report
-about: Report something that is broken or not working as expected
-title: 'fix: '
-labels: ['bug']
-assignees: ''
----
+name: Bug Report
+description: Report a bug or unexpected behaviour
+title: "bug: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+        Please provide as much detail as possible to help us investigate.
 
-## Severity
-<!-- Select one: Critical | High | Medium | Low -->
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: What happened?
+    validations:
+      required: true
 
-## Description
-<!-- A clear and concise description of the bug -->
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Step-by-step instructions to reproduce the bug.
+      placeholder: |
+        1. Run `make ...`
+        2. Navigate to '...'
+        3. See error
+    validations:
+      required: true
 
-## Steps to reproduce
-1.
-2.
-3.
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What did you expect to happen?
+    validations:
+      required: true
 
-## Expected behavior
-<!-- What did you expect to happen? -->
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What actually happened? Include error messages and logs if applicable.
+    validations:
+      required: true
 
-## Actual behavior
-<!-- What actually happened? -->
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - API (FastAPI backend)
+        - Frontend (React)
+        - Docker / docker-compose
+        - Makefile
+        - CI/CD (GitHub Actions)
+        - pre-commit hooks
+        - Documentation
+        - Other
+    validations:
+      required: true
 
-## Environment
-- OS:
-- Python/Node version:
-- Relevant versions:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide environment details.
+      placeholder: |
+        - OS: Ubuntu 24.04 / macOS 15 / Windows 11
+        - Docker version: 27.x
+        - Python version: 3.12.x
+        - Node version: 20.x
+        - Branch: develop
+    validations:
+      required: true
 
-## Milestone
-<!-- GitHub milestone this issue belongs to — e.g. M2-Core, Maintenance -->
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste any relevant log output here.
+      render: shell
 
-## Notion
-<!-- Notion page or task link if tracked — leave blank if none -->
-
-## Depends on
-<!-- Issues blocking this one. Format: chrysa/REPO#NUMBER or bare #NUMBER -->
-<!-- None -->
-
-## Additional context
-<!-- Logs, screenshots, SonarCloud findings, etc. -->
-
-## Next step
-<!-- Create a PR with `Closes #<this issue number>` once the fix is ready -->
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched for existing issues before creating this one
+          required: true
+        - label: I have included all information needed to reproduce the issue
+          required: true

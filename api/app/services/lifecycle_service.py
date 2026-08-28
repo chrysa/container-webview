@@ -2,8 +2,8 @@ from app.constants import ERR_CONTAINER_NOT_FOUND
 from app.constants import ERR_PROJECT_NOT_FOUND
 from app.constants import ERR_SERVICE_NOT_FOUND
 from app.constants import ERR_UNKNOWN_ACTION
-from app.services.docker_client import get_container_for_service
-from app.services.project_manager import load_project
+from app.services.docker_client import docker_client
+from app.services.project_manager import project_manager
 
 
 class LifecycleService:

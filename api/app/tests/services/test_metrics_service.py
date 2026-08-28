@@ -1,3 +1,4 @@
+import docker.errors
 import pytest
 
 from app.services.metrics_service import MetricsService
@@ -10,7 +11,7 @@ class TestMetricsService:
         """Tests for _bytes_to_mb()."""
 
         @pytest.mark.parametrize(
-            "byte_count,expected_mb",
+            ("byte_count", "expected_mb"),
             [
                 (0, 0.0),
                 (1024 * 1024, 1.0),
@@ -156,7 +157,7 @@ class TestMetricsService:
             c2.stats.return_value = c1.stats.return_value
 
             mocker.patch(
-                "app.services.metrics_service.get_all_containers_for_project",
+                "app.services.metrics_service.docker_client.get_all_containers_for_project",
                 return_value=[c1, c2],
             )
 
@@ -172,8 +173,6 @@ class TestMetricsService:
             When: Calling get_project_metrics()
             Then: Should return zeroed ServiceMetrics instead of raising
             """
-            import docker.errors
-
             container = mocker.MagicMock()
             container.short_id = "abc"
             container.status = "running"
@@ -181,7 +180,7 @@ class TestMetricsService:
             container.stats.side_effect = docker.errors.APIError("stats failed")
 
             mocker.patch(
-                "app.services.metrics_service.get_all_containers_for_project",
+                "app.services.metrics_service.docker_client.get_all_containers_for_project",
                 return_value=[container],
             )
 

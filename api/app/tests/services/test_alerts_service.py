@@ -1,3 +1,5 @@
+import docker.errors
+
 from app.constants import AlertLevel
 from app.constants import ContainerState
 from app.constants import DockerComposeLabel
@@ -167,7 +169,7 @@ class TestAlertsService:
 
             mock_client = mocker.MagicMock()
             mock_client.containers.list.return_value = [c1, c2]
-            mocker.patch("app.services.alerts_service.get_docker_client", return_value=mock_client)
+            mocker.patch("app.services.alerts_service.docker_client.client", return_value=mock_client)
 
             service = AlertsService()
             result = service.get_all()
@@ -182,11 +184,9 @@ class TestAlertsService:
             When: Calling get_all()
             Then: Should return an empty list without raising
             """
-            import docker.errors
-
             mock_client = mocker.MagicMock()
             mock_client.containers.list.side_effect = docker.errors.DockerException("Docker down")
-            mocker.patch("app.services.alerts_service.get_docker_client", return_value=mock_client)
+            mocker.patch("app.services.alerts_service.docker_client.client", return_value=mock_client)
 
             service = AlertsService()
             result = service.get_all()

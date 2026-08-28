@@ -1,23 +1,23 @@
+from fastapi import status
 from httpx import ASGITransport
 from httpx import AsyncClient
 
 from app.main import app
 
 
-class TestPing:
-    """Tests for the /api health check endpoint."""
+class TestHealth:
+    """Tests for the /health liveness endpoint."""
 
-    async def test_ping_returns_ok(self):
+    async def test_health_returns_ok(self):
         """Health check endpoint returns 200 with status ok.
 
         Given: The FastAPI application is running
-        When: GET /api
-        Then: Should return 200 with status "ok" and the demo_mode flag
+        When: GET /health
+        Then: Should return 200 with a payload whose status is "ok"
         """
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-            response = await client.get("/api")
+            response = await client.get("/health")
 
-        assert response.status_code == 200, f"Expected 200 but got {response.status_code=}"
+        assert response.status_code == status.HTTP_200_OK, f"Expected 200 but got {response.status_code=}"
         data = response.json()
-        assert data["status"] == "ok", f"Expected ok payload but got {data=}"
-        assert data["demo_mode"] is False, f"Demo mode must default to off but got {data=}"
+        assert data["status"] == "ok", f"Expected ok status but got {data=}"

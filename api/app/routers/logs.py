@@ -12,6 +12,9 @@ from app.services.docker_client import get_container_for_service
 from app.services.project_manager import load_project
 
 
+if typing.TYPE_CHECKING:
+    from docker.models.containers import Container
+
 router = APIRouter()
 
 
@@ -28,19 +31,20 @@ async def stream_logs(
         verify_token(token)
     except HTTPException:
         await websocket.close(code=4001)
-        return
+    else:
+        if not project_manager.load(project_id):
+            await websocket.close(code=4004)
+        else:
+            container = docker_client.get_container_for_service(project_id, service_name)
+            if container is None:
+                await websocket.close(code=4004)
+            else:
+                await websocket.accept()
+                await _pipe_logs(websocket, container, tail)
 
-    project = load_project(project_id)
-    if not project:
-        await websocket.close(code=4004)
-        return
 
-    container = get_container_for_service(project_id, service_name)
-    if container is None:
-        await websocket.close(code=4004)
-        return
-
-    await websocket.accept()
+async def _pipe_logs(websocket: WebSocket, container: Container, tail: int) -> None:
+    """Forward container log lines to the WebSocket until the client disconnects."""
     try:
         log_stream = container.logs(stream=True, follow=True, tail=tail, timestamps=True)
         for chunk in log_stream:
@@ -53,5 +57,5 @@ async def stream_logs(
         with contextlib.suppress(Exception):  # noqa: BLE001
             await websocket.send_text(f"[ERROR] {exc!s}")
     finally:
-        with contextlib.suppress(Exception):  # noqa: BLE001
+        with contextlib.suppress(RuntimeError):
             await websocket.close()
