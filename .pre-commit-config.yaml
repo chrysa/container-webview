@@ -33,7 +33,7 @@ repos:
       - id: ts-unreachable-code
         additional_dependencies:
           - tree-sitter>=0.23
-          - tree-sitter-typescript>=0.23
+          - tree-sitter-typescript>=0.23.2
       - id: import-no-relative-parent
       - id: format-dockerfiles
       - id: dockerfile-no-latest
