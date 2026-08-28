@@ -108,7 +108,7 @@ repos:
           - '@typescript-eslint/parser'
           - eslint-config-prettier
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args:
