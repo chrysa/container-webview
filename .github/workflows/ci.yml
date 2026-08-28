@@ -40,7 +40,7 @@ jobs:
 
             - name: GitVersion
               id: gitversion
-              uses: chrysa/github-actions/gitversion@v1.6.0
+              uses: chrysa/github-actions/gitversion@v1.8.1
 
             - name: Summary
               run: |
@@ -90,7 +90,7 @@ jobs:
               uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
 
             - name: Setup Python
-              uses: chrysa/github-actions/python-setup@v1.6.0
+              uses: chrysa/github-actions/python-setup@v1.8.1
               with:
                   python-version: '3.12'
 
@@ -98,13 +98,13 @@ jobs:
               run: sudo apt-get update && sudo apt-get install -y libldap2-dev libsasl2-dev
 
             - name: Install project
-              uses: chrysa/github-actions/install-project@v1.6.0
+              uses: chrysa/github-actions/install-project@v1.8.1
               with:
                   extras: 'dev'
                   working-directory: api
 
             - name: Ruff check
-              uses: chrysa/github-actions/ruff-check@v1.6.0
+              uses: chrysa/github-actions/ruff-check@v1.8.1
               with:
                   python-version: '3.12'
                   latest-python: '3.12'
@@ -112,7 +112,7 @@ jobs:
                   sources: api/app
 
             - name: Mypy check
-              uses: chrysa/github-actions/mypy-check@v1.6.0
+              uses: chrysa/github-actions/mypy-check@v1.8.1
               with:
                   python-version: '3.12'
                   latest-python: '3.12'
@@ -131,7 +131,7 @@ jobs:
               uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3
+              uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e  # v4.3.0
 
             - name: Build test image
               run: docker compose build api-test
@@ -209,7 +209,7 @@ jobs:
               uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4
 
             - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3
+              uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e  # v4.3.0
 
             - name: Build API image (dev)
               run: |
@@ -242,7 +242,7 @@ jobs:
                   fetch-depth: 0
 
             - name: SonarCloud scan
-              uses: chrysa/github-actions/sonar-scan-python@v1.6.0
+              uses: chrysa/github-actions/sonar-scan-python@v1.8.1
               with:
                   python-version: '3.12'
                   sonar-token: ${{ secrets.SONAR_TOKEN }}
