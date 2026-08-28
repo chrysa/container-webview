@@ -3,7 +3,6 @@ import logging
 
 import bcrypt
 
-from app.config import get_settings
 
 
 _logger = logging.getLogger(__name__)
@@ -19,7 +18,6 @@ class AuthService:
 
     def _authenticate_ldap(self, username: str, password: str) -> bool:
         """Return True if the user can bind to the configured LDAP server."""
-        settings = get_settings()
         if not settings.ldap_server:
             return False
         try:

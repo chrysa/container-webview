@@ -21,11 +21,11 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
-    # LDAP (optional — leave empty to disable)
+    # LDAP (optionnel — laisser vide pour désactiver)
     ldap_server: str = ""
     ldap_base_dn: str = ""
     ldap_bind_dn: str = ""
-    ldap_bind_password: str = ""
+    ldap_bind_password: str = ""  # nosec B105 — set via LDAP_BIND_PASSWORD env var
 
     # Local admin fallback (used when LDAP is not configured).
     # Prefer admin_password_hash (a bcrypt hash); admin_password is a
@@ -34,7 +34,10 @@ class Settings(BaseSettings):
     admin_password: str = ""
     admin_password_hash: str = ""
 
-    # Path where docker-compose project directories are stored
+    # CORS — allowed origins (comma-separated via env var CORS_ORIGINS)
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]  # no-hardcoded-localhost: disable
+
+    # Chemin monté où sont stockés les docker-compose des projets
     projects_path: str = "/projects"
 
     # Allowed CORS origins
@@ -43,7 +46,11 @@ class Settings(BaseSettings):
         "http://localhost:5173",  # no-hardcoded-localhost: disable -- dev default, override via CORS_ORIGINS
     ]
 
-    model_config = {"env_file": ".env"}
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()
 
     @model_validator(mode="after")
     def _guard_production(self) -> "Settings":
@@ -63,6 +70,6 @@ class Settings(BaseSettings):
         return self
 
 
-@lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    """Dependency-injectable settings accessor."""
+    return settings

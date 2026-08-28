@@ -1,9 +1,5 @@
-from __future__ import annotations
-
 import asyncio
 import contextlib
-import logging
-import typing
 
 from fastapi import APIRouter
 from fastapi import HTTPException
@@ -11,15 +7,14 @@ from fastapi import Query
 from fastapi import WebSocket
 from fastapi import WebSocketDisconnect
 
-from app.security import security
-from app.services.docker_client import docker_client
-from app.services.project_manager import project_manager
+from app.security import verify_token
+from app.services.docker_client import get_container_for_service
+from app.services.project_manager import load_project
 
 
 if typing.TYPE_CHECKING:
     from docker.models.containers import Container
 
-_logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -31,13 +26,9 @@ async def stream_logs(
     token: str = Query(...),
     tail: int = Query(100),
 ) -> None:
-    """Stream container logs over a WebSocket connection.
-
-    Authenticates via a `token` query parameter because WebSocket handshakes
-    do not carry the Authorization header.
-    """
+    # Auth via query param (WebSocket ne supporte pas les headers Authorization)
     try:
-        security.get_current_user(token)
+        verify_token(token)
     except HTTPException:
         await websocket.close(code=4001)
     else:
@@ -59,9 +50,12 @@ async def _pipe_logs(websocket: WebSocket, container: Container, tail: int) -> N
         for chunk in log_stream:
             line = chunk.decode("utf-8", errors="replace").rstrip("\n")
             await websocket.send_text(line)
-            await asyncio.sleep(0)
+            await asyncio.sleep(0)  # yield control  # NOSONAR
     except WebSocketDisconnect:
-        _logger.debug("WebSocket client disconnected during log stream")
+        pass
+    except Exception as exc:  # noqa: BLE001 — unknown errors during log streaming
+        with contextlib.suppress(Exception):  # noqa: BLE001
+            await websocket.send_text(f"[ERROR] {exc!s}")
     finally:
         with contextlib.suppress(RuntimeError):
             await websocket.close()

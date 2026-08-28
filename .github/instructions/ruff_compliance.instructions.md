@@ -1,14 +1,14 @@
----
-applyTo: "api/**/*.py"
----
+______________________________________________________________________
+
+## applyTo: "api/\*\*/\*.py"
 
 # Ruff Compliance Guidelines
 
 **Applies to:** `api/**/*.py`
 
-**Version:** 1.0 (adapted from Padam-AV guidelines)
+**Version:** 1.0 (chrysa guidelines)
 
----
+______________________________________________________________________
 
 ## Ruff as Source of Truth
 
@@ -22,7 +22,7 @@ Ruff is the single linting authority for this project. It ensures:
 
 **Golden Rule:** If Ruff fails locally, it will fail in CI. Fix it before pushing.
 
----
+______________________________________________________________________
 
 ## Priority Rule Categories
 
@@ -100,7 +100,7 @@ from app.constants import TokenType
 
 - **RUF012**: Mutable class attributes must use `field(default_factory=...)`
 
----
+______________________________________________________________________
 
 ## Common Violation Patterns
 
@@ -270,13 +270,13 @@ ruff check api/app/services/docker_client.py
 ruff rule G004
 ```
 
----
+______________________________________________________________________
 
 ## Development Workflow
 
 1. **Write code** following guidelines
-2. **Run Ruff** locally: `ruff check api/ --fix`
-3. **Address remaining** violations manually
-4. **Commit** when all checks pass
+1. **Run Ruff** locally: `ruff check api/ --fix`
+1. **Address remaining** violations manually
+1. **Commit** when all checks pass
 
 **Zero `# noqa` policy**: Never suppress violations. Fix the root cause always.

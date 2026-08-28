@@ -46,12 +46,10 @@ def fixt_override_settings(test_settings):
     def _load(**kwargs):
         settings = test_settings(**kwargs)
         app.dependency_overrides[get_settings] = lambda: settings
-        get_settings.cache_clear()
         return settings
 
     yield _load
     app.dependency_overrides.pop(get_settings, None)
-    get_settings.cache_clear()
 
 
 @pytest.fixture(name="api_client")

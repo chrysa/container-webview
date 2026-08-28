@@ -17,7 +17,7 @@ SHELL := /bin/bash
 check-defined-% :
 	@:$(call check_defined, $*, target-specific)
 
-check_defined = $(strip $(foreach 1,$1, $(call __check_defined,$1,$(strip $(value 2)))))
+.PHONY: $(shell grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(shell find makefiles -name "*.Makefile" -o -name "*.makefile" -type f) | sort | cut -d":" -f1 | tr "\n" " ")
 
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value ), required by target $)))
 

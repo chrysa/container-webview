@@ -52,17 +52,11 @@ class ProjectManager:
     _YAML_KEY_NETWORKS: str = "networks"
     _ERR_INVALID_PATH: str = "Invalid project path: {}"
 
-    # ── Path helpers ────────────────────────────────────────────────────────
 
-    def _safe_project_path(self, project_id: str) -> Path:
-        """Resolve and validate path stays within projects_path (path-traversal guard)."""
-        base = Path(get_settings().projects_path).resolve()
-        target = (base / project_id).resolve()
-        if not str(target).startswith(str(base)):
-            raise ValueError(self._ERR_INVALID_PATH.format(project_id))
-        return target
+def _parse_compose(compose_path: Path) -> dict:
+    with compose_path.open() as f:
+        return yaml.safe_load(f) or {}
 
-    # ── Compose parsing helpers ─────────────────────────────────────────────
 
     @staticmethod
     def _parse_compose(compose_path: Path) -> dict[str, Any]:
@@ -86,6 +80,13 @@ class ProjectManager:
         if isinstance(raw, dict):
             return list(raw.keys())
         return []
+    result = []
+    for p in ports_raw:
+        if isinstance(p, dict):
+            result.append(f"{p.get('target', '')}")
+        else:
+            result.append(str(p))
+    return result
 
     @staticmethod
     def _normalize_volumes(raw: list | None) -> list[str]:
@@ -115,6 +116,16 @@ class ProjectManager:
                     result[k] = v
             return result
         return {}
+    if isinstance(env_raw, dict):
+        return {k: str(v) for k, v in env_raw.items() if v is not None}
+    if isinstance(env_raw, list):
+        result = {}
+        for item in env_raw:
+            if "=" in item:
+                k, v = item.split("=", 1)
+                result[k] = v
+        return result
+    return {}
 
     def _build_service(self, name: str, conf: dict[str, Any]) -> ServiceModel:
         return ServiceModel(
@@ -128,7 +139,7 @@ class ProjectManager:
             healthcheck=conf.get("healthcheck"),
         )
 
-    # ── Public API ──────────────────────────────────────────────────────────
+    top_networks = list((data.get("networks") or {}).keys())
 
     def load(self, project_id: str) -> ProjectModel | None:
         """Return the parsed *ProjectModel* for *project_id*, or ``None`` if not found."""
@@ -172,4 +183,14 @@ class ProjectManager:
         return projects
 
 
-project_manager = ProjectManager()
+def list_projects() -> list[ProjectModel]:
+    base = Path(settings.projects_path)
+    if not base.exists():
+        return []
+    projects = []
+    for entry in sorted(base.iterdir()):
+        if entry.is_dir():
+            project = load_project(entry.name)
+            if project:
+                projects.append(project)
+    return projects

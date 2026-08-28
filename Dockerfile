@@ -1,19 +1,27 @@
 # syntax=docker/dockerfile:1.4
 
-FROM node:lts-slim AS package
+# ─────────────── Stage 1 : dépendances ───────────────
 
 COPY ./code/package.json /app/package.json
 COPY ./code/package-lock.json /app/package-lock.json
 
 WORKDIR /app
 
-RUN npm ci
+COPY code/package.json ./
 
-COPY ./code /app
+# The node_modules named volume is seeded from this layer; chown it to the host
+# UID (default 1000) so bind-mount dev/test containers running as
+# "${UID:-1000}:${GID:-1000}" can write Vite/Vitest caches into node_modules/.
+RUN npm install --legacy-peer-deps \
+    && chown -R 1000:1000 /app/node_modules
 
 FROM package AS build
 
-ENV PATH=$PATH:/app/node_modules
+ARG VITE_API_URL=
+
+ENV VITE_API_URL=${VITE_API_URL}
+
+COPY code/ .
 
 RUN npm run build
 
@@ -23,8 +31,7 @@ ENV PORT=80 \
     NODE_ENV=production \
     PATH=$PATH:/app/node_modules/:/app/node_modules/.bin
 
-COPY --from=build /app/build /app/build
-COPY --from=build /app/package*.json /app/
+USER appuser
 
 RUN set -ex \
     && set -ex pipefail \

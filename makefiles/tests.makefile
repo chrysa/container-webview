@@ -4,7 +4,7 @@ api-tests: ## run backend unit tests
 	@docker compose --profile test run --rm $(API_SERVICE)
 
 api-tests-cov: ## run backend tests with terminal coverage report
-	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=term-missing
+	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=term-missing --cov-fail-under=85
 
 api-tests-html: ## run backend tests with HTML coverage report
 	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=html --cov-report=term-missing
@@ -13,13 +13,13 @@ api-tests-xml: ## run backend tests with XML coverage report (CI)
 	@docker compose --profile test run --rm $(API_SERVICE) python -m pytest --cov=app --cov-report=xml --cov-report=term-missing
 
 api-lint: ## run ruff linter on backend code
-	@docker compose run --rm api python -m ruff check app/
+	@docker compose run --rm --no-deps api-test python -m ruff check app/
 
 api-lint-fix: ## run ruff linter with auto-fix on backend code
 	@docker compose run --rm api python -m ruff check --fix app/
 
 api-format: ## run ruff formatter on backend code
-	@docker compose run --rm api python -m ruff format app/
+	@docker compose run --rm --no-deps api-test python -m ruff format app/
 
 api-typecheck: ## run mypy type checking on backend code
 	@docker compose run --rm api python -m mypy app/

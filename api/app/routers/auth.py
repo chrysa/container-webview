@@ -15,6 +15,13 @@ from app.services.auth_service import auth_service
 
 router = APIRouter()
 
+try:
+    import ldap as _ldap
+
+    _HAS_LDAP = True
+except ImportError:
+    _HAS_LDAP = False
+
 
 class Token(BaseModel):
     """OAuth2 token response payload."""
@@ -30,13 +37,10 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
     if not auth_service.authenticate(form_data.username, form_data.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ERR_INVALID_CREDENTIALS,
+            detail="Identifiants incorrects",
         )
-    return Token(
-        access_token=security.create_access_token(form_data.username),
-        token_type=TokenType.BEARER,
-        username=form_data.username,
-    )
+    token = create_access_token({"sub": form_data.username})
+    return Token(access_token=token, token_type="bearer", username=form_data.username)  # noqa: S106  # nosec B106
 
 
 @router.get("/check", response_model=dict)

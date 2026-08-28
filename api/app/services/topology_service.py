@@ -73,7 +73,21 @@ class TopologyService:
     @staticmethod
     def _network_color_map(networks: list[str]) -> dict[str, str]:
         """Assign a distinct display colour to each network."""
-        return {network_name: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, network_name in enumerate(networks)}
+        return {net: _NETWORK_COLORS[i % len(_NETWORK_COLORS)] for i, net in enumerate(networks)}
+
+    @staticmethod
+    def _get_container_status(project_id: str, service_name: str) -> str:
+        """Query Docker for the current container status of a service."""
+        with contextlib.suppress(Exception):  # noqa: BLE001 — Docker may be unavailable
+            client = get_docker_client()
+            for container in client.containers.list(all=True):
+                labels = container.labels
+                if (
+                    labels.get("com.docker.compose.project") == project_id
+                    and labels.get("com.docker.compose.service") == service_name
+                ):
+                    return container.status
+        return ContainerState.UNKNOWN
 
     @staticmethod
     def _service_nodes_and_edges(
@@ -87,7 +101,7 @@ class TopologyService:
 
         for service_index, service in enumerate(project.services):
             column_index, row_index = service_index % _GRID_COLS, service_index // _GRID_COLS
-            status: str = docker_client.get_container_status(project_id, service.name)
+            status: str = TopologyService._get_container_status(project_id, service.name)
             bg_color: str = (
                 color_map.get(service.networks[0], _DEFAULT_NODE_COLOR) if service.networks else _DEFAULT_NODE_COLOR
             )

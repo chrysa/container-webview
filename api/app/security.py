@@ -50,4 +50,19 @@ class SecurityService:
             ) from exc
 
 
-security = SecurityService()
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(UTC) + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+
+
+def verify_token(token: str) -> dict:
+    try:
+        return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+    except jwt.PyJWTError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide") from exc
+
+
+def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+    return verify_token(token)

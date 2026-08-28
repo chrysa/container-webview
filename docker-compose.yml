@@ -1,47 +1,116 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# Development stack
-#   api      : FastAPI + uvicorn --reload  (port 8000)
-#   frontend : React / CRA dev server      (port 3000)
-# ─────────────────────────────────────────────────────────────────────────────
-services:
+---
+# ═══════════════════════════════════════════════════════════
+#  Docker Overview WebUI — docker-compose.yml
+# ═══════════════════════════════════════════════════════════
 
-  # ── FastAPI backend ──────────────────────────────────────────────────────
-  api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: dev
-    container_name: container-webview-api
-    env_file: .env
-    environment:
-      PROJECTS_PATH: /projects
-    ports:
-      - "8000:8000"
-    volumes:
-      # Hot-reload: mount source code
-      - ./api:/app
-      # Docker socket so the API can inspect running containers
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      # Mount a local directory that holds your docker-compose projects
-      - ${PROJECTS_PATH:-./data/projects}:/projects:ro
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+x-common: &common
     restart: unless-stopped
-
-  # ── FastAPI tests ────────────────────────────────────────────────────────
-  api-test:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-      target: test
-    container_name: container-webview-api-test
     volumes:
-      - ./api:/app
-    environment:
-      SECRET_KEY: test-secret-key-for-ci
-      ADMIN_USERNAME: testuser
-      ADMIN_PASSWORD: testpass
-      PROJECTS_PATH: /tmp/projects
-    profiles: [test]
+        - source: /etc/localtime
+          target: /etc/localtime
+          type: bind
+          read_only: true
+
+name: container-webview
+services:
+    # ─── Backend FastAPI ─────────────────────────────────────
+    api:
+        <<: *common
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        hostname: api
+        image: docker-overview-api:latest
+        environment:
+            PROJECTS_PATH: /projects
+            SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+            ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+            ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+            LDAP_SERVER: ${LDAP_SERVER:-}
+            LDAP_BASE_DN: ${LDAP_BASE_DN:-}
+        volumes:
+            - source: /var/run/docker.sock
+              target: /var/run/docker.sock
+              type: bind
+              read_only: true
+            - source: /etc/localtime
+              target: /etc/localtime
+              type: bind
+              read_only: true
+            - source: ${PROJECTS_PATH:-/opt/projects}
+              target: /projects
+              type: bind
+              read_only: true
+        expose:
+            - "8000"
+        ports:
+            - 9003:8000
+        healthcheck:
+            test: [CMD, curl, -f, "http://localhost:8000/api"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+
+    # ─── Frontend (serve + React build) ──────────────────────
+    frontend:
+        <<: *common
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: production
+            args:
+                # URL absolue de l'API vue depuis le navigateur
+                VITE_API_URL: ${VITE_API_URL:-http://localhost:9003}
+        hostname: frontend
+        image: docker-overview-frontend:latest
+        ports:
+            - 9103:3000
+        depends_on:
+            api:
+                condition: service_healthy
+
+    # ─── Dev : API (hot-reload) ───────────────────────────────
+    api-dev:
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+            target: dev
+        hostname: api
+        # Bind-mounts the repo → run as host UID, never root, so no root-owned
+        # artifacts land in ./api.
+        user: "${UID:-1000}:${GID:-1000}"
+        command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+        environment:
+            PROJECTS_PATH: /projects
+            SECRET_KEY: dev-secret-key
+            ADMIN_USERNAME: admin
+            ADMIN_PASSWORD: admin
+            # Keep tool caches out of the mounted tree; HOME must be writable.
+            HOME: /tmp
+            PYTHONPYCACHEPREFIX: /tmp/.toolcache/pycache
+            RUFF_CACHE_DIR: /tmp/.toolcache/ruff
+            MYPY_CACHE_DIR: /tmp/.toolcache/mypy
+            PYTEST_ADDOPTS: -p no:cacheprovider
+        volumes:
+            - source: ./api
+              target: /app
+              type: bind
+            - source: /var/run/docker.sock
+              target: /var/run/docker.sock
+              type: bind
+              read_only: true
+            - source: /etc/localtime
+              target: /etc/localtime
+              type: bind
+              read_only: true
+            - source: ${PROJECTS_PATH:-/opt/projects}
+              target: /projects
+              type: bind
+              read_only: true
+        ports:
+            - 8000:8000
+        profiles:
+            - dev
 
   # ── React frontend (CRA dev server) ─────────────────────────────────────
   frontend:
@@ -63,4 +132,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  frontend_node_modules:
+    docker-overview-node-modules:

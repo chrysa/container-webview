@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 import typing
 
-import docker.errors
+from docker.errors import APIError
+from docker.models.containers import Container
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
@@ -114,10 +115,10 @@ class MetricsService:
     def get_project_metrics(self, project_id: str) -> list[ServiceMetrics]:
         """Return resource metrics for all containers in a Compose project."""
         result: list[ServiceMetrics] = []
-        for container in docker_client.get_all_containers_for_project(project_id):
+        for container in get_all_containers_for_project(project_id):
             try:
                 raw_stats = container.stats(stream=False)
-            except docker.errors.APIError as api_exc:
+            except APIError as api_exc:
                 _logger.warning(
                     "Could not get stats for container %s: %s",
                     container.short_id,

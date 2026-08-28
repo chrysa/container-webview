@@ -5,7 +5,8 @@ from datetime import datetime
 import logging
 import typing
 
-import docker.errors
+from docker.errors import DockerException
+from docker.models.containers import Container
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
@@ -105,8 +106,8 @@ class AlertsService:
     def get_all(self) -> list[Alert]:
         """Return all alerts across every running container."""
         try:
-            containers = docker_client.client().containers.list(all=True)
-        except docker.errors.DockerException as docker_exc:
+            containers = get_docker_client().containers.list(all=True)
+        except DockerException as docker_exc:
             _logger.warning("Docker unavailable — cannot fetch alerts: %s", docker_exc)
             return []
         result: list[Alert] = []

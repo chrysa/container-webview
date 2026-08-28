@@ -1,14 +1,14 @@
----
-applyTo: "api/**/*.py"
----
+______________________________________________________________________
+
+## applyTo: "api/\*\*/\*.py"
 
 # Python Typing Guidelines
 
 **Applies to:** `api/**/*.py`
 
-**Version:** 1.0 (adapted from Padam-AV guidelines)
+**Version:** 1.0 (chrysa guidelines)
 
----
+______________________________________________________________________
 
 ## Project Overview: Type Safety First
 
@@ -22,7 +22,7 @@ applyTo: "api/**/*.py"
 
 **Golden Rule:** No `Any` unless absolutely necessary. Use specific types or `Union` instead.
 
----
+______________________________________________________________________
 
 ## Rules
 
@@ -94,7 +94,7 @@ ERR_NOT_FOUND: Final[str] = "Project not found"
 _LDAP_DN_TEMPLATE: str = "cn={},{}"
 ```
 
----
+______________________________________________________________________
 
 ## Type Annotation Examples
 
@@ -152,7 +152,7 @@ def parse_stats(self, container: Any, stats: Any) -> ServiceMetrics: ...
 def _parse_stats(self, container: Container, stats: dict) -> ServiceMetrics: ...
 ```
 
----
+______________________________________________________________________
 
 ## Enforcement
 

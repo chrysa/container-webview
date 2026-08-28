@@ -19,20 +19,75 @@ _CurrentUser = Annotated[dict, Depends(security.get_current_user)]
 _NOT_FOUND: dict[int | str, dict[str, Any]] = {
     400: {"description": "Unknown action"},
     404: {"description": "Project, service or container not found"},
+    500: {"description": "Docker API error"},
+}
+
+_CONTAINER_ACTIONS: dict[str, str] = {
+    "start": "start",
+    "stop": "stop",
+    "restart": "restart",
+    "pause": "pause",
+    "unpause": "unpause",
+    "kill": "kill",
+}
+
+# Container status reflected back after a successful action, used in demo mode
+# where no real Docker call is made.
+_DEMO_ACTION_RESULT: dict[str, str] = {
+    "start": "running",
+    "restart": "running",
+    "unpause": "running",
+    "stop": "exited",
+    "kill": "exited",
+    "pause": "paused",
 }
 
 
 class ActionResponse(BaseModel):
-    """Result of a lifecycle action on a service container."""
-
     service: str
     action: str
     status: str
     message: str = ""
 
 
-def _run(project_id: str, service_name: str, action: str) -> ActionResponse:
-    """Delegate a lifecycle action to the service, translating ValueError to HTTPException."""
+def _perform_demo_action(project_id: str, service_name: str, action: str) -> ActionResponse:
+    demo_project = demo.load_project(project_id)
+    if not demo_project:
+        raise HTTPException(status_code=404, detail="Projet introuvable")
+    if not any(s["name"] == service_name for s in demo_project["services"]):
+        raise HTTPException(status_code=404, detail=f"Service '{service_name}' introuvable")
+    if action not in _CONTAINER_ACTIONS:
+        raise HTTPException(status_code=400, detail=f"Action inconnue : {action}")
+    return ActionResponse(
+        service=service_name,
+        action=action,
+        status=_DEMO_ACTION_RESULT.get(action, "running"),
+        message="Demo mode — no real container was changed.",
+    )
+
+
+def _perform_action(project_id: str, service_name: str, action: str) -> ActionResponse:
+    if settings.demo_mode:
+        return _perform_demo_action(project_id, service_name, action)
+
+    project = load_project(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Projet introuvable")
+
+    if not any(s.name == service_name for s in project.services):
+        raise HTTPException(status_code=404, detail=f"Service '{service_name}' introuvable")
+
+    container = get_container_for_service(project_id, service_name)
+    if container is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Container pour '{service_name}' introuvable (démarré via compose ?)",
+        )
+
+    method_name = _CONTAINER_ACTIONS.get(action)
+    if method_name is None:
+        raise HTTPException(status_code=400, detail=f"Action inconnue : {action}")
+
     try:
         container_status = lifecycle_service.perform(project_id, service_name, action)
     except ValueError as exc:
