@@ -38,7 +38,10 @@ class Settings(BaseSettings):
     projects_path: str = "/projects"
 
     # Allowed CORS origins
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",  # no-hardcoded-localhost: disable -- dev default, override via CORS_ORIGINS
+        "http://localhost:5173",  # no-hardcoded-localhost: disable -- dev default, override via CORS_ORIGINS
+    ]
 
     model_config = {"env_file": ".env"}
 

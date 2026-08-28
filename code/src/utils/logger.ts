@@ -2,7 +2,7 @@
 export const logger = {
   debug: (...args: unknown[]) => {
     if (import.meta.env.DEV) {
-      console.debug(...args)
+      console.debug(...args) // console-debug-detection: disable -- intentional dev-only logger
     }
   },
   info: (...args: unknown[]) => console.info(...args),

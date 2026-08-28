@@ -32,8 +32,8 @@ repos:
       - id: no-console-warn
       - id: ts-unreachable-code
         additional_dependencies:
-          - tree-sitter>=0.23
-          - tree-sitter-typescript>=0.23
+          - tree-sitter>=0.26.0
+          - tree-sitter-typescript>=0.23.2
       - id: import-no-relative-parent
       - id: format-dockerfiles
       - id: dockerfile-no-latest
@@ -53,6 +53,7 @@ repos:
         exclude: '(^|/)tests/'
       - id: no-sync-in-async
       - id: debugger-detection
+        types_or: [javascript, ts, tsx, jsx, python]
         exclude: '(^|/)tests?/|^(README\.md|docs/)'
       - id: yaml-sorter
         exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
@@ -101,13 +102,13 @@ repos:
           - --config
           - code/.eslintrc.cjs
         additional_dependencies:
-          - eslint@8.57.1
+          - eslint@10.9.1
           - typescript
           - '@typescript-eslint/eslint-plugin'
           - '@typescript-eslint/parser'
           - eslint-config-prettier
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args:
@@ -155,8 +156,7 @@ repos:
     hooks:
       - id: bashate
         args:
-          - --ignore=E006
-          - E020
+          - --ignore=E006,E020
   - repo: https://github.com/Yelp/detect-secrets
     rev: 50119d658ab48021cad234fc5c8d3253263b2ec0
     hooks:
@@ -164,7 +164,7 @@ repos:
         args:
           - --baseline
           - .secrets.baseline
-        exclude: \.pre-commit-config\.yaml
+        exclude: (\.pre-commit-config\.yaml|\.guideline-baseline\.json)
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:
