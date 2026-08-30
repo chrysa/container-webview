@@ -125,7 +125,8 @@ fixable = ["ALL"]
 "**/services/alerts_service.py"  = ["TCH001"]
 "**/services/metrics_service.py" = ["TCH001"]
 "**/services/topology_service.py" = ["TCH001"]
-
+"**/test_*.py" = ["PLR2004"]
+"**/conftest.py" = ["PLR2004"]
 [tool.ruff.lint.isort]
 force-single-line = true
 force-sort-within-sections = true
