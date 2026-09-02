@@ -1,2 +1,44 @@
-**/build/
+# Dependencies & build artefacts
 **/node_modules/
+**/build/
+**/dist/
+**/.vite/
+**/coverage/
+
+# VCS & CI
+.git/
+.github/
+.gitlab-ci.yml
+.gitattributes
+.gitleaks.toml
+.secrets.baseline
+
+# Python backend (built from ./api context, not the root frontend/e2e context)
+api/
+tests/
+
+# Tooling caches
+**/.mypy_cache/
+**/.ruff_cache/
+**/.pytest_cache/
+**/__pycache__/
+
+# Editor / IDE / agent tooling
+.vscode/
+.devcontainer/
+.claude/
+.config/
+config-tools/
+makefiles/
+scripts/
+k8s/
+
+# Docs & metadata
+docs/
+*.md
+!code/README.md
+
+# Local env & secrets
+.env
+.env.*
+!.env.example
