@@ -14,3 +14,9 @@ pre-commit: pre-commit-install pre-commit-run ## install hooks and run on all fi
 
 changelog-generate: ## generate changelog from yaml files
 	@pre-commit run generate-changelog --hook-stage manual --all-files
+
+quality-gate-baseline: ## capture the current quality-gate metrics as the baseline
+	@python3 scripts/quality_gate.py baseline
+
+quality-gate-verify: ## verify quality gates against the recorded baseline
+	@python3 scripts/quality_gate.py verify

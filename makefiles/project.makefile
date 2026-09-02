@@ -14,6 +14,3 @@ ci-lint: api-lint node-lint ## run all linters (backend + frontend)
 
 ci-test: api-tests node-test ## run all test suites (backend + frontend)
 	@:
-
-ci: ci-lint ci-test ## canonical CI gate: lint + test (shared-standards socle)
-	@:
