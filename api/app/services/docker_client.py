@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import typing
 
-import docker
-
 from app.constants import ContainerState
 from app.constants import DockerComposeLabel
+import docker
 
 
 if typing.TYPE_CHECKING:

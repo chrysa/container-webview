@@ -21,6 +21,9 @@ api-lint-fix: ## run ruff linter with auto-fix on backend code
 api-format: ## run ruff formatter on backend code
 	@docker compose run --rm api python -m ruff format app/
 
+api-format-check: ## check backend formatting without writing changes
+	@docker compose run --rm api python -m ruff format --check app/
+
 api-typecheck: ## run mypy type checking on backend code
 	@docker compose run --rm api python -m mypy app/
 
