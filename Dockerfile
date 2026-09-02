@@ -17,7 +17,7 @@ ENV PATH=$PATH:/app/node_modules
 
 RUN npm run build
 
-FROM node:lts-slim as production
+FROM node:lts-slim AS production
 
 ENV PORT=80 \
     NODE_ENV=production \
@@ -26,13 +26,12 @@ ENV PORT=80 \
 COPY --from=build /app/build /app/build
 COPY --from=build /app/package*.json /app/
 
-RUN set -ex \
-    && set -ex pipefail \
+RUN set -eux \
     && apt-get update \
     && apt-get install -qq -o=Dpkg::Use-Pty=0 --no-install-recommends -y xsel \
     && apt-get purge -y --auto-remove \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*set -ex \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && npm install -g serve@14.2.4 --silent
 
 CMD [ "serve", "-s", "/app/build" ]
