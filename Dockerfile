@@ -1,46 +1,62 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.7
 
-# ─────────────── Stage 1 : dépendances ───────────────
+# Frontend (React + Vite) — multi-stage: base -> builder -> production -> dev
+# The app source lives in ./code; the build context is the repo root.
+# Stage 1: OS base (shared parent) — pinned Node
 
-COPY ./code/package.json /app/package.json
-COPY ./code/package-lock.json /app/package-lock.json
+FROM node:22-slim AS base
+
+ENV NODE_ENV=production
 
 WORKDIR /app
 
-COPY code/package.json ./
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r appuser \
+    && useradd -r -u 10001 -g appuser appuser
 
-# The node_modules named volume is seeded from this layer; chown it to the host
-# UID (default 1000) so bind-mount dev/test containers running as
-# "${UID:-1000}:${GID:-1000}" can write Vite/Vitest caches into node_modules/.
-RUN npm install --legacy-peer-deps \
-    && chown -R 1000:1000 /app/node_modules
+# Stage 2: builder — install deps and compile the static bundle
 
-FROM package AS build
+FROM base AS builder
+
+ENV NODE_ENV=development
+
+COPY code/package.json code/package-lock.json ./
+
+RUN npm ci --legacy-peer-deps
+
+COPY code/ ./
 
 ARG VITE_API_URL=
 
 ENV VITE_API_URL=${VITE_API_URL}
 
-COPY code/ .
-
 RUN npm run build
 
-FROM node:lts-slim as production
+# Stage 3: production — minimal static server, non-root
 
-ENV PORT=80 \
-    NODE_ENV=production \
-    PATH=$PATH:/app/node_modules/:/app/node_modules/.bin
+FROM base AS production
 
-USER appuser
+RUN npm install -g serve@14.2.4
 
-RUN set -ex \
-    && set -ex pipefail \
-    && apt-get update \
-    && apt-get install -qq -o=Dpkg::Use-Pty=0 --no-install-recommends -y xsel \
-    && apt-get purge -y --auto-remove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*set -ex \
-    && npm install -g serve@14.2.4 --silent
+COPY --from=builder /app/dist ./dist
 
-CMD [ "serve", "-s", "/app/build" ]
-VOLUME ["/configs"]
+USER 10001
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["curl", "-f", "http://localhost:3000/"]
+
+CMD ["serve", "-s", "dist", "-l", "3000"]
+
+# Stage 4: dev — Vite dev server with hot reload (extends builder)
+
+FROM builder AS dev
+
+ENV NODE_ENV=development
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
