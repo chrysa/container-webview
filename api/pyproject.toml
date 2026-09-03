@@ -85,6 +85,8 @@ extend-exclude = [
     ".mypy_cache/*",
     ".ruff_cache/*",
     ".venv/*",
+    ".claude",
+    "scripts/quality_gate.py",
 ]
 
 [tool.ruff.lint]
