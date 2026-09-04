@@ -33,7 +33,7 @@ jobs:
 
             - name: GitVersion
               id: gitversion
-              uses: chrysa/github-actions/gitversion@v1.8.1
+              uses: chrysa/github-actions/gitversion@v1.8.2
 
             - name: Docker metadata
               id: meta
