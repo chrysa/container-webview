@@ -40,7 +40,7 @@ jobs:
 
             - name: GitVersion
               id: gitversion
-              uses: chrysa/github-actions/gitversion@v1.8.1
+              uses: chrysa/github-actions/gitversion@v1.8.2
 
             - name: Summary
               run: |
@@ -90,7 +90,7 @@ jobs:
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
             - name: Setup Python
-              uses: chrysa/github-actions/python-setup@v1.8.1
+              uses: chrysa/github-actions/python-setup@v1.8.2
               with:
                   python-version: '3.12'
 
@@ -98,13 +98,13 @@ jobs:
               run: sudo apt-get update && sudo apt-get install -y libldap2-dev libsasl2-dev
 
             - name: Install project
-              uses: chrysa/github-actions/install-project@v1.8.1
+              uses: chrysa/github-actions/install-project@v1.8.2
               with:
                   extras: 'dev'
                   working-directory: api
 
             - name: Ruff check
-              uses: chrysa/github-actions/ruff-check@v1.8.1
+              uses: chrysa/github-actions/ruff-check@v1.8.2
               with:
                   python-version: '3.12'
                   latest-python: '3.12'
@@ -112,7 +112,7 @@ jobs:
                   sources: api/app
 
             - name: Mypy check
-              uses: chrysa/github-actions/mypy-check@v1.8.1
+              uses: chrysa/github-actions/mypy-check@v1.8.2
               with:
                   python-version: '3.12'
                   latest-python: '3.12'
@@ -242,7 +242,7 @@ jobs:
                   fetch-depth: 0
 
             - name: SonarCloud scan
-              uses: chrysa/github-actions/sonar-scan-python@v1.8.1
+              uses: chrysa/github-actions/sonar-scan-python@v1.8.2
               with:
                   python-version: '3.12'
                   sonar-token: ${{ secrets.SONAR_TOKEN }}
