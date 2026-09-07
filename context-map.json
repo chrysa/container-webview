@@ -1,0 +1,27 @@
+{
+  "adrs": [],
+  "contracts": [
+    "standards"
+  ],
+  "ddd_level": "(not available)",
+  "dependencies": {},
+  "depends_on_shared_standards": true,
+  "description": "Web interface for managing and visualising Docker Compose projects — interactive topology, real-time metrics, alerts, and service lifecycle management.",
+  "entry_points": [],
+  "key_directories": [
+    ".claude",
+    ".config",
+    ".devcontainer",
+    ".github",
+    ".vscode",
+    "api",
+    "code",
+    "config-tools",
+    "makefiles",
+    "scripts",
+    "standards"
+  ],
+  "name": "Docker Overview WebUI",
+  "profiles": [],
+  "schema": "chrysa.context-map/1"
+}
