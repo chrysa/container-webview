@@ -134,7 +134,7 @@ repos:
     stages:
     - manual
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: f6faa10fb133ca2e45e663d664e557ced434d04e
+  rev: c40e667e73eb6ee2c998d9578d8f3e5c02479ee9
   hooks:
   - id: markdownlint
     args:
