@@ -112,7 +112,6 @@ Web interface for managing and visualising Docker Compose projects — interacti
     action-check.yml
     approved-label.yml
     auto-assign.yml
-    auto-update-pre-commit.yml
     cd.yml
     ci.yml
     dependabot-auto-merge.yml
@@ -266,6 +265,7 @@ makefiles/
   tools.makefile
 opencode.json
 scripts/
+  gen_context_files.py
   quality_gate.py
   update_host.ps1
 standards/
@@ -336,4 +336,5 @@ api/app/tests/services/test_metrics_service.py
 api/app/tests/services/test_project_manager.py
 api/app/tests/services/test_topology_service.py
 api/app/tests/test_main.py
+scripts/gen_context_files.py — Generate the standardised per-repo context files from the repo's own content.
 scripts/quality_gate.py
