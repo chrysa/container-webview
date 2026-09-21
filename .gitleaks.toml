@@ -1,0 +1,15 @@
+# Gitleaks configuration for container-webview.
+#
+# Extends the default gitleaks ruleset (all built-in secret detectors stay active
+# on real code). The only allowlist is the detect-secrets baseline: `.secrets.baseline`
+# stores SHA hashes of already-audited findings ("hashed_secret" fields), which are
+# not live secrets — gitleaks would otherwise re-flag every hash as a generic API key.
+# Detection is unchanged everywhere else.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "detect-secrets baseline holds audited hashes, not live secrets"
+paths = [
+  '''\.secrets\.baseline$''',
+]
