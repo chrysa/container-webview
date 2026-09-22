@@ -43,7 +43,7 @@
       "id": "d_claude",
       "type": "backend",
       "label": ".claude",
-      "sublabel": "383 nodes",
+      "sublabel": "501 nodes",
       "pos": [
         272,
         60
@@ -85,7 +85,7 @@
       "id": "d_root",
       "type": "backend",
       "label": "(root)",
-      "sublabel": "101 nodes",
+      "sublabel": "114 nodes",
       "pos": [
         272,
         210
@@ -131,7 +131,7 @@
       "title": "Auto-generated",
       "items": [
         "Derived from graphify graph.json",
-        "1531 nodes \u00b7 1852 edges"
+        "1662 nodes \u00b7 1969 edges"
       ]
     },
     {
