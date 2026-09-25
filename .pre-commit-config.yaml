@@ -99,7 +99,7 @@ repos:
     args:
     - --config=./config-tools/.hadolint.yaml
 - repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v10.9.1
+  rev: v10.11.0
   hooks:
   - id: eslint
     files: \.(js|ts|tsx|jsx)$
