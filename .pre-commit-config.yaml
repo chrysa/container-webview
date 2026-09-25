@@ -107,7 +107,7 @@ repos:
     - --config
     - code/.eslintrc.cjs
     additional_dependencies:
-    - eslint@10.10.0
+    - eslint@10.11.0
     - typescript
     - '@typescript-eslint/eslint-plugin'
     - '@typescript-eslint/parser'
