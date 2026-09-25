@@ -12,6 +12,30 @@
         ],
         "matcher": "Bash"
       }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "sh -c 'f=\"$1\"; case \"$f\" in api/*.py) cd \"$CLAUDE_PROJECT_DIR/api\" && ruff format \"$CLAUDE_PROJECT_DIR/$f\" && ruff check --fix \"$CLAUDE_PROJECT_DIR/$f\" ;; esac' _ \"$CLAUDE_TOOL_INPUT_FILE_PATH\"",
+            "name": "ruff-format-on-edit",
+            "timeout": 15000,
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write"
+      },
+      {
+        "hooks": [
+          {
+            "command": "sh -c 'f=\"$1\"; case \"$f\" in code/src/*.ts|code/src/*.tsx) cd \"$CLAUDE_PROJECT_DIR/code\" && npx vitest related \"$CLAUDE_PROJECT_DIR/$f\" --run ;; esac' _ \"$CLAUDE_TOOL_INPUT_FILE_PATH\"",
+            "name": "vitest-related-on-edit",
+            "timeout": 30000,
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write"
+      }
     ]
   }
 }
