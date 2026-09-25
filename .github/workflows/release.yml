@@ -33,7 +33,7 @@ jobs:
 
             - name: GitVersion
               id: gitversion
-              uses: chrysa/github-actions/gitversion@v1.9.0
+              uses: chrysa/github-actions/gitversion@v1.10.0
 
             - name: Print version
               run: |
