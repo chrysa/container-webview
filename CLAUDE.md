@@ -89,6 +89,17 @@ the needed detail, or (c) the graph is missing or stale.
 
 Type `/graphify` in Copilot Chat to build or update the graph.
 
+## Documentation map
+
+Root docs generated 2026-09-25 (descriptive; canon in `standards/` wins on any conflict):
+- `ARCHITECTURE.md` — components, data flow, deployment.
+- `REQUIREMENTS.md` — REQ-PROD/REQ-TECH matrix with status + evidence.
+- `DECISIONS.md` — observed ADRs reconstructed from the tree.
+- `CONSTRAINTS.md` — runtime/config/quality constraints (tagged).
+- `TESTING.md` — test layout + documented commands (not executed).
+- `SECURITY.md` — secret-scan result + findings (Docker socket S1) for owner triage.
+- `GLOSSARY.md`, `REVIEW.md` (contradictions C1–C4 + doc debt).
+
 <!-- chrysa:standards:start · managed by distribute-standards.sh · DO NOT EDIT -->
 # chrysa — Transverse Standards (core)
 
