@@ -123,7 +123,7 @@ repos:
     - parsable
     - --strict
 - repo: https://github.com/frnmst/md-toc
-  rev: 9.0.0
+  rev: 9.0.1
   hooks:
   - id: md-toc
     args:
