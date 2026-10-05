@@ -24,3 +24,14 @@ Thumbs.db
 
 # CI bootstrap backup artifacts
 .ci-backup-*/
+
+.claude-plugin-setup-report.md
+
+# ai-lint: keep secrets and local config out of git
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.claude/settings.local.json
+CLAUDE.local.md
