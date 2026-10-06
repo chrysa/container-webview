@@ -73,6 +73,8 @@ Web interface for managing and visualising Docker Compose projects — interacti
       SKILL.md
     plan/
       SKILL.md
+    rollout-status/
+      SKILL.md
     spec/
       SKILL.md
     standards-authoring/
