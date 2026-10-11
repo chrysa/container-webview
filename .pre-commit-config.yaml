@@ -63,6 +63,7 @@ repos:
   - id: yaml-sorter
     exclude: ^(\.github/|workflows/|templates/|docker-compose)|(^|/)(pnpm-lock|yarn|uv|poetry)\.(yaml|lock)$|(^|/)\.pre-commit-config\.yaml$
   - id: json-sorter
+    exclude: (^|/)package-lock\.json$
   - id: requirements-sort
   - id: env-file-check
   - id: env-example-sync
