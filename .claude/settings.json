@@ -4,6 +4,7 @@
     "commit": "",
     "pr": ""
   },
+  "effortLevel": "low",
   "hooks": {
     "PostToolUse": [
       {
@@ -43,6 +44,7 @@
       }
     ]
   },
+  "model": "haiku",
   "permissions": {
     "allow": [
       "Bash(rtk git status *)",
@@ -138,7 +140,5 @@
       "Read(**/*.min.js)",
       "Read(**/*.map)"
     ]
-  },
-  "model": "haiku",
-  "effortLevel": "low"
+  }
 }
