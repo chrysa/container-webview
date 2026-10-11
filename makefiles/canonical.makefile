@@ -18,6 +18,15 @@ test: api-tests node-test ## run backend + frontend tests (canonical alias)
 
 test-cov: api-tests-cov ## run tests with coverage (canonical alias)
 
+docker-test: api-tests ## run the backend test suite in Docker (CI-compatible)
+
+web-build: node-build ## build the frontend bundle (canonical alias)
+
+web-lint: node-lint ## lint the frontend (canonical alias)
+
+web-typecheck: ## type-check the frontend
+	@docker compose run --rm frontend npm run type-check
+
 ci: lint typecheck test ## run the canonical CI pipeline locally
 
 clean: ## remove build artifacts and caches
