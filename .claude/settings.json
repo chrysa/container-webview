@@ -30,6 +30,20 @@
         "matcher": "Edit|Write"
       }
     ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-compact.sh"
+            ],
+            "command": "bash",
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "hooks": [
@@ -43,43 +57,29 @@
         "matcher": "Bash"
       },
       {
-        "matcher": "Read",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/read_guard.py"
             ],
-            "timeout": 10
+            "command": "python3",
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "Read"
       }
     ],
     "SessionStart": [
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "bash",
             "args": [
               "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-context.sh"
             ],
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
             "command": "bash",
-            "args": [
-              "${CLAUDE_PROJECT_DIR}/.claude/hooks/pre-compact.sh"
-            ],
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
         ]
       }
