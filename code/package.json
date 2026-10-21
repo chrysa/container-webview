@@ -18,7 +18,7 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "typescript": "^5.2.2",
-    "vite": "^8.2.0",
+    "vite": "^8.3.4",
     "vitest": "^4.1.11"
   },
   "name": "docker-overview-webui",
