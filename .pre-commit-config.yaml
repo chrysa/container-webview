@@ -4,7 +4,7 @@ fail_fast: false
 minimum_pre_commit_version: 4.1.0
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: 2ee68084ed80421ef5a6d062cf1637825adfcb22
+  rev: 3de0a59de6e02a8090983c77211d0ad22e205581
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
@@ -94,7 +94,7 @@ repos:
     stages:
     - manual
 - repo: https://github.com/hadolint/hadolint.git
-  rev: v2.12.0
+  rev: v2.15.1
   hooks:
   - id: hadolint-docker
     args:
@@ -135,7 +135,7 @@ repos:
     stages:
     - manual
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: 5cd5c9f8f0b4697198401442a4fe3743357d4615
+  rev: cbcdc463be5464e25e3e955a511599a67b9b987f
   hooks:
   - id: markdownlint
     args:
@@ -158,7 +158,7 @@ repos:
     - --indent-size
     - '4'
 - repo: https://github.com/openstack/bashate
-  rev: ec2f2400915200d633299612a02d7d285e4be24c
+  rev: 6b09d270eb83e523526ec8ca8fe1edf920ebdb05
   hooks:
   - id: bashate
     args:
@@ -193,7 +193,7 @@ repos:
     - revert
     - ci
 - repo: https://github.com/chrysa/guideline-checker
-  rev: v1.30.10
+  rev: v1.30.16
   hooks:
   - id: guideline-check
     args:
