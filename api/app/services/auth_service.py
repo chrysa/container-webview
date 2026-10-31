@@ -22,15 +22,20 @@ class AuthService:
         settings = get_settings()
         if not settings.ldap_server:
             return False
+        # An empty password turns simple_bind_s into an unauthenticated bind,
+        # which some servers (e.g. Active Directory) report as a success.
+        if not username or not password:
+            return False
         try:
             import ldap  # noqa: PLC0415 — optional dependency, imported only when LDAP is enabled
+            import ldap.dn  # noqa: PLC0415 — optional dependency, imported only when LDAP is enabled
         except ImportError:
             _logger.warning("LDAP is configured but python-ldap is not installed; skipping LDAP auth")
             return False
         try:
             conn = ldap.initialize(settings.ldap_server)
             conn.simple_bind_s(
-                _LDAP_DN_TEMPLATE.format(username, settings.ldap_base_dn),
+                _LDAP_DN_TEMPLATE.format(ldap.dn.escape_dn_chars(username), settings.ldap_base_dn),
                 password,
             )
         except ldap.LDAPError as ldap_exc:

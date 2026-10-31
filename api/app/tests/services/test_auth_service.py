@@ -148,6 +148,47 @@ class TestAuthService:
             result = service._authenticate_ldap("user", "wrongpass")
             assert result is False, f"Expected False but got {result=}"
 
+        def test_rejects_empty_password_without_binding(self, mocker):
+            """Return False for an empty password without contacting the LDAP server.
+
+            Given: A configured LDAP server that would accept an unauthenticated bind
+            When: Calling _authenticate_ldap('user', '')
+            Then: Should return False and never call ldap.initialize/simple_bind_s
+            """
+            mock_settings = mocker.MagicMock(
+                ldap_server="ldap://ldap.example.com",
+                ldap_base_dn="dc=example,dc=com",
+            )
+            mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
+            mock_conn = mocker.MagicMock()
+            mock_initialize = mocker.patch("ldap.initialize", return_value=mock_conn)
+
+            service = AuthService()
+            result = service._authenticate_ldap("user", "")
+            assert result is False, f"Expected False but got {result=}"
+            mock_initialize.assert_not_called()
+            mock_conn.simple_bind_s.assert_not_called()
+
+        def test_escapes_special_characters_in_dn(self, mocker):
+            """Escape DN metacharacters in the username before binding.
+
+            Given: A configured LDAP server and a username containing ',', '=' and '+'
+            When: Calling _authenticate_ldap('evil,cn=admin+x', 'pass')
+            Then: The bind DN should contain the escaped username, not injected RDNs
+            """
+            mock_settings = mocker.MagicMock(
+                ldap_server="ldap://ldap.example.com",
+                ldap_base_dn="dc=example,dc=com",
+            )
+            mocker.patch("app.services.auth_service.get_settings", return_value=mock_settings)
+            mock_conn = mocker.MagicMock()
+            mocker.patch("ldap.initialize", return_value=mock_conn)
+
+            service = AuthService()
+            service._authenticate_ldap("evil,cn=admin+x", "pass")
+            bind_dn = mock_conn.simple_bind_s.call_args.args[0]
+            assert bind_dn == r"cn=evil\,cn\=admin\+x,dc=example,dc=com", f"Unexpected {bind_dn=}"
+
     class TestAuthenticate:
         """Tests for the public authenticate() entry point."""
 
