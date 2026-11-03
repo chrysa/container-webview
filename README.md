@@ -97,7 +97,7 @@ cd container-webview
 
 # 2. Copy and adapt the configuration
 cp .env.example .env
-# Edit .env: SECRET_KEY, ADMIN_USERNAME, ADMIN_PASSWORD, PROJECTS_PATH
+# Edit .env: SECRET_KEY, ADMIN_USERNAME, ADMIN_PASSWORD (or ADMIN_PASSWORD_HASH), PROJECTS_PATH
 
 # 3. Create a projects directory (or point to an existing one)
 mkdir -p data/projects
@@ -110,7 +110,16 @@ docker compose up --build
 #   API docs : http://localhost:8000/api/docs
 ```
 
-Default credentials if not configured: `admin` / `admin`.
+There are no default credentials: with neither `ADMIN_PASSWORD_HASH`, `ADMIN_PASSWORD` nor LDAP configured, every login is refused. For local development, set `ADMIN_PASSWORD` in `.env`.
+
+### Production image
+
+The `production` stage of `api/Dockerfile` sets `ENVIRONMENT=production`. In that mode the API **refuses to start** unless:
+
+- `SECRET_KEY` is set to a strong value other than the `change-me-in-production` example (generate one with `python -c "import secrets; print(secrets.token_urlsafe(32))"`);
+- `ADMIN_PASSWORD_HASH` (bcrypt) is set, or LDAP is configured with `LDAP_SERVER`. A plaintext `ADMIN_PASSWORD` is not accepted in production.
+
+Changing `SECRET_KEY` invalidates existing sessions.
 
 ---
 
@@ -120,9 +129,11 @@ All variables are documented in [.env.example](.env.example).
 
 | Variable | Default | Description |
 |---|---|---|
-| `SECRET_KEY` | `change-me-in-production` | JWT signing key — **change in production** |
+| `ENVIRONMENT` | `development` (`production` in the production image) | `development` and `test` tolerate the example `SECRET_KEY`; any other value requires a real one; `production` also requires `ADMIN_PASSWORD_HASH` or LDAP |
+| `SECRET_KEY` | `change-me-in-production` | JWT signing key — only accepted when `ENVIRONMENT` is `development` or `test` |
 | `ADMIN_USERNAME` | `admin` | Local admin username |
-| `ADMIN_PASSWORD` | `admin` | Local admin password — **change in production** |
+| `ADMIN_PASSWORD_HASH` | _(empty)_ | bcrypt hash of the local admin password — required in production when LDAP is not configured |
+| `ADMIN_PASSWORD` | _(empty)_ | Plaintext local admin password — development only, ignored if `ADMIN_PASSWORD_HASH` is set |
 | `PROJECTS_PATH` | `/projects` | Container path to Compose projects |
 | `LDAP_SERVER` | _(empty)_ | LDAP URL (`ldap://host:389`) — empty = disabled |
 | `LDAP_BASE_DN` | _(empty)_ | LDAP base DN |

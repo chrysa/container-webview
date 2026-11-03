@@ -43,6 +43,10 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 FROM base AS production
 
+# Enforce the secure-config guards (app/config.py) in the production image.
+
+ENV ENVIRONMENT=production
+
 COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY app/ app/
