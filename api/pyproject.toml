@@ -133,6 +133,8 @@ fixable = ["ALL"]
 force-single-line = true
 force-sort-within-sections = true
 known-first-party = ["app"]
+# api/docker/ is a directory, not the SDK: without this ruff treats `import docker` as first-party when run from api/.
+known-third-party = ["docker"]
 lines-after-imports = 2
 
 [tool.ruff.lint.flake8-annotations]

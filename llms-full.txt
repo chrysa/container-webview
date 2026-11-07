@@ -19,6 +19,8 @@ Web interface for managing and visualising Docker Compose projects — interacti
     general-solution-architect.md
     general-technical-project-lead.md
     general-technical-writer.md
+    security-reviewer.md
+    ui-accessibility-reviewer.md
   commands/
     adr-new.md
     commit.md
@@ -50,6 +52,8 @@ Web interface for managing and visualising Docker Compose projects — interacti
       SKILL.md
     council/
       SKILL.md
+    docker-engine-security/
+      SKILL.md
     dockerfile-multistage/
       SKILL.md
     error-handling/
@@ -65,7 +69,11 @@ Web interface for managing and visualising Docker Compose projects — interacti
       SKILL.md
     implement/
       SKILL.md
+    ldap-auth-patterns/
+      SKILL.md
     plan/
+      SKILL.md
+    rollout-status/
       SKILL.md
     spec/
       SKILL.md
@@ -127,6 +135,7 @@ Web interface for managing and visualising Docker Compose projects — interacti
 .gitlab-ci.yml
 .gitleaks.toml
 .guideline-baseline.json
+.mcp.json
 .pre-commit-config.yaml
 .secrets.baseline
 .vscode/
@@ -274,6 +283,7 @@ standards/
     README.md
     accessibility.md
     agents.md
+    ai-orchestration.md
     api.md
     architecture.md
     backend-python.md

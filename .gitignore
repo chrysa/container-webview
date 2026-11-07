@@ -24,3 +24,12 @@ Thumbs.db
 
 # CI bootstrap backup artifacts
 .ci-backup-*/
+
+# prism-ai-lint: keep secrets and local config out of git
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+.claude/settings.local.json
+CLAUDE.local.md

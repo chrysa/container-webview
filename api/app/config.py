@@ -7,6 +7,11 @@ from pydantic_settings import BaseSettings
 INSECURE_SECRET_KEY = "change-me-in-production"  # noqa: S105 — sentinel default, guarded in production
 
 
+# Environments in which the sentinel SECRET_KEY is tolerated. Any other value
+# (production, staging, a typo...) must provide a real secret.
+_SENTINEL_SECRET_ALLOWED_ENVIRONMENTS: frozenset[str] = frozenset({"development", "test"})
+
+
 class InsecureConfigurationError(RuntimeError):
     """Raised when a production deployment is started with insecure defaults."""
 
@@ -14,7 +19,7 @@ class InsecureConfigurationError(RuntimeError):
 class Settings(BaseSettings):
     """Application configuration loaded from environment variables or .env file."""
 
-    # Deployment environment: "development" (default) or "production".
+    # Deployment environment: "development" (default), "test" or "production".
     environment: str = "development"
 
     secret_key: str = INSECURE_SECRET_KEY
@@ -47,13 +52,14 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _guard_production(self) -> "Settings":
-        """Reject insecure defaults when running in production."""
-        if self.environment.lower() != "production":
-            return self
+        """Reject insecure defaults outside explicit development/test environments."""
+        environment = self.environment.strip().lower()
         problems: list[str] = []
-        if self.secret_key == INSECURE_SECRET_KEY or not self.secret_key:
+        if (
+            self.secret_key == INSECURE_SECRET_KEY or not self.secret_key
+        ) and environment not in _SENTINEL_SECRET_ALLOWED_ENVIRONMENTS:
             problems.append("secret_key must be set to a strong, non-default value")
-        if not self.ldap_server and not self.admin_password_hash:
+        if environment == "production" and not self.ldap_server and not self.admin_password_hash:
             problems.append(
                 "a local admin requires admin_password_hash (bcrypt); "
                 "plaintext admin_password is not allowed in production"
