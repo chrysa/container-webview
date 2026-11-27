@@ -100,7 +100,7 @@ repos:
     args:
     - --config=./config-tools/.hadolint.yaml
 - repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v10.14.0
+  rev: v10.15.0
   hooks:
   - id: eslint
     files: \.(js|ts|tsx|jsx)$
@@ -108,7 +108,7 @@ repos:
     - --config
     - code/.eslintrc.cjs
     additional_dependencies:
-    - eslint@10.14.0
+    - eslint@10.15.0
     - typescript
     - '@typescript-eslint/eslint-plugin'
     - '@typescript-eslint/parser'
